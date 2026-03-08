@@ -165,3 +165,31 @@ jobs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 🚀 Ready for Deployment!" >> $GITHUB_STEP_SUMMARY
         echo "Images are now available in GitHub Container Registry and ready for production deployment." >> $GITHUB_STEP_SUMMARY
+
+  codeguardian:
+    name: 🤖 CodeGuardian AI Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout CodeGuardian
+        uses: actions/checkout@v4
+        with:
+          repository: lady-logic/CodeGuardian
+          path: codeguardian
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Build CodeGuardian
+        run: dotnet build codeguardian/src/CodeGuardian.Analyzer/CodeGuardian.Analyzer/CodeGuardian.Analyzer.csproj
+      - name: Run CodeGuardian
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: dotnet run --project codeguardian/src/CodeGuardian.Analyzer/CodeGuardian.Analyzer/CodeGuardian.Analyzer.csproj -- lady-logic_FitnessAnalyticsHubV1_0

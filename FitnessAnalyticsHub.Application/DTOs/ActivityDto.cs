@@ -6,8 +6,6 @@ public class ActivityDto
 {
     public int Id { get; set; }
 
-    public string? StravaId { get; set; }
-
     [Required]
     public int AthleteId { get; set; }
 

@@ -56,11 +56,4 @@ public class AthleteController : ControllerBase
             return this.NoContent();
         }
     }
-
-    [HttpPost("import-from-strava")]
-    public async Task<ActionResult<AthleteDto>> ImportFromStrava(string accessToken, CancellationToken cancellationToken)
-    {
-        AthleteDto athlete = await this.athleteService.ImportAthleteFromStravaAsync(accessToken, cancellationToken);
-        return this.Ok(athlete);
-    }
 }

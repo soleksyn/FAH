@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
@@ -89,7 +89,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Domain-specific exceptions** for better error categorization:
   - `ActivityNotFoundException` for missing activities
   - `AthleteNotFoundException` for missing athletes
-  - `StravaServiceException` family for Strava API errors
 - **Structured error responses** with type, message, status code, and timestamp
 - **Comprehensive unit tests** for all exception classes and middleware
 

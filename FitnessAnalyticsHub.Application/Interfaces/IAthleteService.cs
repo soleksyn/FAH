@@ -13,6 +13,4 @@ public interface IAthleteService
     Task UpdateAthleteAsync(UpdateAthleteDto athleteDto, CancellationToken cancellationToken);
 
     Task DeleteAthleteAsync(int id, CancellationToken cancellationToken);
-
-    Task<AthleteDto> ImportAthleteFromStravaAsync(string accessToken, CancellationToken cancellationToken);
 }

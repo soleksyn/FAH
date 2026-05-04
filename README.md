@@ -1,4 +1,4 @@
-![Build Status](https://github.com/lady-logic/FitnessAnalyticsHubV1_0/actions/workflows/main.yml/badge.svg)
+﻿![Build Status](https://github.com/lady-logic/FitnessAnalyticsHubV1_0/actions/workflows/main.yml/badge.svg)
 ![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=lady-logic_FitnessAnalyticsHubV1_0&metric=alert_status)
 ![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lady-logic_FitnessAnalyticsHub_0&metric=coverage)
 ![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=lady-logic_FitnessAnalyticsHubV1_0&metric=sqale_rating)
@@ -57,7 +57,6 @@ Dieses Projekt ist eine persönliche Spielwiese für moderne Softwareentwicklung
 - Clean Architecture mit strikter Dependency Inversion
 - Multi-Protocol Communication (HTTP, gRPC, gRPC-JSON)
 - AI-Integration mit HuggingFace + Google Gemini
-- Strava API Integration mit automatischem Activity Import
 - Health Monitoring Dashboard mit Auto-Refresh
 - Comprehensive Error Handling mit custom Exception Hierarchy
 - Docker Multi-Service Setup
@@ -101,7 +100,6 @@ Dieses Projekt verwendet **SonarCloud** für kontinuierliche Code-Qualitätsübe
 ├── Application Services        ├── HuggingFace Integration
 ├── Domain Logic               ├── Google Gemini Integration
 └── Infrastructure             └── Multi-Protocol Endpoints
-    ├── Strava API                 ├── HTTP/REST
     ├── Database (SQLite)          ├── Native gRPC
     └── Health Monitoring          └── gRPC-JSON Bridge
 ```
@@ -123,7 +121,6 @@ Frontend → WebAPI → AIAssistant
 ---
 ## ✨ Features
 
-- 🏃‍♂️ **Strava Integration** - Automatischer Activity Import und Performance-Tracking
 - 🤖 **AI-Powered Analytics** - HuggingFace + Google Gemini für intelligente Trainingsanalyse  
 - 🔄 **Multi-Protocol API** - HTTP/REST, gRPC und gRPC-JSON Bridge
 - 📊 **Training Plans** - Strukturierte Planung mit Fortschrittstracking
@@ -211,7 +208,6 @@ curl http://localhost:8080/health
 **Database:** SQLite (Development), SQL Server (Production)  
 **Quality:** xUnit, NetArchTest, SonarCloud, FluentAssertions  
 **DevOps:** Docker, GitHub Actions, Health Monitoring  
-**Integration:** Strava API, Swagger/OpenAPI
 
 **Geplant:** RabbitMQ (Event-Driven)
 
@@ -251,8 +247,6 @@ Domain Exceptions
 └── ValidationException (400)
 
 Infrastructure Exceptions  
-├── StravaApiException (502)
-├── InvalidStravaTokenException (401)
 └── AIAssistantApiException (502)
 ```
 
@@ -270,9 +264,7 @@ Infrastructure Exceptions
 
 ---
 
-## 🔗 Strava API Integration
 
-Die Integration mit der Strava API ermöglicht den Zugriff auf:
 - Aktivitätsdaten (Laufen, Radfahren, etc.)
 - Leistungsmetriken
 - Strecken und Routen

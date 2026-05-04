@@ -61,8 +61,4 @@ export class AthleteListComponent implements OnInit {
   createNewAthlete(): void {
     this.router.navigate(['/athletes/create']);
   }
-
-  importFromStrava(): void {
-    this.router.navigate(['/athletes/strava-import']);
-  }
 }

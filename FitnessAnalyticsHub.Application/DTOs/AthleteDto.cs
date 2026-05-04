@@ -4,8 +4,6 @@ public class AthleteDto
 {
     public int Id { get; set; }
 
-    public string? StravaId { get; set; }
-
     public string FirstName { get; set; } = string.Empty;
 
     public string LastName { get; set; } = string.Empty;

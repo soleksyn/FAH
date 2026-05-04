@@ -1,10 +1,9 @@
-using System.Text.Json;
+ï»¿using System.Text.Json;
 using FitnessAnalyticsHub.Application;
 using FitnessAnalyticsHub.Application.Interfaces;
-using FitnessAnalyticsHub.Domain.Interfaces;
 using FitnessAnalyticsHub.Infrastructure;
-using FitnessAnalyticsHub.Infrastructure.Configuration;
 using FitnessAnalyticsHub.Infrastructure.Services;
+
 using FitnessAnalyticsHub.WebApi.Middleware;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -28,7 +27,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Fitness Analytics Hub API",
         Version = "v1",
-        Description = "Backend API für die FitnessAnalyticsHub-Anwendung",
+        Description = "Backend API fï¿½r die FitnessAnalyticsHub-Anwendung",
     });
 });
 
@@ -53,21 +52,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddHealthChecks()
     .AddCheck("api", () => HealthCheckResult.Healthy(), tags: new[] { "service" });
 
-// UI für HealthChecks
+// UI fï¿½r HealthChecks
 builder.Services.AddHealthChecksUI(setup =>
 {
-    setup.SetEvaluationTimeInSeconds(60); // Alle 60 Sekunden prüfen
-    setup.MaximumHistoryEntriesPerEndpoint(50); // 50 Einträge in der Historie speichern
+    setup.SetEvaluationTimeInSeconds(60); // Alle 60 Sekunden prï¿½fen
+    setup.MaximumHistoryEntriesPerEndpoint(50); // 50 Eintrï¿½ge in der Historie speichern
 })
 .AddInMemoryStorage();
 
-// Strava
-// Configuration
-builder.Services.Configure<StravaConfiguration>(
-    builder.Configuration.GetSection(StravaConfiguration.SectionName));
 
-// HttpClient
-builder.Services.AddHttpClient("StravaApi");
 
 // ==========================================
 // AIAssistant Client Services Registrierung
@@ -96,8 +89,6 @@ builder.Services.AddScoped<IAIAssistantClientService>(provider =>
     };
 });
 
-// Service
-builder.Services.AddScoped<IStravaService, StravaService>();
 
 WebApplication app = builder.Build();
 

@@ -17,9 +17,6 @@ public class ActivityConfiguration : IEntityTypeConfiguration<Activity>
         builder.Property(e => e.Description)
             .HasMaxLength(1000);
 
-        builder.Property(e => e.StravaId)
-            .HasMaxLength(50);
-
         builder.Property(e => e.SportType)
             .IsRequired()
             .HasMaxLength(50);

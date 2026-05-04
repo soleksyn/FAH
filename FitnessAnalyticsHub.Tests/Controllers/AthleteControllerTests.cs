@@ -191,31 +191,4 @@ public class AthleteControllerTests
     }
     #endregion
 
-    #region ImportFromStrava Tests
-
-    [Fact]
-    public async Task ImportFromStrava_WithValidToken_ReturnsOkWithAthlete()
-    {
-        // Arrange
-        string accessToken = "valid_strava_token";
-        AthleteDto importedAthlete = new AthleteDto
-        {
-            Id = 1,
-            FirstName = "Strava",
-            LastName = "User",
-            Email = "strava.user@example.com",
-        };
-        this.mockAthleteService.Setup(s => s.ImportAthleteFromStravaAsync(accessToken, It.IsAny<CancellationToken>()))
-                          .ReturnsAsync(importedAthlete);
-
-        // Act
-        ActionResult<AthleteDto> result = await this.controller.ImportFromStrava(accessToken, It.IsAny<CancellationToken>());
-
-        // Assert
-        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result.Result);
-        AthleteDto athlete = Assert.IsType<AthleteDto>(okResult.Value);
-        Assert.Equal(importedAthlete.Id, athlete.Id);
-        Assert.Equal(importedAthlete.FirstName, athlete.FirstName);
-    }
-    #endregion
 }

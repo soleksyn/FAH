@@ -16,33 +16,6 @@ using Activity = FitnessAnalyticsHub.Domain.Entities.Activity;
 public class ActivityServiceTests
 {
     private readonly ApplicationDbContext context;
-    private readonly Mock<IStravaService> mockStravaService;
-    private readonly Mock<IAIAssistantClientService> mockAiAssistantClient;
-    private readonly IMapper mapper;
-    private readonly ActivityService activityService;
-
-    public ActivityServiceTests()
-    {
-        // InMemory Database erstellen
-        DbContextOptions<ApplicationDbContext> options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) // Eindeutiger Name pro Test
-            .Options;
-
-        this.context = new ApplicationDbContext(options);
-        this.mockStravaService = new Mock<IStravaService>();
-        this.mockAiAssistantClient = new Mock<IAIAssistantClientService>();
-
-        // Konfiguriere AutoMapper mit dem tatsächlichen Mappingprofil
-        MapperConfiguration mapperConfig = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<MappingProfile>();
-        });
-        this.mapper = mapperConfig.CreateMapper();
-
-        // Service erstellen
-        this.activityService = new ActivityService(
-            this.context,
-            this.mockStravaService.Object,
             this.mapper);
     }
 

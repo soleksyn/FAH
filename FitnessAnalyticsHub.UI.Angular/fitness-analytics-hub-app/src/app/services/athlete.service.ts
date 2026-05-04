@@ -52,13 +52,6 @@ export class AthleteService {
       .pipe(catchError(this.handleError));
   }
 
-  // Athleten von Strava importieren
-  importFromStrava(accessToken: string): Observable<Athlete> {
-    return this.http
-      .post<Athlete>(`${this.apiUrl}/import-from-strava`, { accessToken })
-      .pipe(catchError(this.handleError));
-  }
-
   // Fehlerbehandlung
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Ein unbekannter Fehler ist aufgetreten.';

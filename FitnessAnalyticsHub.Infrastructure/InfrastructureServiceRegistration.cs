@@ -1,5 +1,4 @@
 ﻿using FitnessAnalyticsHub.Application.Interfaces;
-using FitnessAnalyticsHub.Domain.Interfaces;
 using FitnessAnalyticsHub.Infrastructure.Configuration;
 using FitnessAnalyticsHub.Infrastructure.Extensions;
 using FitnessAnalyticsHub.Infrastructure.Persistence;
@@ -20,15 +19,6 @@ public static class InfrastructureServiceRegistration
         // Register DbContext Interface
         services.AddScoped<IApplicationDbContext>(provider =>
             provider.GetRequiredService<ApplicationDbContext>());
-
-        // Register Strava service
-        services.AddScoped<IStravaService, StravaService>();
-
-        // HTTP Client for Strava API
-        services.AddHttpClient("StravaApi", client =>
-        {
-            client.BaseAddress = new Uri("https://www.strava.com/api/v3/");
-        });
 
         // Service registrieren
         services.AddScoped<IAIAssistantClientService, AIAssistantClientService>();

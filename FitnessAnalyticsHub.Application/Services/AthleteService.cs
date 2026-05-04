@@ -5,22 +5,18 @@ using FitnessAnalyticsHub.Application.DTOs;
 using FitnessAnalyticsHub.Application.Interfaces;
 using FitnessAnalyticsHub.Domain.Entities;
 using FitnessAnalyticsHub.Domain.Exceptions.Athletes;
-using FitnessAnalyticsHub.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 public class AthleteService : IAthleteService
 {
     private readonly IApplicationDbContext context;
-    private readonly IStravaService stravaService;
     private readonly IMapper mapper;
 
     public AthleteService(
         IApplicationDbContext context,
-        IStravaService stravaService,
         IMapper mapper)
     {
         this.context = context;
-        this.stravaService = stravaService;
         this.mapper = mapper;
     }
 
@@ -78,31 +74,4 @@ public class AthleteService : IAthleteService
         await this.context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<AthleteDto> ImportAthleteFromStravaAsync(string accessToken, CancellationToken cancellationToken)
-    {
-        Athlete stravaAthlete = await this.stravaService.GetAthleteProfileAsync(accessToken, cancellationToken);
-
-        // Check if athlete already exists
-        Athlete? existingAthlete = await this.context.Athletes.FirstOrDefaultAsync(a => a.StravaId == stravaAthlete.StravaId, cancellationToken);
-
-        if (existingAthlete != null)
-        {
-            // Update existing athlete
-            this.mapper.Map(stravaAthlete, existingAthlete);
-            await this.context.SaveChangesAsync(cancellationToken);
-            return this.mapper.Map<AthleteDto>(existingAthlete);
-        }
-        else
-        {
-            // Create new athlete
-            Athlete newAthlete = this.mapper.Map<Athlete>(stravaAthlete);
-            newAthlete.CreatedAt = DateTime.Now;
-            newAthlete.UpdatedAt = DateTime.Now;
-
-            await this.context.Athletes.AddAsync(newAthlete, cancellationToken);
-            await this.context.SaveChangesAsync(cancellationToken);
-
-            return this.mapper.Map<AthleteDto>(newAthlete);
-        }
-    }
 }

@@ -63,51 +63,6 @@
                     Details = $"AI Assistant API returned status code: {ex.StatusCode}",
                 },
 
-                // Strava Konfigurationsfehler
-                StravaConfigurationException ex => new ErrorResponse
-                {
-                    Type = "StravaConfigurationError",
-                    Message = ex.Message,
-                    StatusCode = (int)HttpStatusCode.InternalServerError,
-                    Details = "Please check your Strava API configuration",
-                },
-
-                // Strava Autorisierungsfehler
-                StravaAuthorizationException ex => new ErrorResponse
-                {
-                    Type = "StravaAuthorizationError",
-                    Message = ex.Message,
-                    StatusCode = (int)HttpStatusCode.BadRequest,
-                    Details = "Authorization process failed",
-                },
-
-                // Ungültiger Strava Token
-                InvalidStravaTokenException ex => new ErrorResponse
-                {
-                    Type = "InvalidStravaToken",
-                    Message = ex.Message,
-                    StatusCode = (int)HttpStatusCode.Unauthorized,
-                    Details = "Please check your Strava access token",
-                },
-
-                // Strava API Fehler
-                StravaApiException ex => new ErrorResponse
-                {
-                    Type = "StravaApiError",
-                    Message = ex.Message,
-                    StatusCode = (int)HttpStatusCode.BadGateway,
-                    Details = $"Strava API returned status code: {ex.StatusCode}",
-                },
-
-                // Allgemeine Strava Service Fehler
-                StravaServiceException ex => new ErrorResponse
-                {
-                    Type = "StravaServiceError",
-                    Message = ex.Message,
-                    StatusCode = (int)HttpStatusCode.BadRequest,
-                    Details = ex.InnerException?.Message,
-                },
-
                 // Fallback für alle anderen Exceptions
                 _ => new ErrorResponse
                 {

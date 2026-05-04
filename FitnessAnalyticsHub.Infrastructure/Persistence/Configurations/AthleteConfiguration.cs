@@ -18,9 +18,6 @@ public class AthleteConfiguration : IEntityTypeConfiguration<Athlete>
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(e => e.StravaId)
-            .HasMaxLength(50);
-
         builder.Property(e => e.Username)
             .HasMaxLength(100);
 

@@ -9,8 +9,6 @@ public class Activity
     [Required]
     public int Id { get; set; }
 
-    public string? StravaId { get; set; }
-
     public int AthleteId { get; set; }
 
     [ForeignKey(nameof(AthleteId))]

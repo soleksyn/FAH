@@ -14,7 +14,5 @@ public interface IActivityService
 
     Task DeleteActivityAsync(int id, CancellationToken cancellationToken);
 
-    Task<IEnumerable<ActivityDto>> ImportActivitiesFromStravaAsync(CancellationToken cancellationToken);
-
     Task<ActivityStatisticsDto> GetAthleteActivityStatisticsAsync(int athleteId, CancellationToken cancellationToken);
 }

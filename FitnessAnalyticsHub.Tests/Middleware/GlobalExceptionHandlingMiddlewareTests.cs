@@ -20,8 +20,6 @@
     /// <remarks>
     /// Exception mapping:
     /// - ActivityNotFoundException -> 404 Not Found
-    /// - InvalidStravaTokenException -> 401 Unauthorized
-    /// - StravaConfigurationException -> 500 Internal Server Error
     /// - Generic exceptions -> 500 Internal Server Error
     ///
     /// All responses follow the ErrorResponse model with type, message,

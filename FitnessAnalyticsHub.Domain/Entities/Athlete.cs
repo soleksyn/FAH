@@ -6,7 +6,6 @@ public class Athlete
 {
     [Required]
     public int Id { get; set; }
-    public string? StravaId { get; set; }
     [Required]
     public string FirstName { get; set; } = string.Empty;
     [Required]

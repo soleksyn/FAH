@@ -6,22 +6,18 @@ using FitnessAnalyticsHub.Application.Interfaces;
 using FitnessAnalyticsHub.Domain.Entities;
 using FitnessAnalyticsHub.Domain.Exceptions.Activities;
 using FitnessAnalyticsHub.Domain.Exceptions.Athletes;
-using FitnessAnalyticsHub.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 public class ActivityService : IActivityService
 {
     private readonly IApplicationDbContext context;
-    private readonly IStravaService stravaService;
     private readonly IMapper mapper;
 
     public ActivityService(
     IApplicationDbContext context,
-    IStravaService stravaService,
     IMapper mapper)
     {
         this.context = context;
-        this.stravaService = stravaService;
         this.mapper = mapper;
     }
 
@@ -95,71 +91,6 @@ public class ActivityService : IActivityService
 
         this.context.Activities.Remove(activity);
         await this.context.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task<IEnumerable<ActivityDto>> ImportActivitiesFromStravaAsync(CancellationToken cancellationToken)
-    {
-        Console.WriteLine("=== IMPORTING YOUR STRAVA ACTIVITIES ===");
-
-        // StravaService aufrufen
-        (Athlete stravaAthlete, IEnumerable<Activity> stravaActivities) = await this.stravaService.ImportMyActivitiesAsync(cancellationToken);
-
-        // Athlet in DB finden oder erstellen
-        Athlete? athlete = await this.context.Athletes.FirstOrDefaultAsync(a => a.StravaId == stravaAthlete.StravaId, cancellationToken);
-
-        if (athlete == null)
-        {
-            // Neuen Athleten erstellen
-            athlete = this.mapper.Map<Athlete>(stravaAthlete);
-            athlete.CreatedAt = DateTime.Now;
-            athlete.UpdatedAt = DateTime.Now;
-
-            await this.context.Athletes.AddAsync(athlete, cancellationToken);
-            await this.context.SaveChangesAsync(cancellationToken);
-
-            Console.WriteLine($"✅ Created new athlete: {athlete.FirstName} {athlete.LastName} (ID: {athlete.Id})");
-        }
-        else
-        {
-            Console.WriteLine($"✅ Found existing athlete: {athlete.FirstName} {athlete.LastName} (ID: {athlete.Id})");
-        }
-
-        // Aktivitäten verarbeiten und speichern
-        // BULK CHECK: Alle existierenden StravaIds auf einmal abfragen
-        List<string?> stravaIds = stravaActivities.Select(sa => sa.StravaId).ToList();
-        List<string?> existingStravaIds = await this.context.Activities
-            .Where(a => a.AthleteId == athlete.Id && stravaIds.Contains(a.StravaId))
-            .Select(a => a.StravaId)
-            .ToListAsync(cancellationToken);
-
-        // Nur neue Aktivitäten verarbeiten
-        List<Activity> newStravaActivities = stravaActivities
-            .Where(sa => !existingStravaIds.Contains(sa.StravaId))
-            .ToList();
-
-        List<ActivityDto> importedActivities = new List<ActivityDto>();
-
-        foreach (Activity? stravaActivity in newStravaActivities)
-        {
-            Activity newActivity = this.mapper.Map<Activity>(stravaActivity);
-            newActivity.AthleteId = athlete.Id;
-            newActivity.Athlete = athlete; // Für das AthleteFullName Mapping
-
-            await this.context.Activities.AddAsync(newActivity, cancellationToken);
-
-            ActivityDto activityDto = this.mapper.Map<ActivityDto>(newActivity);
-            importedActivities.Add(activityDto);
-
-            Console.WriteLine($"✅ Imported: {newActivity.Name} ({newActivity.SportType}, {newActivity.Distance / 1000:F1}km)");
-        }
-
-        await this.context.SaveChangesAsync(cancellationToken);
-
-        Console.WriteLine($"=== IMPORT COMPLETE ===");
-        Console.WriteLine($"Total activities from Strava: {stravaActivities.Count()}");
-        Console.WriteLine($"New activities imported: {importedActivities.Count}");
-
-        return importedActivities;
     }
 
     public async Task<ActivityStatisticsDto> GetAthleteActivityStatisticsAsync(int athleteId, CancellationToken cancellationToken)

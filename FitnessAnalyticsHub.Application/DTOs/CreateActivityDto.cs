@@ -5,8 +5,6 @@ using System.Text.Json.Serialization;
 
 public class CreateActivityDto
 {
-    public string? StravaId { get; set; }
-
     [Required]
     public int AthleteId { get; set; }
 

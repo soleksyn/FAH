@@ -79,10 +79,6 @@ namespace FitnessAnalyticsHub.Infrastructure.Migrations
                     b.Property<DateTime>("StartDateLocal")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("StravaId")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Timezone")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
@@ -98,6 +94,73 @@ namespace FitnessAnalyticsHub.Infrastructure.Migrations
                     b.HasIndex("AthleteId");
 
                     b.ToTable("Activities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AthleteId = 1,
+                            AverageCadence = 180.0,
+                            AverageHeartRate = 145,
+                            AverageSpeed = 2.7799999999999998,
+                            CreatedAt = new DateTime(2026, 5, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "5km morning run in the park",
+                            Distance = 5000.0,
+                            ElapsedTime = 1800,
+                            MaxHeartRate = 165,
+                            MaxSpeed = 3.5,
+                            MovingTime = 1800,
+                            Name = "Morning Run",
+                            SportType = "Run",
+                            StartDate = new DateTime(2026, 5, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            StartDateLocal = new DateTime(2026, 5, 3, 3, 0, 0, 0, DateTimeKind.Utc),
+                            Timezone = "Europe/Kiev",
+                            TotalElevationGain = 50.0,
+                            UpdatedAt = new DateTime(2026, 5, 3, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AthleteId = 1,
+                            AverageCadence = 90.0,
+                            AverageHeartRate = 130,
+                            AverageSpeed = 5.5599999999999996,
+                            CreatedAt = new DateTime(2026, 5, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "20km cycling training",
+                            Distance = 20000.0,
+                            ElapsedTime = 3600,
+                            MaxHeartRate = 150,
+                            MaxSpeed = 8.0,
+                            MovingTime = 3600,
+                            Name = "Cycling Training",
+                            SportType = "Ride",
+                            StartDate = new DateTime(2026, 5, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            StartDateLocal = new DateTime(2026, 5, 2, 3, 0, 0, 0, DateTimeKind.Utc),
+                            Timezone = "Europe/Kiev",
+                            TotalElevationGain = 200.0,
+                            UpdatedAt = new DateTime(2026, 5, 2, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AthleteId = 2,
+                            AverageHeartRate = 140,
+                            AverageSpeed = 0.63,
+                            CreatedAt = new DateTime(2026, 5, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "1.5km swimming in the pool",
+                            Distance = 1500.0,
+                            ElapsedTime = 2400,
+                            MaxHeartRate = 160,
+                            MaxSpeed = 0.80000000000000004,
+                            MovingTime = 2400,
+                            Name = "Swimming Session",
+                            SportType = "Swim",
+                            StartDate = new DateTime(2026, 5, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            StartDateLocal = new DateTime(2026, 5, 3, 3, 0, 0, 0, DateTimeKind.Utc),
+                            Timezone = "Europe/Kiev",
+                            TotalElevationGain = 0.0,
+                            UpdatedAt = new DateTime(2026, 5, 3, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("FitnessAnalyticsHub.Domain.Entities.Athlete", b =>
@@ -135,10 +198,6 @@ namespace FitnessAnalyticsHub.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("StravaId")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("TEXT");
 
@@ -149,6 +208,34 @@ namespace FitnessAnalyticsHub.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Athletes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            City = "Kyiv",
+                            Country = "Ukraine",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "john.doe@example.com",
+                            FirstName = "John",
+                            LastName = "Doe",
+                            ProfilePictureUrl = "https://example.com/john.jpg",
+                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Username = "johndoe"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            City = "Lviv",
+                            Country = "Ukraine",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "jane.smith@example.com",
+                            FirstName = "Jane",
+                            LastName = "Smith",
+                            ProfilePictureUrl = "https://example.com/jane.jpg",
+                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Username = "janesmith"
+                        });
                 });
 
             modelBuilder.Entity("FitnessAnalyticsHub.Domain.Entities.PlannedActivity", b =>
@@ -190,6 +277,41 @@ namespace FitnessAnalyticsHub.Infrastructure.Migrations
                     b.HasIndex("TrainingPlanId");
 
                     b.ToTable("PlannedActivities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "15km long run",
+                            PlannedDate = new DateTime(2026, 5, 7, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PlannedDistance = 15000.0,
+                            PlannedDuration = 5400,
+                            SportType = "Run",
+                            Title = "Long Run",
+                            TrainingPlanId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "5x1km intervals",
+                            PlannedDate = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PlannedDistance = 8000.0,
+                            PlannedDuration = 2400,
+                            SportType = "Run",
+                            Title = "Interval Training",
+                            TrainingPlanId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Bike to run transition",
+                            PlannedDate = new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PlannedDistance = 50000.0,
+                            PlannedDuration = 7200,
+                            SportType = "Brick",
+                            Title = "Brick Workout",
+                            TrainingPlanId = 2
+                        });
                 });
 
             modelBuilder.Entity("FitnessAnalyticsHub.Domain.Entities.TrainingPlan", b =>
@@ -231,6 +353,32 @@ namespace FitnessAnalyticsHub.Infrastructure.Migrations
                     b.HasIndex("AthleteId");
 
                     b.ToTable("TrainingPlans");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AthleteId = 1,
+                            CreatedAt = new DateTime(2026, 5, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "12-week marathon training plan",
+                            EndDate = new DateTime(2026, 7, 27, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Goal = 0,
+                            Name = "Marathon Preparation",
+                            StartDate = new DateTime(2026, 5, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2026, 5, 4, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AthleteId = 2,
+                            CreatedAt = new DateTime(2026, 5, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "8-week triathlon preparation",
+                            EndDate = new DateTime(2026, 6, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Goal = 0,
+                            Name = "Triathlon Training",
+                            StartDate = new DateTime(2026, 5, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2026, 5, 4, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("FitnessAnalyticsHub.Domain.Entities.Activity", b =>

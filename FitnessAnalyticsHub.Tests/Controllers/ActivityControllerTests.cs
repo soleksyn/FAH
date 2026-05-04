@@ -193,29 +193,6 @@ public class ActivityControllerTests
     }
     #endregion
 
-    #region ImportFromStrava Tests
-    [Fact]
-    public async Task ImportFromStrava_WithValidParameters_ReturnsOkWithActivities()
-    {
-        // Arrange
-        List<ActivityDto> importedActivities = new List<ActivityDto>
-            {
-                new ActivityDto { Id = 1, Name = "Strava Activity 1", AthleteId = 1 },
-                new ActivityDto { Id = 2, Name = "Strava Activity 2", AthleteId = 1 },
-            };
-
-        this.mockActivityService.Setup(s => s.ImportActivitiesFromStravaAsync(It.IsAny<CancellationToken>()))
-                          .ReturnsAsync(importedActivities);
-
-        // Act
-        ActionResult<IEnumerable<ActivityDto>> result = await this.controller.ImportFromStrava(It.IsAny<CancellationToken>());
-
-        // Assert
-        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result.Result);
-        IEnumerable<ActivityDto> activities = Assert.IsAssignableFrom<IEnumerable<ActivityDto>>(okResult.Value);
-        Assert.Equal(importedActivities.Count, activities.Count());
-    }
-    #endregion
 
     #region GetStatistics Tests
     [Fact]

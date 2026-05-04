@@ -1,9 +1,9 @@
-# Base image für .NET 8 Apps
+ï»¿# Base image fï¿½r .NET 8 Apps
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
 
-# Build image für .NET 8 SDK
+# Build image fï¿½r .NET 8 SDK
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
@@ -29,7 +29,7 @@ COPY ["FitnessAnalyticsHub.Infrastructure/", "FitnessAnalyticsHub.Infrastructure
 WORKDIR "/src/FitnessAnalyticsHub.WebApi"
 RUN dotnet build "FitnessAnalyticsHub.WebApi.csproj" -c Release -o /app/build
 
-# App veröffentlichen
+# App verï¿½ffentlichen
 FROM build AS publish
 RUN dotnet publish "FitnessAnalyticsHub.WebApi.csproj" -c Release -o /app/publish
 
@@ -40,13 +40,6 @@ WORKDIR /app
 # Files kopieren (als root)
 COPY --from=publish /app/publish .
 
-# Umgebungsvariablen für Strava-Konfiguration (werden zur Laufzeit überschrieben)
-ENV Strava__ClientId=""
-ENV Strava__ClientSecret=""
-ENV Strava__RedirectUrl="http://localhost:8080/auth/strava/callback"
-ENV Strava__BaseUrl="https://www.strava.com/api/v3/"
-ENV Strava__AuthorizeUrl="https://www.strava.com/oauth/authorize"
-ENV Strava__TokenUrl="https://www.strava.com/oauth/token"
 
 # Standard ASP.NET Core Umgebungsvariablen
 ENV ASPNETCORE_ENVIRONMENT=Production

@@ -55,13 +55,6 @@ public class ActivityController : ControllerBase
         return this.NoContent();
     }
 
-    [HttpPost("import-from-strava")]
-    public async Task<ActionResult<IEnumerable<ActivityDto>>> ImportFromStrava(CancellationToken cancellationToken)
-    {
-        IEnumerable<ActivityDto> activities = await this.activityService.ImportActivitiesFromStravaAsync(cancellationToken);
-        return this.Ok(activities);
-    }
-
     [HttpGet("statistics/{athleteId}")]
     public async Task<ActionResult<ActivityStatisticsDto>> GetStatistics(int athleteId, CancellationToken cancellationToken)
     {

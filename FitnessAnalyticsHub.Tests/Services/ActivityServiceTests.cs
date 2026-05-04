@@ -7,16 +7,30 @@ using FitnessAnalyticsHub.Application.Mapping;
 using FitnessAnalyticsHub.Application.Services;
 using FitnessAnalyticsHub.Domain.Entities;
 using FitnessAnalyticsHub.Domain.Exceptions.Activities;
-using FitnessAnalyticsHub.Domain.Interfaces;
 using FitnessAnalyticsHub.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Activity = FitnessAnalyticsHub.Domain.Entities.Activity;
 
-public class ActivityServiceTests
+public class ActivityServiceTests : IDisposable
 {
     private readonly ApplicationDbContext context;
-            this.mapper);
+    private readonly IMapper mapper;
+    private readonly ActivityService activityService;
+
+    public ActivityServiceTests()
+    {
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+
+        this.context = new ApplicationDbContext(options);
+        var mappingConfig = new MapperConfiguration(mc =>
+        {
+            mc.AddProfile(new MappingProfile());
+        });
+        this.mapper = mappingConfig.CreateMapper();
+        this.activityService = new ActivityService(this.context, this.mapper);
     }
 
     public void Dispose()
@@ -53,7 +67,7 @@ public class ActivityServiceTests
             UpdatedAt = DateTime.Now,
         };
 
-        // Daten in InMemory Database einfügen
+        // Insert data into InMemory Database
         await this.context.Athletes.AddAsync(athlete);
         await this.context.Activities.AddAsync(activity);
         await this.context.SaveChangesAsync();
@@ -73,7 +87,7 @@ public class ActivityServiceTests
     [Fact]
     public async Task GetActivityByIdAsync_ShouldThrowActivityNotFoundException_WhenActivityDoesNotExist()
     {
-        // Arrange - Keine Daten in DB einfügen
+        // Arrange - No data inserted into DB
 
         // Act & Assert
         ActivityNotFoundException exception = await Assert.ThrowsAsync<ActivityNotFoundException>(
@@ -289,7 +303,7 @@ public class ActivityServiceTests
     [Fact]
     public async Task DeleteActivityAsync_ShouldThrowActivityNotFoundException_WhenActivityDoesNotExist()
     {
-        // Arrange - Keine Activity in DB
+        // Arrange - No Activity in DB
 
         // Act & Assert
         ActivityNotFoundException exception = await Assert.ThrowsAsync<ActivityNotFoundException>(

@@ -63,7 +63,7 @@
                     Details = $"AI Assistant API returned status code: {ex.StatusCode}",
                 },
 
-                // Fallback für alle anderen Exceptions
+                // Fallback for all other exceptions
                 _ => new ErrorResponse
                 {
                     Type = "InternalServerError",

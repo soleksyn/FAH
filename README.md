@@ -42,7 +42,7 @@ Dieses Projekt ist eine persönliche Spielwiese für moderne Softwareentwicklung
 
 ### 🤖 KI & Moderne Technologien
 - **AI-Integration** mit HuggingFace und Google Gemini für intelligente Trainingsanalyse
-- **Angular Frontend** mit modernen UI-Patterns
+- **ASP.NET Core Razor Pages Frontend** mit modernen UI-Patterns
 - **Real-time Health Monitoring** mit umfassendem Dashboard
 
 ### 🧪 Code Quality & Testing

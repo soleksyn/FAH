@@ -114,7 +114,7 @@ public class HuggingFaceService : IAIPromptService
                 this.logger.LogError("Request payload: {Payload}", jsonContent);
                 this.logger.LogError("API Key used: {ApiKeyPreview}...", this.apiKey?.Substring(0, Math.Min(10, this.apiKey.Length)));
 
-                // Spezifische Fehlerbehandlung
+                // Specific error handling
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     this.logger.LogError("UNAUTHORIZED: Check your HuggingFace API key permissions!");
@@ -124,7 +124,7 @@ public class HuggingFaceService : IAIPromptService
                     this.logger.LogWarning("RATE LIMITED: HuggingFace rate limit exceeded");
                 }
 
-                // Fallback response für verschiedene Fehler
+                // Fallback response for various errors
                 return this.GetFallbackResponse(modelType, response.StatusCode.ToString());
             }
 

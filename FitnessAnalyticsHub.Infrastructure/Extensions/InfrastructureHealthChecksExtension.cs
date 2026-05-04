@@ -9,7 +9,7 @@ public static class InfrastructureHealthChecksExtension
         this IHealthChecksBuilder builder,
         IConfiguration configuration)
     {
-        // Datenbank-Checks
+        // Database checks
         builder.AddSqlServer(
             connectionString: configuration.GetConnectionString("DefaultConnection"),
             name: "database",

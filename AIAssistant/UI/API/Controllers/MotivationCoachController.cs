@@ -42,7 +42,7 @@ public class MotivationCoachController : ControllerBase
         }
     }
 
-    // Neuer spezifischer HuggingFace Endpoint (optional)
+    // New specific HuggingFace endpoint (optional)
     [HttpPost("motivate/huggingface")]
     public async Task<ActionResult<MotivationResponseDto>> GetHuggingFaceMotivation(
         [FromBody] MotivationRequestDto request, CancellationToken cancellationToken)

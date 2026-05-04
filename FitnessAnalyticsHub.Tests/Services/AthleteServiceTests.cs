@@ -6,15 +6,29 @@ using FitnessAnalyticsHub.Application.Mapping;
 using FitnessAnalyticsHub.Application.Services;
 using FitnessAnalyticsHub.Domain.Entities;
 using FitnessAnalyticsHub.Domain.Exceptions.Athletes;
-using FitnessAnalyticsHub.Domain.Interfaces;
 using FitnessAnalyticsHub.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
-public class AthleteServiceTests
+public class AthleteServiceTests : IDisposable
 {
     private readonly ApplicationDbContext context;
-            this.mapper);
+    private readonly IMapper mapper;
+    private readonly AthleteService athleteService;
+
+    public AthleteServiceTests()
+    {
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+
+        this.context = new ApplicationDbContext(options);
+        var mappingConfig = new MapperConfiguration(mc =>
+        {
+            mc.AddProfile(new MappingProfile());
+        });
+        this.mapper = mappingConfig.CreateMapper();
+        this.athleteService = new AthleteService(this.context, this.mapper);
     }
 
     public void Dispose()
@@ -57,7 +71,7 @@ public class AthleteServiceTests
     [Fact]
     public async Task GetAthleteByIdAsync_ShouldThrowAthleteNotFoundException_WhenAthleteDoesNotExist()
     {
-        // Arrange - Keine Daten in DB
+        // Arrange - No data in DB
 
         // Act & Assert
         AthleteNotFoundException exception = await Assert.ThrowsAsync<AthleteNotFoundException>(
@@ -218,7 +232,7 @@ public class AthleteServiceTests
     [Fact]
     public async Task DeleteAthleteAsync_ShouldThrowAthleteNotFoundException_WhenAthleteDoesNotExist()
     {
-        // Arrange - Keine Daten in DB
+        // Arrange - No data in DB
 
         // Act & Assert
         AthleteNotFoundException exception = await Assert.ThrowsAsync<AthleteNotFoundException>(
@@ -226,5 +240,4 @@ public class AthleteServiceTests
 
         Assert.Equal(999, exception.AthleteId);
     }
-
-    [Fact]
+}

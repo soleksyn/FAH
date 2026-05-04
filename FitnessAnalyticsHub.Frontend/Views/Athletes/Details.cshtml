@@ -1,0 +1,106 @@
+@model FitnessAnalyticsHub.Frontend.Models.AthleteDetailViewModel
+@{
+    ViewData["Title"] = "Athlet Details";
+}
+
+<div class="container mt-4">
+    @if (Model.Error != null)
+    {
+        <div class="alert alert-danger">
+            @Model.Error
+        </div>
+    }
+
+    @if (Model.Loading)
+    {
+        <div class="text-center p-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Wird geladen...</span>
+            </div>
+        </div>
+    }
+
+    @if (!Model.Loading && Model.Athlete != null)
+    {
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Athlet: @Model.Athlete.FirstName @Model.Athlete.LastName</h2>
+            <div>
+                <a asp-controller="Dashboard" asp-action="Index" asp-route-id="@Model.Athlete.Id" class="btn btn-success me-2">
+                    <i class="bi bi-speedometer2"></i> Fitness Dashboard
+                </a>
+                <a asp-action="Edit" asp-route-id="@Model.Athlete.Id" class="btn btn-primary me-2">
+                    <i class="bi bi-pencil"></i> Bearbeiten
+                </a>
+                <form method="post" asp-action="Delete" asp-route-id="@Model.Athlete.Id" class="d-inline" onsubmit="return confirm('Bist du sicher, dass du diesen Athleten löschen möchtest?');">
+                    <button type="submit" class="btn btn-danger me-2">
+                        <i class="bi bi-trash"></i> Löschen
+                    </button>
+                </form>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Zurück
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>ID:</th>
+                                    <td>@Model.Athlete.Id</td>
+                                </tr>
+                                <tr>
+                                    <th>Vorname:</th>
+                                    <td>@Model.Athlete.FirstName</td>
+                                </tr>
+                                <tr>
+                                    <th>Nachname:</th>
+                                    <td>@Model.Athlete.LastName</td>
+                                </tr>
+                                <tr>
+                                    <th>E-Mail:</th>
+                                    <td>@Model.Athlete.Email</td>
+                                </tr>
+                                <tr>
+                                    <th>Geburtsdatum:</th>
+                                    <td>@Model.Athlete.DateOfBirth.ToString("dd.MM.yyyy")</td>
+                                </tr>
+                                <tr>
+                                    <th>Gewicht:</th>
+                                    <td>@Model.Athlete.Weight kg</td>
+                                </tr>
+                                <tr>
+                                    <th>Größe:</th>
+                                    <td>@Model.Athlete.Height cm</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-lightning"></i> Schnellaktionen
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <a asp-controller="Dashboard" asp-action="Index" asp-route-id="@Model.Athlete.Id" class="btn btn-outline-success">
+                                        <i class="bi bi-graph-up"></i> Fitness Dashboard öffnen
+                                    </a>
+                                    <button class="btn btn-outline-info" onclick="alert('Kommt bald!')">
+                                        <i class="bi bi-list-ul"></i> Aktivitäten anzeigen
+                                    </button>
+                                    <button class="btn btn-outline-warning" onclick="alert('Kommt bald!')">
+                                        <i class="bi bi-file-earmark-text"></i> Bericht erstellen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -72,7 +72,7 @@ public class Activity
         }
         else
         {
-            this.Pace = null; // Keine gültige Distanz/Zeit
+            this.Pace = null; // No valid distance/time
         }
     }
 }

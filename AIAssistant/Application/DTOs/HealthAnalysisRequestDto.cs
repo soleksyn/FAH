@@ -15,12 +15,12 @@ public class HealthAnalysisRequestDto
     public Dictionary<string, object>? HealthMetrics { get; set; }
 
     /// <summary>
-    /// Spezifische Bereiche für die Analyse (z.B. "injury_prevention", "recovery", "overtraining")
+    /// Specific areas for analysis (e.g. "injury_prevention", "recovery", "overtraining")
     /// </summary>
     public List<string>? FocusAreas { get; set; }
 
     /// <summary>
-    /// Bekannte Verletzungen oder gesundheitliche Einschränkungen
+    /// Known injuries or health limitations
     /// </summary>
     public List<string>? KnownIssues { get; set; }
 }

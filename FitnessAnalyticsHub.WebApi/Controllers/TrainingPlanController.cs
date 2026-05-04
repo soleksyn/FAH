@@ -47,7 +47,7 @@ public class TrainingPlanController : ControllerBase
     {
         if (id != updateTrainingPlanDto.Id)
         {
-            return this.BadRequest("ID in der URL stimmt nicht mit der ID im Körper überein.");
+            return this.BadRequest("ID in URL does not match ID in body.");
         }
 
         try
@@ -84,7 +84,7 @@ public class TrainingPlanController : ControllerBase
     {
         if (trainingPlanId != createPlannedActivityDto.TrainingPlanId)
         {
-            return this.BadRequest("TrainingPlanID in der URL stimmt nicht mit der ID im Körper überein.");
+            return this.BadRequest("TrainingPlanID in URL does not match ID in body.");
         }
 
         try
@@ -104,7 +104,7 @@ public class TrainingPlanController : ControllerBase
     {
         if (plannedActivityId != updatePlannedActivityDto.Id)
         {
-            return this.BadRequest("ID in der URL stimmt nicht mit der ID im Körper überein.");
+            return this.BadRequest("ID in URL does not match ID in body.");
         }
 
         try

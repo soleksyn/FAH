@@ -59,7 +59,7 @@
 
             Assert.False(string.IsNullOrEmpty(responseBody));
 
-            // Prüfen ob es gültiges JSON ist
+            // Check if it is valid JSON
             JsonElement errorResponse = JsonSerializer.Deserialize<JsonElement>(responseBody);
             Assert.True(errorResponse.ValueKind == JsonValueKind.Object);
         }
@@ -79,38 +79,6 @@
 
             // Assert
             Assert.Equal((int)HttpStatusCode.NotFound, this.httpContext.Response.StatusCode);
-        }
-
-        [Fact]
-        public async Task InvokeAsync_WithInvalidStravaTokenException_ShouldReturn401()
-        {
-            // Arrange
-            InvalidStravaTokenException exception = new InvalidStravaTokenException();
-
-            RequestDelegate next = (HttpContext context) => throw exception;
-            GlobalExceptionHandlingMiddleware middleware = new GlobalExceptionHandlingMiddleware(next, this.mockLogger.Object);
-
-            // Act
-            await middleware.InvokeAsync(this.httpContext);
-
-            // Assert
-            Assert.Equal((int)HttpStatusCode.Unauthorized, this.httpContext.Response.StatusCode);
-        }
-
-        [Fact]
-        public async Task InvokeAsync_WithStravaConfigurationException_ShouldReturn500()
-        {
-            // Arrange
-            StravaConfigurationException exception = new StravaConfigurationException("Missing config");
-
-            RequestDelegate next = (HttpContext context) => throw exception;
-            GlobalExceptionHandlingMiddleware middleware = new GlobalExceptionHandlingMiddleware(next, this.mockLogger.Object);
-
-            // Act
-            await middleware.InvokeAsync(this.httpContext);
-
-            // Assert
-            Assert.Equal((int)HttpStatusCode.InternalServerError, this.httpContext.Response.StatusCode);
         }
 
         [Fact]

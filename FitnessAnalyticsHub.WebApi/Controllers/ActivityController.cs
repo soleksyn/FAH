@@ -41,7 +41,7 @@ public class ActivityController : ControllerBase
     {
         if (id != updateActivityDto.Id)
         {
-            return this.BadRequest("ID in der URL stimmt nicht mit der ID im Körper überein.");
+            return this.BadRequest("ID in URL does not match ID in body.");
         }
 
         await this.activityService.UpdateActivityAsync(updateActivityDto, cancellationToken);

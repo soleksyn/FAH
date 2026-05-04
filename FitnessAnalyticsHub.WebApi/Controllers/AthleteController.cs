@@ -41,7 +41,7 @@ public class AthleteController : ControllerBase
     {
         if (id != updateAthleteDto.Id)
         {
-            return this.BadRequest("ID in der URL stimmt nicht mit der ID im Körper überein.");
+            return this.BadRequest("ID in URL does not match ID in body.");
         }
 
         await this.athleteService.UpdateAthleteAsync(updateAthleteDto, cancellationToken);

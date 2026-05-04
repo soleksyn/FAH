@@ -109,7 +109,7 @@ public class WorkoutAnalysisService : IWorkoutAnalysisService
         string athleteContext = request.AthleteProfile != null ?
             $"\nAthlete Level: {request.AthleteProfile.FitnessLevel}\nPrimary Goal: {request.AthleteProfile.PrimaryGoal}" : string.Empty;
 
-        // Spezifischer Prompt basierend auf Analyse-Typ
+        // Specific prompt based on analysis type
         string analysisPrompt = request.AnalysisType?.ToLower() switch
         {
             "health" => this.BuildHealthAnalysisPrompt(workoutsData, athleteContext),
@@ -123,117 +123,117 @@ public class WorkoutAnalysisService : IWorkoutAnalysisService
 
     private string BuildHealthAnalysisPrompt(string workoutsData, string athleteContext)
     {
-        return $@"Du bist ein Gesundheits- und Fitnessexperte. Analysiere die folgenden Trainingsdaten für Gesundheitserkenntnisse:
+        return $@"You are a health and fitness expert. Analyze the following training data for health insights:
 
-TRAININGSDATEN:
+TRAINING DATA:
 {workoutsData}
 {athleteContext}
 
-Erstelle eine gesundheitsfokussierte Analyse mit:
+Create a health-focused analysis with:
 
-GESUNDHEITSANALYSE:
-- Bewertung der Trainingsbelastung (angemessen/übermäßig?)
-- Regenerationsmuster und Empfehlungen
-- Verletzungspräventions-Erkenntnisse
-- Herz-Kreislauf-Gesundheitsindikatoren
+HEALTH ANALYSIS:
+- Assessment of training load (appropriate/excessive?)
+- Recovery patterns and recommendations
+- Injury prevention insights
+- Cardiovascular health indicators
 
-WICHTIGE ERKENNTNISSE:
-- 3-4 spezifische gesundheitsbezogene Beobachtungen
-- Warnzeichen falls vorhanden
+KEY INSIGHTS:
+- 3-4 specific health-related observations
+- Warning signs if present
 
-EMPFEHLUNGEN:
-- Gesundheitsorientierte umsetzbare Ratschläge
-- Regenerationsstrategien
-- Trainingsmodifikationen für optimale Gesundheit
+RECOMMENDATIONS:
+- Health-oriented actionable advice
+- Recovery strategies
+- Training modifications for optimal health
 
-Konzentriere dich auf Gesundheit und Verletzungsprävention.";
+Focus on health and injury prevention.";
     }
 
     private string BuildPerformanceAnalysisPrompt(string workoutsData, string athleteContext)
     {
-        return $@"Du bist ein Leistungstrainer. Analysiere die folgenden Trainingsdaten für Leistungsoptimierung:
+        return $@"You are a performance coach. Analyze the following training data for performance optimization:
 
-TRAININGSDATEN:
+TRAINING DATA:
 {workoutsData}
 {athleteContext}
 
-Erstelle eine leistungsfokussierte Analyse mit:
+Create a performance-focused analysis with:
 
-LEISTUNGSANALYSE:
-- Fortschrittsbewertung und Trends
-- Leistungsstärken und -schwächen
-- Bewertung der Trainingseffizienz
-- Zielerreichungspotential
+PERFORMANCE ANALYSIS:
+- Progress assessment and trends
+- Performance strengths and weaknesses
+- Training efficiency evaluation
+- Goal achievement potential
 
-WICHTIGE ERKENNTNISSE:
-- 3-4 spezifische Leistungsbeobachtungen
-- Identifizierte Verbesserungsbereiche
+KEY INSIGHTS:
+- 3-4 specific performance observations
+- Identified improvement areas
 
-EMPFEHLUNGEN:
-- Strategien zur Leistungsoptimierung
-- Anpassungen der Trainingsintensität
-- Spezifische Techniken zur Verbesserung
+RECOMMENDATIONS:
+- Strategies for performance optimization
+- Training intensity adjustments
+- Specific techniques for improvement
 
-Fokussiere dich auf sportliche Leistung und Wettkampfverbesserung.";
+Focus on athletic performance and competition improvement.";
     }
 
     private string BuildTrendsAnalysisPrompt(string workoutsData, string athleteContext)
     {
-        return $@"Du bist ein Datenanalyst spezialisiert auf Fitnesstrends. Analysiere die folgenden Trainingsmuster:
+        return $@"You are a data analyst specialized in fitness trends. Analyze the following training patterns:
 
-TRAININGSDATEN:
+TRAINING DATA:
 {workoutsData}
 {athleteContext}
 
-Erstelle eine trendfokussierte Analyse mit:
+Create a trend-focused analysis with:
 
-TRENDANALYSE:
-- Trainingskonsistenzmuster über die Zeit
-- Leistungsfortschritt oder -rückgang
-- Wöchentliche/monatliche Mustererkennung
-- Trainingsvielfalt und -verteilung
+TREND ANALYSIS:
+- Training consistency patterns over time
+- Performance progress or decline
+- Weekly/monthly pattern recognition
+- Training variety and distribution
 
-WICHTIGE ERKENNTNISSE:
-- 3-4 bedeutsame Trendbeobachtungen
-- Mustererkennung-Befunde
+KEY INSIGHTS:
+- 3-4 significant trend observations
+- Pattern recognition findings
 
-EMPFEHLUNGEN:
-- Trendbasierte Trainingsratschläge
-- Strategien zur Konsistenzverbesserung
-- Vorschläge für zukünftige Planung
+RECOMMENDATIONS:
+- Trend-based training advice
+- Strategies for consistency improvement
+- Suggestions for future planning
 
-Fokussiere dich auf Muster, Trends und langfristige Fortschrittsanalyse.";
+Focus on patterns, trends, and long-term progress analysis.";
     }
 
     private string BuildGeneralAnalysisPrompt(string workoutsData, string athleteContext, string analysisType)
     {
-        return $@"Du bist ein Fitnessexperte. Erstelle eine umfassende Analyse der folgenden Trainingsdaten:
+        return $@"You are a fitness expert. Create a comprehensive analysis of the following training data:
 
-TRAININGSDATEN:
+TRAINING DATA:
 {workoutsData}
 {athleteContext}
 
-Analysefokus: {analysisType}
+Analysis focus: {analysisType}
 
-Erstelle eine detaillierte Fitnessanalyse mit:
+Create a detailed fitness analysis with:
 
-ANALYSE:
-- Gesamtbewertung des Trainings
-- Bewertung der Trainingseffektivität
-- Fortschrittsindikatoren
-- Verbesserungsbereiche
+ANALYSIS:
+- Overall training assessment
+- Training effectiveness evaluation
+- Progress indicators
+- Areas for improvement
 
-WICHTIGE ERKENNTNISSE:
-- 3-4 spezifische Beobachtungen aus den Daten
-- Wichtige Muster oder Trends
-- Leistungshöhepunkte
+KEY INSIGHTS:
+- 3-4 specific observations from the data
+- Important patterns or trends
+- Performance highlights
 
-EMPFEHLUNGEN:
-- Umsetzbare Trainingsratschläge
-- Spezifische Verbesserungsstrategien
-- Zielorientierte Vorschläge
+RECOMMENDATIONS:
+- Actionable training advice
+- Specific improvement strategies
+- Goal-oriented suggestions
 
-Liefere praktische, umsetzbare Erkenntnisse für Fitnessverbesserung.";
+Provide practical, actionable insights for fitness improvement.";
     }
 
     private WorkoutAnalysisResponseDto ParseAnalysisResponse(string aiResponse, string? analysisType)
@@ -256,14 +256,14 @@ Liefere praktische, umsetzbare Erkenntnisse für Fitnessverbesserung.";
             return this.GetDefaultAnalysis();
         }
 
-        // Versuche erst strukturierte Extraktion
+        // Try structured extraction first
         string structuredAnalysis = this.TryExtractStructuredAnalysis(aiResponse);
         if (!string.IsNullOrEmpty(structuredAnalysis))
         {
             return this.LimitAnalysisLength(structuredAnalysis);
         }
 
-        // Fallback: Freie Text-Extraktion
+        // Fallback: Free text extraction
         string fallbackAnalysis = this.ExtractFallbackAnalysis(aiResponse);
         return this.LimitAnalysisLength(fallbackAnalysis);
     }
@@ -366,7 +366,6 @@ Liefere praktische, umsetzbare Erkenntnisse für Fitnessverbesserung.";
     {
         return new[]
         {
-        "ANALYSE:", "GESUNDHEITSANALYSE:", "LEISTUNGSANALYSE:", "TRENDANALYSE:",
         "ANALYSIS:", "HEALTH ANALYSIS:", "PERFORMANCE ANALYSIS:", "TRENDS ANALYSIS:",
         };
     }
@@ -375,19 +374,18 @@ Liefere praktische, umsetzbare Erkenntnisse für Fitnessverbesserung.";
     {
         return new[]
         {
-        "WICHTIGE ERKENNTNISSE:", "EMPFEHLUNGEN:",
         "KEY INSIGHTS:", "RECOMMENDATIONS:",
         };
     }
 
     private List<string>? ExtractKeyInsights(string aiResponse)
     {
-        return this.ExtractListSection(aiResponse, new[] { "WICHTIGE ERKENNTNISSE:", "KEY INSIGHTS:", "INSIGHTS:", "ERKENNTNISSE:" });
+        return this.ExtractListSection(aiResponse, new[] { "KEY INSIGHTS:", "INSIGHTS:" });
     }
 
     private List<string>? ExtractRecommendations(string aiResponse)
     {
-        return this.ExtractListSection(aiResponse, new[] { "EMPFEHLUNGEN:", "RECOMMENDATIONS:", "ADVICE:", "RATSCHLÄGE:" });
+        return this.ExtractListSection(aiResponse, new[] { "RECOMMENDATIONS:", "ADVICE:" });
     }
 
     private List<string>? ExtractListSection(string aiResponse, string[] sectionHeaders)
@@ -521,7 +519,7 @@ Liefere praktische, umsetzbare Erkenntnisse für Fitnessverbesserung.";
         {
             "health" => $"Basierend auf Ihren {workoutCount} letzten Trainingseinheiten scheint Ihre Trainingsbelastung gut ausgewogen zu sein. " +
                        $"Die Gesamtdistanz von {totalDistance:F1}km über {TimeSpan.FromSeconds(totalDuration):h\\:mm} zeigt gutes Herz-Kreislauf-Engagement. " +
-                       $"Keine bedenklichen Übertrainingsmuster erkannt. Ihr durchschnittlicher Kalorienverbrauch von {avgCalories:F0} pro Einheit deutet auf angemessene Trainingsintensität hin.",
+                       $"No concerning overtraining patterns detected. Your average calorie consumption of {avgCalories:F0} per unit indicates appropriate training intensity.",
 
             "performance" => $"Ihre Leistungsdaten zeigen {workoutCount} absolvierte Trainingseinheiten mit {totalDistance:F1}km Gesamtdistanz. " +
                            $"Die Trainingskonsistenz erscheint stark mit variierenden Trainingsarten. " +
@@ -542,31 +540,31 @@ Liefere praktische, umsetzbare Erkenntnisse für Fitnessverbesserung.";
         {
             "health" => new List<string>
             {
-                $"{workoutCount} Trainingseinheiten ohne Übertrainingsindikatoren absolviert",
-                $"Durchschnittlicher Kalorienverbrauch von {avgCalories:F0} deutet auf angemessene Intensität hin",
-                "Trainingshäufigkeit unterstützt gute Herz-Kreislauf-Gesundheit",
-                "Keine bedenklichen Gesundheitsmuster in den Trainingsdaten erkannt",
+                $"{workoutCount} training sessions completed without overtraining indicators",
+                $"Average calorie consumption of {avgCalories:F0} indicates appropriate intensity",
+                "Training frequency supports good cardiovascular health",
+                "No concerning health patterns detected in the training data",
             },
             "performance" => new List<string>
             {
-                $"{totalDistance:F1}km Gesamtdistanz über {workoutCount} Einheiten erreicht",
-                "Trainingskonsistenz zeigt starkes Engagement für Leistungsziele",
-                $"Durchschnittliche Trainingsintensität von {avgCalories:F0} Kalorien ist leistungsorientiert",
-                "Trainingsvielfalt unterstützt vielseitige sportliche Entwicklung",
+                $"{totalDistance:F1}km total distance achieved over {workoutCount} units",
+                "Training consistency shows strong commitment to performance goals",
+                $"Average training intensity of {avgCalories:F0} calories is performance-oriented",
+                "Training variety supports diverse athletic development",
             },
             "trends" => new List<string>
             {
-                $"Trainingshäufigkeit von {workoutCount} Einheiten zeigt konsistente Gewohnheitsbildung",
-                "Distanz- und Dauertrends deuten auf Anwendung progressiver Überlastung hin",
-                "Kalorienverbrauchsmuster deuten auf effektives Trainingsintensitätsmanagement hin",
-                "Gesamttrajektorie deutet auf anhaltende Fitnessverbesserung hin",
+                $"Training frequency of {workoutCount} units shows consistent habit formation",
+                "Distance and duration trends indicate application of progressive overload",
+                "Calorie consumption patterns indicate effective training intensity management",
+                "Overall trajectory indicates sustained fitness improvement",
             },
             _ => new List<string>
             {
-                $"{workoutCount} Trainingseinheiten mit Gesamtdistanz von {totalDistance:F1}km absolviert",
-                "Trainingskonsistenz zeigt Engagement für Fitnessziele",
-                "Leistungsmetriken deuten auf stetige Verbesserungstrajektorie hin",
-                "Trainingsintensität und -häufigkeit scheinen gut ausgewogen",
+                $"{workoutCount} training sessions completed with total distance of {totalDistance:F1}km",
+                "Training consistency shows commitment to fitness goals",
+                "Performance metrics indicate steady improvement trajectory",
+                "Training intensity and frequency appear well-balanced",
             }
         };
 
@@ -574,31 +572,31 @@ Liefere praktische, umsetzbare Erkenntnisse für Fitnessverbesserung.";
         {
             "health" => new List<string>
             {
-                "Aktuellen Trainingsplan fortsetzen, um Gesundheitsvorteile zu erhalten",
-                "Regenerationszeichen überwachen und Intensität bei Müdigkeit anpassen",
-                "Ausreichend Schlaf und Ernährung sicherstellen, um Trainingsbelastung zu unterstützen",
-                "Mobilitätsarbeit hinzufügen, um Verletzungen vorzubeugen",
+                "Continue current training plan to obtain health benefits",
+                "Monitor recovery signs and adjust intensity when fatigued",
+                "Ensure adequate sleep and nutrition to support training load",
+                "Add mobility work to prevent injuries",
             },
             "performance" => new List<string>
             {
-                "Trainingsintensität schrittweise um 5-10% für Leistungssteigerungen erhöhen",
-                "Intervalltraining hinzufügen, um Geschwindigkeits- und Kraftentwicklung zu fördern",
-                "Leistungstests in Betracht ziehen, um spezifische Verbesserungen zu verfolgen",
-                "Sportspezifische Übungen für gezielte Fertigkeitsentwicklung integrieren",
+                "Gradually increase training intensity by 5-10% for performance gains",
+                "Add interval training to promote speed and strength development",
+                "Consider performance tests to track specific improvements",
+                "Integrate sport-specific exercises for targeted skill development",
             },
             "trends" => new List<string>
             {
-                "Aktuelle Trainingshäufigkeit für anhaltende positive Trends beibehalten",
-                "Progressive Steigerungen in Distanz und Dauer planen",
-                "Wöchentliche Trends verfolgen, um optimale Trainingsmuster zu identifizieren",
-                "Monatliche Ziele basierend auf aktueller Fortschrittsrate setzen",
+                "Maintain current training frequency for sustained positive trends",
+                "Plan progressive increases in distance and duration",
+                "Track weekly trends to identify optimal training patterns",
+                "Set monthly goals based on current progress rate",
             },
             _ => new List<string>
             {
-                "Mit aktuellem Trainingsplan und -intensität fortfahren",
-                "Trainingsschwierigkeit alle 2-3 Wochen schrittweise um 5-10% erhöhen",
-                "Ausreichende Erholung zwischen intensiven Trainingseinheiten sicherstellen",
-                "Trainingsvielfalt für ausgewogene Entwicklung hinzufügen",
+                "Continue with current training plan and intensity",
+                "Gradually increase training difficulty by 5-10% every 2-3 weeks",
+                "Ensure adequate recovery between intense training sessions",
+                "Add training variety for balanced development",
             }
         };
 

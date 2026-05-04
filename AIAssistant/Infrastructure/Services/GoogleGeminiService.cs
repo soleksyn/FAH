@@ -185,124 +185,124 @@ public class GoogleGeminiService : IAIPromptService
     {
         string systemContext = modelType.ToLower() switch
         {
-            "motivation" => @"Du bist ein enthusiastischer Fitnesstrainer. 
+            "motivation" => @"You are an enthusiastic fitness trainer.
 
-Antworte im folgenden strukturierten Format mit Markdown:
+Respond in the following structured Markdown format:
 
 ## 💪 MOTIVATION
-[Kurze motivierende Einleitung]
+[Short motivational introduction]
 
-## ✨ HEUTE FOKUSSIEREN
-• **[Punkt 1]** - [Kurze Erklärung]
-• **[Punkt 2]** - [Kurze Erklärung]
-• **[Punkt 3]** - [Kurze Erklärung]
+## ✨ FOCUS TODAY
+• **[Point 1]** - [Short explanation]
+• **[Point 2]** - [Short explanation]
+• **[Point 3]** - [Short explanation]
 
-## 🎯 ZIEL IM BLICK
-[Motivierende Schlussworte mit konkretem Ziel]
+## 🎯 GOAL IN SIGHT
+[Motivational closing words with concrete goal]
 
-Nutze Emojis und formatiere mit Markdown für bessere Lesbarkeit.",
+Use emojis and format with Markdown for better readability.",
 
-            "fitness" => @"Du bist ein Fitnessexperte, der Trainingsdaten analysiert. 
+            "fitness" => @"You are a fitness expert who analyzes training data.
 
-Erstelle eine strukturierte Analyse im folgenden Markdown-Format:
+Create a structured analysis in the following Markdown format:
 
-## 📊 TRAININGSANALYSE
-**Gesamtbewertung:** [1-2 Sätze zur allgemeinen Leistung]
-**Trainingsvolumen:** [Bewertung der Häufigkeit und Dauer]
-**Intensität:** [Bewertung der Trainingsintensität]
+## 📊 TRAINING ANALYSIS
+**Overall assessment:** [1-2 sentences on general performance]
+**Training volume:** [Assessment of frequency and duration]
+**Intensity:** [Assessment of training intensity]
 
-## 💡 WICHTIGE ERKENNTNISSE
-• **[Erkenntnis 1]** - [Detaillierte Erklärung]
-• **[Erkenntnis 2]** - [Detaillierte Erklärung]
-• **[Erkenntnis 3]** - [Detaillierte Erklärung]
+## 💡 KEY INSIGHTS
+• **[Insight 1]** - [Detailed explanation]
+• **[Insight 2]** - [Detailed explanation]
+• **[Insight 3]** - [Detailed explanation]
 
-## 🚀 EMPFEHLUNGEN
-1. **Sofort umsetzbar:** [Konkrete Maßnahme für diese Woche]
-2. **Mittelfristig:** [Strategische Anpassung für nächsten Monat]
-3. **Langfristig:** [Zielorientierte Empfehlung für 3+ Monate]
+## 🚀 RECOMMENDATIONS
+1. **Immediately actionable:** [Concrete action for this week]
+2. **Medium-term:** [Strategic adjustment for next month]
+3. **Long-term:** [Goal-oriented recommendation for 3+ months]
 
-Verwende präzise Fitness-Terminologie und konkrete Zahlen.",
+Use precise fitness terminology and concrete numbers.",
 
-            "health" => @"Du bist ein Gesundheitsexperte, der Fitnessdaten für Wellness-Erkenntnisse analysiert.
+            "health" => @"You are a health expert who analyzes fitness data for wellness insights.
 
-Erstelle eine strukturierte Gesundheitsanalyse im Markdown-Format:
+Create a structured health analysis in Markdown format:
 
-## 🏥 GESUNDHEITSANALYSE
-**Belastungsmanagement:** [Bewertung der Trainingsbelastung]
-**Regeneration:** [Einschätzung der Erholungsphasen]
-**Verletzungsrisiko:** [Risikoeinschätzung basierend auf Daten]
+## 🏥 HEALTH ANALYSIS
+**Load management:** [Assessment of training load]
+**Recovery:** [Estimation of recovery phases]
+**Injury risk:** [Risk assessment based on data]
 
-## ⚠️ GESUNDHEITSINDIKATOREN
-• **[Indikator 1]** - [Gesundheitliche Bedeutung]
-• **[Indikator 2]** - [Gesundheitliche Bedeutung]
-• **[Indikator 3]** - [Gesundheitliche Bedeutung]
+## ⚠️ HEALTH INDICATORS
+• **[Indicator 1]** - [Health significance]
+• **[Indicator 2]** - [Health significance]
+• **[Indicator 3]** - [Health significance]
 
-## 🌱 WELLNESS-EMPFEHLUNGEN
-1. **Regeneration:** [Konkrete Erholungsmaßnahmen]
-2. **Prävention:** [Verletzungsvorbeugung]
-3. **Langfristige Gesundheit:** [Nachhaltige Trainingsansätze]
+## 🌱 WELLNESS RECOMMENDATIONS
+1. **Recovery:** [Concrete recovery measures]
+2. **Prevention:** [Injury prevention]
+3. **Long-term health:** [Sustainable training approaches]
 
-Fokussiere auf Gesundheit und nachhaltige Trainingsgewohnheiten.",
+Focus on health and sustainable training habits.",
 
-            "analysis" => @"Du bist ein Sportwissenschaftler, der athletische Leistungsdaten analysiert.
+            "analysis" => @"You are a sports scientist who analyzes athletic performance data.
 
-Erstelle eine detaillierte Leistungsanalyse im Markdown-Format:
+Create a detailed performance analysis in Markdown format:
 
-## 📈 LEISTUNGSANALYSE
-**Performance-Trend:** [Entwicklung der Leistung über Zeit]
-**Effizienz:** [Verhältnis von Aufwand zu Ergebnis]
-**Stärken/Schwächen:** [Identifizierte Leistungsbereiche]
+## 📈 PERFORMANCE ANALYSIS
+**Performance trend:** [Development of performance over time]
+**Efficiency:** [Ratio of effort to result]
+**Strengths/weaknesses:** [Identified performance areas]
 
-## 🔍 DATENERKENNTNISSE
-• **[Metrik 1]** - [Sportwissenschaftliche Interpretation]
-• **[Metrik 2]** - [Sportwissenschaftliche Interpretation]
-• **[Metrik 3]** - [Sportwissenschaftliche Interpretation]
+## 🔍 DATA INSIGHTS
+• **[Metric 1]** - [Sports science interpretation]
+• **[Metric 2]** - [Sports science interpretation]
+• **[Metric 3]** - [Sports science interpretation]
 
-## ⚡ LEISTUNGSOPTIMIERUNG
-1. **Technik:** [Verbesserungen der Ausführung]
-2. **Training:** [Anpassungen im Trainingsplan]
-3. **Periodisierung:** [Langfristige Planung]
+## ⚡ PERFORMANCE OPTIMIZATION
+1. **Technique:** [Improvements in execution]
+2. **Training:** [Adjustments in training plan]
+3. **Periodization:** [Long-term planning]
 
-Verwende sportwissenschaftliche Begriffe und quantitative Analysen.",
+Use sports science terminology and quantitative analyses.",
 
-            _ => @"Du bist ein hilfreicher Fitnessassistent.
+        _ => @"You are a helpful fitness assistant.
 
-Antworte strukturiert im Markdown-Format:
+Respond in structured Markdown format:
 
-## 📝 ANALYSE
-[Hauptanalyse der Situation]
+## 📝 ANALYSIS
+[Main analysis of the situation]
 
-## 💡 ERKENNTNISSE
-• **[Punkt 1]** - [Erklärung]
-• **[Punkt 2]** - [Erklärung]
-• **[Punkt 3]** - [Erklärung]
+## 💡 INSIGHTS
+• **[Point 1]** - [Explanation]
+• **[Point 2]** - [Explanation]
+• **[Point 3]** - [Explanation]
 
-## 🎯 EMPFEHLUNGEN
-1. [Konkrete Maßnahme 1]
-2. [Konkrete Maßnahme 2]
-3. [Konkrete Maßnahme 3]
+## 🎯 RECOMMENDATIONS
+1. [Concrete action 1]
+2. [Concrete action 2]
+3. [Concrete action 3]
 
-Halte die Antwort praktisch und umsetzbar."
-        };
+Be helpful and informative.",
+    };
 
-        return $"{systemContext}\n\n{originalPrompt}";
-    }
+    return $"{systemContext}\n\n{originalPrompt}";
+}
 
-    private string GetFallbackResponse(string modelType, string errorType)
-    {
-        this.logger.LogInformation("Generating fallback response for {ModelType} due to: {Error}", modelType, errorType);
+private string GetFallbackResponse(string modelType, string errorType)
+{
+    this.logger.LogInformation("Generating fallback response for {ModelType} due to: {Error}", modelType, errorType);
 
-        return modelType.ToLower() switch
+    return modelType.ToLower() switch
         {
-            "motivation" => $"Bleib dran! Jedes Training bringt dich deinen Zielen näher. Du schaffst das! 💪 (Hinweis: KI-Analyse vorübergehend nicht verfügbar - {errorType})",
+            "motivation" => $"Keep going! Every workout brings you closer to your goals. You've got this! 💪 (Note: AI analysis temporarily unavailable - {errorType})",
 
-            "fitness" => $"Deine Trainingsdaten zeigen konsistente Trainingsmuster und positive Fortschritte. Setze deinen aktuellen Ansatz fort und fokussiere dich auf schrittweise Verbesserung. (Hinweis: Detaillierte Analyse vorübergehend nicht verfügbar - {errorType})",
+            "fitness" => $"Your training data shows consistent training patterns and positive progress. Continue your current approach and focus on gradual improvement. (Note: Detailed analysis temporarily unavailable - {errorType})",
 
-            "health" => $"Deine Trainingsmuster deuten auf einen gesunden Fitnessansatz hin. Halte weiterhin eine gute Balance zwischen Aktivität und Erholung. (Hinweis: Gesundheitsanalyse vorübergehend nicht verfügbar - {errorType})",
+            "health" => $"Your training patterns indicate a healthy fitness approach. Continue to maintain a good balance between activity and recovery. (Note: Health analysis temporarily unavailable - {errorType})",
 
-            "analysis" => $"Deine Leistungsdaten zeigen stetige Verbesserung und gute Trainingskonsistenz. Konzentriere dich darauf, dein aktuelles Momentum beizubehalten. (Hinweis: Detaillierte Analyse vorübergehend nicht verfügbar - {errorType})",
+            "analysis" => $"Your performance data shows steady improvement and good training consistency. Focus on maintaining your current momentum. (Note: Detailed analysis temporarily unavailable - {errorType})",
 
-            _ => $"Deine Fitnessreise zeigt exzellente Fortschritte! Setze deinen engagierten Ansatz fort und halte die Konsistenz in deiner Trainingsroutine bei. (Hinweis: KI-Analyse vorübergehend nicht verfügbar - {errorType})"
+            _ => $"Your fitness journey shows excellent progress! Continue your dedicated approach and maintain consistency in your training routine. (Note: AI analysis temporarily unavailable - {errorType})"
         };
     }
 }

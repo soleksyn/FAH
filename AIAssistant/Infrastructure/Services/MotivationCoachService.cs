@@ -177,7 +177,7 @@ Response:";
         {
             string quote = match.Groups[1].Value.Trim();
 
-            // Filtere motivierende Quotes (keine technischen Texte)
+            // Filter motivational quotes (no technical texts)
             if (quote.Length >= 15 && quote.Length <= 150 &&
                 (quote.Contains("success") || quote.Contains("achieve") || quote.Contains("goal") ||
                  quote.Contains("dream") || quote.Contains("believe") || quote.Contains("strong") ||
@@ -196,7 +196,7 @@ Response:";
                 string quoteLine = quoteParts[1].Split('\n')[0].Trim().Trim('"', '-', '*').Trim();
                 if (!string.IsNullOrWhiteSpace(quoteLine) && quoteLine.Length >= 15)
                 {
-                    return quoteLine; // ← Keine Keyword-Prüfung mehr
+                    return quoteLine; // ← No keyword check anymore
                 }
             }
         }

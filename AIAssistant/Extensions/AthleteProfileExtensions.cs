@@ -40,7 +40,7 @@ public static class AthleteProfileExtensions
             Name = grpcProfile.Name ?? string.Empty,
             FitnessLevel = grpcProfile.FitnessLevel,
             PrimaryGoal = grpcProfile.PrimaryGoal,
-            Preferences = null,  // gRPC-JSON hat keine Preferences
+            Preferences = null,  // gRPC-JSON has no Preferences
         };
     }
 
@@ -53,7 +53,7 @@ public static class AthleteProfileExtensions
             Name = grpcProfile.Name ?? string.Empty,
             FitnessLevel = grpcProfile.FitnessLevel ?? string.Empty,
             PrimaryGoal = grpcProfile.PrimaryGoal ?? string.Empty,
-            Preferences = null, // gRPC hat keine Preferences
+            Preferences = null, // gRPC has no Preferences
         };
     }
 }

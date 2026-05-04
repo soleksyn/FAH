@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FitnessAnalyticsHub.Infrastructure
+namespace SportMatrix.Infrastructure
 {
     public static class DependencyInjection
     {

@@ -1,100 +1,91 @@
-﻿![Build Status](https://github.com/lady-logic/FitnessAnalyticsHubV1_0/actions/workflows/main.yml/badge.svg)
-![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=lady-logic_FitnessAnalyticsHubV1_0&metric=alert_status)
-![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lady-logic_FitnessAnalyticsHub_0&metric=coverage)
-![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=lady-logic_FitnessAnalyticsHubV1_0&metric=sqale_rating)
-![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=lady-logic_FitnessAnalyticsHubV1_0&metric=security_rating)
-![.NET](https://img.shields.io/badge/.NET-8.0-purple)
+﻿![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Docker](https://img.shields.io/badge/Docker-Multi--Service-blue)
 ![API Documentation](https://img.shields.io/badge/API-Swagger%20%2B%20OpenAPI-orange)
 ![Microservices](https://img.shields.io/badge/Architecture-Microservices-green)
 ![Communication](https://img.shields.io/badge/Protocols-HTTP%20%2B%20gRPC%20%2B%20Bridge-blue)
 ![AI Integration](https://img.shields.io/badge/AI-HuggingFace%20%2B%20Llama-orange)
-![License](https://img.shields.io/github/license/lady-logic/FitnessAnalyticsHubV1_0)
-![Last Commit](https://img.shields.io/github/last-commit/lady-logic/FitnessAnalyticsHubV1_0)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
 <!-- Logo -->
 <p align="center">
-  <img src="logo.png" alt="FitnessAnalyticsHub Logo" width="200"/>
+  <img src="logo.png" alt="SportMatrix Logo" width="200"/>
 </p>
 
-<h1 align="center">🏋️‍♀️ FitnessAnalyticsHub</h1>
+<h1 align="center">🏋️‍♀️ SportMatrix</h1>
 <p align="center">
-  Ein wachsendes Analyse- und Lernprojekt rund um Fitness, Trainingsdaten und moderne .NET-Technologien.
+  A comprehensive fitness analytics platform with AI-powered insights, multi-protocol communication, and clean architecture.
 </p>
 
 ---
 
-## 🎯 Projektziele & Roadmap
+## 🎯 Project Goals & Roadmap
 
-Dieses Projekt ist eine persönliche Spielwiese für moderne Softwareentwicklung mit Fokus auf:
+This project is a modern software development platform focusing on:
 
-### 🏗️ Architektur & Design
-- **Clean Architecture** mit Domain, Application, Infrastructure Layering
-- **Domain-Driven Design** Prinzipien für fachliche Modellierung
-- **Microservices-Architektur** mit Multi-Protocol Communication
-- **Event-Driven Architecture** mit RabbitMQ für lose gekoppelte Services
+### 🏗️ Architecture & Design
+- **Clean Architecture** with Domain, Application, Infrastructure Layering
+- **Domain-Driven Design** principles for domain modeling
+- **Microservices Architecture** with Multi-Protocol Communication
+- **Event-Driven Architecture** with RabbitMQ for loosely coupled services
 
 ### 🔄 Multi-Protocol Communication
-- **HTTP/REST** für Standard-API-Integration
-- **Native gRPC** für High-Performance Service-to-Service Communication  
-- **gRPC-JSON Bridge** als Best-of-Both-Worlds Lösung
-- **Message Queuing** mit RabbitMQ für asynchrone Verarbeitung
+- **HTTP/REST** for standard API integration
+- **Native gRPC** for high-performance service-to-service communication  
+- **gRPC-JSON Bridge** as a best-of-both-worlds solution
+- **Message Queuing** with RabbitMQ for asynchronous processing
 
-### 🤖 KI & Moderne Technologien
-- **AI-Integration** mit HuggingFace und Google Gemini für intelligente Trainingsanalyse
-- **ASP.NET Core Razor Pages Frontend** mit modernen UI-Patterns
-- **Real-time Health Monitoring** mit umfassendem Dashboard
+### 🤖 AI & Modern Technologies
+- **AI Integration** with HuggingFace and Google Gemini for intelligent training analysis
+- **ASP.NET Core Razor Pages Frontend** with modern UI patterns
+- **Real-time Health Monitoring** with comprehensive dashboard
 
 ### 🧪 Code Quality & Testing
-- **Architecture Tests** mit NetArchTest für Clean Architecture Compliance
-- **Modularity Maturity Index** Berechnung für nachhaltige Codequalität
-- **Continuous Code Quality** mit SonarCloud Integration
-- **Comprehensive Testing** mit Unit-, Integration- und Architecture Tests
+- **Architecture Tests** with NetArchTest for Clean Architecture compliance
+- **Modularity Maturity Index** calculation for sustainable code quality
+- **Continuous Code Quality** with SonarCloud integration
+- **Comprehensive Testing** with unit, integration, and architecture tests
 
 ### 📋 Roadmap
 
-**✅ Aktuell umgesetzt:**
-- Clean Architecture mit strikter Dependency Inversion
+**✅ Currently Implemented:**
+- Clean Architecture with strict dependency inversion
 - Multi-Protocol Communication (HTTP, gRPC, gRPC-JSON)
-- AI-Integration mit HuggingFace + Google Gemini
-- Health Monitoring Dashboard mit Auto-Refresh
-- Comprehensive Error Handling mit custom Exception Hierarchy
+- AI Integration with HuggingFace + Google Gemini
+- Health Monitoring Dashboard with auto-refresh
+- Comprehensive Error Handling with custom exception hierarchy
 - Docker Multi-Service Setup
 
-**📋 Geplant:**
-- Event-Driven Architecture mit RabbitMQ
-- CQRS-Pattern für bessere Read/Write-Trennung
+**📋 Planned:**
+- Event-Driven Architecture with RabbitMQ
+- CQRS Pattern for better read/write separation
 - Modularity Maturity Index Integration
-- Erweiterte Microservices mit Domain Events
+- Extended microservices with domain events
 
 ---
 
 ## 🎯 Dashboard Overview
 
-![Fitness Analytics Dashboard](./docs/images/Dashboard.png)
+![Sport Analytics Dashboard](./docs/images/Dashboard.png)
 ![Activity Distribution](./docs/images/ActivityDistribution.png)
 
 ---
 
 ## 🔬 Code Quality & Security
 
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=lady-logic_FitnessAnalyticsHubV1_0)](https://sonarcloud.io/summary/new_code?id=lady-logic_FitnessAnalyticsHubV1_0)
-
-Dieses Projekt verwendet **SonarCloud** für kontinuierliche Code-Qualitätsüberwachung:
-- 🛡️ **Security Vulnerabilities** - Automatische Sicherheitsprüfung
-- 🐛 **Bug Detection** - Potentielle Fehler werden erkannt
-- 📊 **Code Coverage** - Test-Abdeckung wird gemessen
-- 🧹 **Code Smells** - Wartbarkeit wird bewertet
-- 📈 **Technical Debt** - Refactoring-Bedarf wird geschätzt
-
-[**→ Live SonarCloud Dashboard ansehen**](https://sonarcloud.io/project/overview?id=lady-logic_FitnessAnalyticsHubV1_0)
+This project uses **SonarCloud** for continuous code quality monitoring:
+- 🛡️ **Security Vulnerabilities** - Automated security scanning
+- 🐛 **Bug Detection** - Potential bugs are identified
+- 📊 **Code Coverage** - Test coverage is measured
+- 🧹 **Code Smells** - Maintainability is evaluated
+- 📈 **Technical Debt** - Refactoring needs are estimated
 
 ---
-## 🏗️ Architektur
 
-### Clean Architecture mit Microservices
+## 🏗️ Architecture
 
-```text
+### Clean Architecture with Microservices
+
+`	ext
 🌐 WebAPI (Port 5000)          🤖 AIAssistant (Port 7276)
 ├── Controllers                 ├── gRPC Services
 ├── Application Services        ├── HuggingFace Integration
@@ -102,38 +93,41 @@ Dieses Projekt verwendet **SonarCloud** für kontinuierliche Code-Qualitätsübe
 └── Infrastructure             └── Multi-Protocol Endpoints
     ├── Database (SQLite)          ├── Native gRPC
     └── Health Monitoring          └── gRPC-JSON Bridge
-```
+`
 
 ### Multi-Protocol Communication
-```text
+`	ext
 Frontend → WebAPI → AIAssistant
-              ↓ (konfigurierbar)
+              ↓ (configurable)
               ├── HTTP/JSON ────→ REST API
               ├── gRPC ─────────→ Native gRPC
               └── gRPC-JSON ────→ JSON Bridge
-```
+`
 
-### Geplante Erweiterungen
-- **Event-Driven Architecture** mit RabbitMQ
-- **Domain Events** für lose gekoppelte Services
-- **CQRS Pattern** für Read/Write-Trennung
+### Planned Extensions
+- **Event-Driven Architecture** with RabbitMQ
+- **Domain Events** for loosely coupled services
+- **CQRS Pattern** for read/write separation
 
 ---
+
 ## ✨ Features
 
-- 🤖 **AI-Powered Analytics** - HuggingFace + Google Gemini für intelligente Trainingsanalyse  
-- 🔄 **Multi-Protocol API** - HTTP/REST, gRPC und gRPC-JSON Bridge
-- 📊 **Training Plans** - Strukturierte Planung mit Fortschrittstracking
-- 🏥 **Health Monitoring** - Live-Dashboard mit automatischem Service-Monitoring
-- 🛡️ **Enterprise Error Handling** - Konsistente Exception-Management
-- 🧪 **Architecture Testing** - Automatische Clean Architecture Compliance
+- 🤖 **AI-Powered Analytics** - HuggingFace + Google Gemini for intelligent training analysis  
+- 🔄 **Multi-Protocol API** - HTTP/REST, gRPC and gRPC-JSON Bridge
+- 📊 **Training Plans** - Structured planning with progress tracking
+- 🏥 **Health Monitoring** - Live dashboard with automatic service monitoring
+- 🛡️ **Enterprise Error Handling** - Consistent exception management
+- 🧪 **Architecture Testing** - Automatic Clean Architecture compliance
+
 ---
+
 ## 🔄 Multi-Protocol Communication
 
-Drei Kommunikationsprotokolle für flexible Microservice-Integration:
+Three communication protocols for flexible microservice integration:
 
-```bash
-# HTTP/REST - Standard & Browser-kompatibel
+`ash
+# HTTP/REST - Standard & Browser-compatible
 POST http://localhost:7276/api/MotivationCoach/motivate
 
 # Native gRPC - High Performance
@@ -141,37 +135,39 @@ grpc://localhost:7276/MotivationService/GetMotivation
 
 # gRPC-JSON Bridge - Best of Both Worlds  
 POST http://localhost:7276/grpc-json/MotivationService/GetMotivation
-```
+`
 
-### Konfiguration
-```json
+### Configuration
+`json
 {
   "AIAssistant": {
     "ClientType": "GrpcJson",    // "Http" | "Grpc" | "GrpcJson"
     "BaseUrl": "https://localhost:7276"
   }
 }
-```
+`
 
-| Protokoll | Performance | Browser Support | Use Case |
+| Protocol | Performance | Browser Support | Use Case |
 |-----------|-------------|-----------------|----------|
-| **HTTP/REST** | Standard | ✅ Vollständig | Frontend, API-Tools |
-| **gRPC** | ⚡ Sehr schnell | ❌ Eingeschränkt | Service-to-Service |
-| **gRPC-JSON** | Standard | ✅ Vollständig | Hybrid-Integration |
+| **HTTP/REST** | Standard | ✅ Full | Frontend, API Tools |
+| **gRPC** | ⚡ Very Fast | ❌ Limited | Service-to-Service |
+| **gRPC-JSON** | Standard | ✅ Full | Hybrid Integration |
+
 ---
+
 ## 🤖 AI-Powered Analytics
 
-### KI-Integration für intelligente Trainingsanalyse
+### AI Integration for Intelligent Training Analysis
 
-- **Meta-Llama-3.1-8B-Instruct** via HuggingFace für Fitnessanalyse
-- **Google Gemini** für zusätzliche AI-Perspektiven
-- **Personalisierte Motivation** - Kontextbezogene Trainingstipps
-- **Workout-Trends** - KI-basierte Leistungsentwicklung
-- **Robuste Fallbacks** - Zuverlässige Funktion bei API-Limits
+- **Meta-Llama-3.1-8B-Instruct** via HuggingFace for fitness analysis
+- **Google Gemini** for additional AI perspectives
+- **Personalized Motivation** - Context-aware training tips
+- **Workout Trends** - AI-based performance development
+- **Robust Fallbacks** - Reliable operation at API limits
 
-### Verfügbare Endpunkte
-```bash
-# Workout-Analyse
+### Available Endpoints
+`ash
+# Workout Analysis
 POST /api/WorkoutAnalysis/analyze/huggingface
 POST /api/WorkoutAnalysis/analyze/googlegemini
 
@@ -181,25 +177,29 @@ POST /api/MotivationCoach/motivate
 # Multi-Protocol via gRPC-JSON Bridge
 POST /grpc-json/MotivationService/GetMotivation
 POST /grpc-json/WorkoutService/GetWorkoutAnalysis
-```
+`
+
 ---
+
 ## 🏥 Health Monitoring
 
-Live-Überwachung aller Services mit automatischem Refresh:
+Live monitoring of all services with automatic refresh:
 
-- **`/health-ui`** - Visual Dashboard mit Verlauf  
-- **`/health`** - JSON API für alle Services
+- **/health-ui** - Visual dashboard with history  
+- **/health** - JSON API for all services
 - **Tag-based Grouping** - Services vs Infrastructure  
-- **Auto-Refresh** - Alle 60 Sekunden
+- **Auto-Refresh** - Every 60 seconds
 
-```bash
-# Health Dashboard öffnen
+`ash
+# Open Health Dashboard
 open http://localhost:8080/health-ui
 
-# Health Status prüfen  
+# Check Health Status  
 curl http://localhost:8080/health
-```
+`
+
 ---
+
 ## 🛠️ Tech Stack
 
 **Backend:** .NET 8, Entity Framework Core, Clean Architecture  
@@ -209,38 +209,41 @@ curl http://localhost:8080/health
 **Quality:** xUnit, NetArchTest, SonarCloud, FluentAssertions  
 **DevOps:** Docker, GitHub Actions, Health Monitoring  
 
-**Geplant:** RabbitMQ (Event-Driven)
+**Planned:** RabbitMQ (Event-Driven)
 
 ---
+
 ## 🚀 Getting Started
 
-### Docker (Empfohlen)
-```bash
-git clone https://github.com/lady-logic/FitnessAnalyticsHubV1_0.git
-cd FitnessAnalyticsHubV1_0
+### Docker (Recommended)
+`ash
+git clone https://github.com/your-org/SportMatrix.git
+cd SportMatrix
 docker-compose up
-```
+`
 
-### Lokale Entwicklung
-```bash
-# API starten
-cd FitnessAnalyticsHub.WebApi && dotnet run
+### Local Development
+`ash
+# Start API
+cd SportMatrix.WebApi && dotnet run
 
-# AI-Service starten  
-cd AIAssistant && dotnet run
-```
+# Start AI Service  
+cd SportMatrix.AIAssistant && dotnet run
+`
 
-**Zugriff:**
-- Haupt-API: `https://localhost:5001`
-- AI-Service: `https://localhost:7276`  
-- Swagger UI: `/swagger`
+**Access:**
+- Main API: https://localhost:5001
+- AI Service: https://localhost:7276  
+- Swagger UI: /swagger
+
 ---
+
 ## 🛡️ Error Handling
 
-Konsistente Exception-Behandlung durch Clean Architecture und Global Middleware.
+Consistent exception handling through Clean Architecture and Global Middleware.
 
-### Exception-Hierarchie
-```text
+### Exception Hierarchy
+`	ext
 Domain Exceptions
 ├── ActivityNotFoundException (404)
 ├── AthleteNotFoundException (404)
@@ -248,29 +251,32 @@ Domain Exceptions
 
 Infrastructure Exceptions  
 └── AIAssistantApiException (502)
-```
+`
 
 ### API Response Format
-```json
+`json
 {
   "type": "ActivityNotFound",
   "message": "Activity with ID 123 not found",
   "statusCode": 404,
   "timestamp": "2024-01-15T10:30:00Z"
 }
-```
+`
 
-**Prinzip:** Controller sind exception-frei - Global Middleware behandelt alle Fehler zentral.
+**Principle:** Controllers are exception-free - Global Middleware handles all errors centrally.
 
 ---
 
+## 📊 Data
 
-- Aktivitätsdaten (Laufen, Radfahren, etc.)
-- Leistungsmetriken
-- Strecken und Routen
-- Benutzerprofildaten
+The platform manages:
+- Activity data (running, cycling, etc.)
+- Performance metrics
+- Routes and distances
+- User profile data
+
 ---
 
 ## 📄 License
 
-Dieses Projekt steht unter der MIT License - siehe [LICENSE](LICENSE) Datei für Details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

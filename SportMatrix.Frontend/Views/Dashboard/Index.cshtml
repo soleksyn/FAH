@@ -1,0 +1,298 @@
+@model SportMatrix.Frontend.Models.FitnessDashboardViewModel
+@{
+    ViewData["Title"] = "Fitness Dashboard";
+}
+
+<div class="dashboard">
+    <div class="header">
+        <h1>🏃‍♀️ Fitness Analytics Hub</h1>
+        @if (Model.Athlete != null)
+        {
+            <p>@Model.Athlete.FirstName's Personal Training Intelligence</p>
+        }
+        else
+        {
+            <p>Your Personal Training Intelligence</p>
+        }
+    </div>
+
+    @if (Model.Loading)
+    {
+        <div class="loading-container">
+            <div class="loading-spinner-large"></div>
+            <p>Dashboard wird geladen...</p>
+        </div>
+    }
+
+    @if (Model.Error != null)
+    {
+        <div class="error-banner">
+            <h3>⚠️ Hinweis</h3>
+            <p>@Model.Error</p>
+        </div>
+    }
+
+    @if (!Model.Loading)
+    {
+        @if (Model.AIAnalysis != null)
+        {
+            <div class="motivation-banner">
+                <h3>🎯 Today's Motivation</h3>
+                <p>@Model.GetMotivationText()</p>
+            </div>
+        }
+        else
+        {
+            <div class="motivation-banner">
+                <h3>🎯 Today's Motivation</h3>
+                <p>"Ready for today's challenge? Let's analyze your latest activities and unlock new insights!"</p>
+            </div>
+        }
+
+        @if (Model.Statistics != null)
+        {
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon">🏃‍♂️</div>
+                    <div class="number">@Model.Statistics.TotalActivities</div>
+                    <div class="label">Total Activities</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">📏</div>
+                    <div class="number">@Model.Statistics.TotalDistance.ToString("F1")</div>
+                    <div class="label">Total Distance (km)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">⏱️</div>
+                    <div class="number">@Model.Statistics.TotalDuration</div>
+                    <div class="label">Total Duration</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">🔥</div>
+                    <div class="number">@Model.GetEstimatedCalories()</div>
+                    <div class="label">Calories Burned</div>
+                </div>
+            </div>
+        }
+
+        <div class="content-grid">
+            <div class="recent-activities">
+                <h2>🏃 Recent Activities</h2>
+
+                @if (Model.RecentActivities.Count > 0)
+                {
+                    @foreach (var activity in Model.RecentActivities)
+                    {
+                        <div class="activity-item">
+                            <div class="activity-icon @Model.GetActivityIconClass(activity.SportType)">
+                                @Model.GetActivityEmoji(activity.SportType)
+                            </div>
+                            <div class="activity-details">
+                                <h4>@activity.Name</h4>
+                                <p>
+                                    @activity.Distance.ToString("F1") km •
+                                    @activity.MovingTime •
+                                    @activity.StartDate.Substring(0, 10)
+                                </p>
+                            </div>
+                            <div class="activity-actions">
+                                <form method="post" asp-action="AnalyzeWorkout" asp-route-id="@Model.Athlete.Id" asp-route-activityId="@activity.Id">
+                                    <button type="submit" class="btn btn-analyze">
+                                        Analyze
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-activities">
+                        <div class="icon">📊</div>
+                        <p>No activities yet. Start your fitness journey!</p>
+                    </div>
+                }
+            </div>
+
+            <div class="ai-insights">
+                <h2><span class="robot-icon">🤖</span> AI Insights</h2>
+
+                @if (Model.AIAnalysis != null)
+                {
+                    @if (!string.IsNullOrEmpty(Model.AIAnalysis.Analysis))
+                    {
+                        <div class="insight-card">
+                            <h4>🎯 Performance Analysis</h4>
+                            <div class="formatted-analysis">
+                                @Html.Raw(Model.FormatMarkdown(Model.AIAnalysis.Analysis))
+                            </div>
+                            @if (Model.AIAnalysis.KeyInsights != null && Model.AIAnalysis.KeyInsights.Count > 0)
+                            {
+                                <ul>
+                                    @foreach (var insight in Model.AIAnalysis.KeyInsights.Take(3))
+                                    {
+                                        <li>@insight</li>
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    }
+
+                    @if (Model.AIAnalysis.Recommendations != null && Model.AIAnalysis.Recommendations.Count > 0)
+                    {
+                        <div class="insight-card">
+                            <h4>💡 Recommendations</h4>
+                            <ul>
+                                @foreach (var rec in Model.AIAnalysis.Recommendations.Take(3))
+                                {
+                                    <li>@rec</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    @if (Model.AIAnalysis.PerformanceScore.HasValue)
+                    {
+                        <div class="insight-card">
+                            <h4>📊 Performance Score: @Model.AIAnalysis.PerformanceScore/100</h4>
+                            <div class="score-bar">
+                                <div class="score-fill @Model.GetScoreClass(Model.AIAnalysis.PerformanceScore)" style="width: @(Model.AIAnalysis.PerformanceScore)%"></div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="insight-card">
+                        <h4>🔄 Ready for Analysis</h4>
+                        <div class="loading-container-small">
+                            <span>Click "Analyze" on any activity to get AI insights...</span>
+                        </div>
+                    </div>
+                }
+
+                <div class="quick-actions">
+                    <form method="post" asp-action="GetPerformanceTrends" asp-route-id="@Model.Athlete.Id">
+                        <button type="submit" class="btn btn-action">📈 Performance Trends</button>
+                    </form>
+                    <form method="post" asp-action="GetTrainingRecommendations" asp-route-id="@Model.Athlete.Id">
+                        <button type="submit" class="btn btn-action">💡 Training Tips</button>
+                    </form>
+                    <form method="post" asp-action="AnalyzeHealthMetrics" asp-route-id="@Model.Athlete.Id">
+                        <button type="submit" class="btn btn-action">❤️ Health Analysis</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.Statistics != null)
+        {
+            <div class="charts-section">
+                <div class="chart-container">
+                    <h3>📈 Weekly Progress</h3>
+                    <div class="weekly-progress-chart">
+                        @{
+                            var weeklyProgress = Model.GetWeeklyProgress();
+                            var i = 0;
+                        }
+                        @foreach (var week in weeklyProgress)
+                        {
+                            <div class="week-item">
+                                <div class="week-label">Week @(4 - i)</div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: @week.Percentage%; background: @Model.GetWeekColor(i)"></div>
+                                    </div>
+                                    <span class="week-value">@week.Distance.ToString("F1")km</span>
+                                </div>
+                            </div>
+                            i++;
+                        }
+
+                        <div class="trend-summary">
+                            <div class="trend-item">
+                                <span class="trend-icon">📊</span>
+                                <span>Avg: @Model.GetAverageWeeklyDistance()km/week</span>
+                            </div>
+                            <div class="trend-item">
+                                <span class="trend-icon">📈</span>
+                                <span>Trend: @Model.GetWeeklyTrend()</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>🎯 Activity Distribution</h3>
+                    <div class="activity-distribution-chart">
+                        <div class="pie-chart">
+                            @foreach (var type in Model.GetActivityTypes())
+                            {
+                                <div class="pie-slice" style="background: @Model.GetActivityColor(type.Name); height: @(type.Percentage * 2)px;" title="@type.Name: @type.Percentage%"></div>
+                            }
+                        </div>
+
+                        <div class="chart-legend">
+                            @foreach (var type in Model.GetActivityTypes())
+                            {
+                                <div class="legend-item @(type.Percentage == 0 ? "no-data" : "")">
+                                    <div class="legend-color" style="background: @Model.GetActivityColor(type.Name)"></div>
+                                    <span class="legend-emoji">@Model.GetActivityEmoji(type.Name)</span>
+                                    <span class="legend-text">@type.Name</span>
+                                    <span class="legend-percentage">@type.Percentage%</span>
+                                    <span class="legend-count">(@type.Count)</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="distribution-summary">
+                            <div class="summary-item">
+                                <strong>@(Model.Statistics.MostCommonSport ?? "Running")</strong>
+                                <small>Most Active Sport</small>
+                            </div>
+                            <div class="summary-item">
+                                <strong>@Model.Statistics.TotalActivities</strong>
+                                <small>Total Activities</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-section-bonus">
+                <div class="chart-container-wide">
+                    <h3>🗓️ Monthly Activity Heatmap</h3>
+                    <div class="heatmap-chart">
+                        <div class="heatmap-container">
+                            @foreach (var month in Model.GetMonthlyData())
+                            {
+                                <div class="heatmap-month @(month.Count > 0 ? "active" : "")">
+                                    <div class="month-label">@month.Name</div>
+                                    <div class="month-bar" style="height: @month.Percentage%; background: @Model.GetMonthHeatColor(month.Count);" title="@month.Name: @month.Count activities"></div>
+                                    <div class="month-count">@month.Count</div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="heatmap-legend">
+                            <span>Less</span>
+                            <div class="heat-scale">
+                                <div class="heat-box heat-0"></div>
+                                <div class="heat-box heat-1"></div>
+                                <div class="heat-box heat-2"></div>
+                                <div class="heat-box heat-3"></div>
+                                <div class="heat-box heat-4"></div>
+                            </div>
+                            <span>More</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="navigation-actions">
+            <a asp-controller="Athletes" asp-action="Index" class="btn btn-secondary">← Back to Athletes</a>
+            <a asp-controller="Dashboard" asp-action="Index" asp-route-id="@Model.Athlete.Id" class="btn btn-primary">🔄 Refresh Data</a>
+        </div>
+    }
+</div>

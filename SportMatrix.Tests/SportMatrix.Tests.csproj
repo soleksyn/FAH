@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <AssemblyName>SportMatrix.Tests</AssemblyName>
+    <RootNamespace>SportMatrix.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="TngTech.ArchUnitNET.xUnit" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+	<PackageReference Include="Moq"  />
+	<PackageReference Include="FluentAssertions"  />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory"  />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SportMatrix.Application\SportMatrix.Application.csproj" />
+    <ProjectReference Include="..\SportMatrix.Domain\SportMatrix.Domain.csproj" />
+    <ProjectReference Include="..\SportMatrix.Infrastructure\SportMatrix.Infrastructure.csproj" />
+    <ProjectReference Include="..\SportMatrix.WebApi\SportMatrix.WebApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

@@ -1,106 +1,140 @@
 @model SportMatrix.Frontend.Models.AthleteDetailViewModel
 @{
-    ViewData["Title"] = "Athlet Details";
+    ViewData["Title"] = Model.Athlete != null
+        ? $"{Model.Athlete.FirstName} {Model.Athlete.LastName}"
+        : "Athlete Details";
+
+    var initials   = Model.Athlete != null
+        ? $"{Model.Athlete.FirstName?[..1]}{Model.Athlete.LastName?[..1]}".ToUpper()
+        : "?";
+    var colorIdx   = Model.Athlete?.LastName is { Length: > 0 } ln ? (int)ln[0] % 6 : 0;
+    var age        = Model.Athlete != null
+        ? (DateTime.Today.Year - Model.Athlete.DateOfBirth.Year).ToString()
+        : "—";
 }
 
-<div class="container mt-4">
-    @if (Model.Error != null)
-    {
-        <div class="alert alert-danger">
-            @Model.Error
-        </div>
-    }
+@if (Model.Error != null)
+{
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>@Model.Error</span>
+    </div>
+}
 
-    @if (Model.Loading)
-    {
-        <div class="text-center p-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Wird geladen...</span>
-            </div>
-        </div>
-    }
+@if (Model.Loading)
+{
+    <div class="loading-state">
+        <div class="spinner spinner-lg"></div>
+        <span>Loading athlete…</span>
+    </div>
+}
+else if (Model.Athlete != null)
+{
+    <!-- Profile hero -->
+    <div class="profile-hero">
+        <div class="avatar avatar-xl av-@colorIdx">@initials</div>
 
-    @if (!Model.Loading && Model.Athlete != null)
-    {
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Athlet: @Model.Athlete.FirstName @Model.Athlete.LastName</h2>
-            <div>
-                <a asp-controller="Dashboard" asp-action="Index" asp-route-id="@Model.Athlete.Id" class="btn btn-success me-2">
-                    <i class="bi bi-speedometer2"></i> Fitness Dashboard
-                </a>
-                <a asp-action="Edit" asp-route-id="@Model.Athlete.Id" class="btn btn-primary me-2">
-                    <i class="bi bi-pencil"></i> Bearbeiten
-                </a>
-                <form method="post" asp-action="Delete" asp-route-id="@Model.Athlete.Id" class="d-inline" onsubmit="return confirm('Bist du sicher, dass du diesen Athleten löschen möchtest?');">
-                    <button type="submit" class="btn btn-danger me-2">
-                        <i class="bi bi-trash"></i> Löschen
-                    </button>
-                </form>
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Zurück
-                </a>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <th>ID:</th>
-                                    <td>@Model.Athlete.Id</td>
-                                </tr>
-                                <tr>
-                                    <th>Vorname:</th>
-                                    <td>@Model.Athlete.FirstName</td>
-                                </tr>
-                                <tr>
-                                    <th>Nachname:</th>
-                                    <td>@Model.Athlete.LastName</td>
-                                </tr>
-                                <tr>
-                                    <th>E-Mail:</th>
-                                    <td>@Model.Athlete.Email</td>
-                                </tr>
-                                <tr>
-                                    <th>Geburtsdatum:</th>
-                                    <td>@Model.Athlete.DateOfBirth.ToString("dd.MM.yyyy")</td>
-                                </tr>
-                                <tr>
-                                    <th>Gewicht:</th>
-                                    <td>@Model.Athlete.Weight kg</td>
-                                </tr>
-                                <tr>
-                                    <th>Größe:</th>
-                                    <td>@Model.Athlete.Height cm</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="bi bi-lightning"></i> Schnellaktionen
-                            </div>
-                            <div class="card-body">
-                                <div class="d-grid gap-2">
-                                    <a asp-controller="Dashboard" asp-action="Index" asp-route-id="@Model.Athlete.Id" class="btn btn-outline-success">
-                                        <i class="bi bi-graph-up"></i> Fitness Dashboard öffnen
-                                    </a>
-                                    <button class="btn btn-outline-info" onclick="alert('Kommt bald!')">
-                                        <i class="bi bi-list-ul"></i> Aktivitäten anzeigen
-                                    </button>
-                                    <button class="btn btn-outline-warning" onclick="alert('Kommt bald!')">
-                                        <i class="bi bi-file-earmark-text"></i> Bericht erstellen
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="profile-hero-info">
+            <div class="profile-hero-name">@Model.Athlete.FirstName @Model.Athlete.LastName</div>
+            <div class="profile-hero-sub">@Model.Athlete.Email</div>
+            <div class="profile-chips">
+                <div class="profile-chip">
+                    <i class="bi bi-calendar3"></i>
+                    @Model.Athlete.DateOfBirth.ToString("dd MMM yyyy") &bull; @age yrs
+                </div>
+                <div class="profile-chip">
+                    <i class="bi bi-rulers"></i>
+                    @Model.Athlete.Height cm
+                </div>
+                <div class="profile-chip">
+                    <i class="bi bi-speedometer"></i>
+                    @Model.Athlete.Weight kg
                 </div>
             </div>
         </div>
-    }
-</div>
+
+        <div class="profile-hero-actions">
+            <a asp-controller="Dashboard" asp-action="Index" asp-route-id="@Model.Athlete.Id"
+               class="btn btn-orange">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.Athlete.Id" class="btn btn-ghost">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a asp-action="Index" class="btn btn-ghost">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <!-- Detail grid -->
+    <div class="detail-grid">
+
+        <!-- Personal info card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-person-fill"></i> Personal Information</div>
+            </div>
+            <div class="card-body">
+                <table class="detail-table">
+                    <tbody>
+                        <tr>
+                            <th>ID</th>
+                            <td><span class="badge badge-gray">#@Model.Athlete.Id</span></td>
+                        </tr>
+                        <tr>
+                            <th>First name</th>
+                            <td>@Model.Athlete.FirstName</td>
+                        </tr>
+                        <tr>
+                            <th>Last name</th>
+                            <td>@Model.Athlete.LastName</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>@Model.Athlete.Email</td>
+                        </tr>
+                        <tr>
+                            <th>Date of birth</th>
+                            <td>@Model.Athlete.DateOfBirth.ToString("dd MMMM yyyy")</td>
+                        </tr>
+                        <tr>
+                            <th>Weight</th>
+                            <td>@Model.Athlete.Weight <span class="text-muted">kg</span></td>
+                        </tr>
+                        <tr>
+                            <th>Height</th>
+                            <td>@Model.Athlete.Height <span class="text-muted">cm</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Quick actions card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-lightning-fill"></i> Quick Actions</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+                <a asp-controller="Dashboard" asp-action="Index" asp-route-id="@Model.Athlete.Id"
+                   class="btn btn-orange">
+                    <i class="bi bi-graph-up"></i> Open Fitness Dashboard
+                </a>
+                <a asp-action="Edit" asp-route-id="@Model.Athlete.Id" class="btn btn-ghost">
+                    <i class="bi bi-pencil"></i> Edit Profile
+                </a>
+
+                <hr class="divider" />
+
+                <form method="post" asp-action="Delete" asp-route-id="@Model.Athlete.Id"
+                      onsubmit="return confirm('Delete @Model.Athlete.FirstName @Model.Athlete.LastName? This cannot be undone.');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger-outline" style="width:100%;">
+                        <i class="bi bi-trash3"></i> Delete Athlete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+}

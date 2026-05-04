@@ -1,0 +1,64 @@
+/* ============================================================
+   SportMatrix Design Tokens (Orange & Mint Theme)
+   ============================================================ */
+
+:root {
+    /* ── Colors ─────────────────────────────────────────── */
+    /* Primary (Orange) */
+    --color-orange:       #F97316; /* Tailwind Orange 500 */
+    --color-orange-hover: #EA580C; /* Tailwind Orange 600 */
+    --color-orange-muted: #FFEDD5; /* Tailwind Orange 100 */
+    
+    /* Secondary (Mint) */
+    --color-mint:         #10B981; /* Tailwind Emerald 500 */
+    --color-mint-hover:   #059669; /* Tailwind Emerald 600 */
+    --color-mint-muted:   #D1FAE5; /* Tailwind Emerald 100 */
+
+    /* Neutrals */
+    --color-bg:           #FAFAF9; /* Stone 50 */
+    --color-surface:      #FFFFFF;
+    --color-surface-alt:  #F5F5F4; /* Stone 100 */
+    --color-border:       #E7E5E4; /* Stone 200 */
+    
+    /* Text */
+    --color-text:         #1C1917; /* Stone 900 */
+    --color-text-2:       #44403C; /* Stone 700 */
+    --color-text-3:       #78716C; /* Stone 500 */
+    
+    /* Status */
+    --color-danger:       #EF4444;
+    --color-success:      var(--color-mint);
+    --color-info:         #3B82F6;
+
+    /* ── Effects ────────────────────────────────────────── */
+    --shadow-sm:     0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-card:   0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-hover:  0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    
+    --radius-sm:     6px;
+    --radius-md:     10px;
+    --radius-lg:     16px;
+
+    /* ── Layout ─────────────────────────────────────────── */
+    --sidebar-width: 260px;
+    --topbar-height: 64px;
+    --content-max-width: 1200px;
+}
+
+/* ── Global Resets ──────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--color-orange); text-decoration: none; transition: 0.2s; }
+a:hover { color: var(--color-orange-hover); }
+
+ul { list-style: none; padding: 0; margin: 0; }

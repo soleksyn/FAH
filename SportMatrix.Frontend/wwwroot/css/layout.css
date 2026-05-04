@@ -1,0 +1,141 @@
+/* ============================================================
+   SportMatrix Layout Shell (Sidebar + Topbar)
+   ============================================================ */
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ── Sidebar ────────────────────────────────────────────── */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-brand {
+    height: var(--topbar-height);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 12px;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-weight: 700;
+}
+
+.sidebar-brand-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--color-orange);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 1.2rem;
+}
+
+.sidebar-brand-label { display: flex; flex-direction: column; line-height: 1.2; }
+.sidebar-brand-name { font-size: 1.1rem; }
+.sidebar-brand-sub { font-size: 0.7rem; color: var(--color-text-3); font-weight: 500; }
+
+.sidebar-nav { padding: 24px 12px; flex: 1; }
+
+.nav-section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-3);
+    margin-bottom: 8px;
+    padding: 0 12px;
+    display: block;
+}
+
+.nav-link-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-2);
+    font-weight: 500;
+    margin-bottom: 4px;
+    transition: 0.2s;
+}
+
+.nav-link-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+.nav-link-item:hover { background-color: var(--color-surface-alt); color: var(--color-orange); }
+.nav-link-item.active { background-color: var(--color-orange-muted); color: var(--color-orange); }
+
+.sidebar-footer {
+    padding: 20px 24px;
+    font-size: 0.75rem;
+    color: var(--color-text-3);
+    border-top: 1px solid var(--color-border);
+}
+
+/* ── Main Wrapper ────────────────────────────────────────── */
+.main-wrapper {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Prevent flex overflow */
+}
+
+.topbar {
+    height: var(--topbar-height);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+}
+
+.topbar-toggle { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+
+.topbar-title { font-weight: 600; font-size: 1rem; color: var(--color-text); }
+
+.main-content {
+    padding: 32px;
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.is-open { transform: translateX(0); }
+    .main-wrapper { margin-left: 0; }
+    .topbar-toggle { display: block; }
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 45;
+        backdrop-filter: blur(2px);
+    }
+    .sidebar-overlay.is-open { display: block; }
+}
+
+@media (max-width: 640px) {
+    .topbar { padding: 0 16px; }
+    .main-content { padding: 20px 16px; }
+}

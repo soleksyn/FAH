@@ -1,0 +1,190 @@
+/* ============================================================
+   Athletes pages — card grid, profile hero, details layout
+   ============================================================ */
+
+/* ── Athlete card grid ────────────────────────────────────── */
+.athlete-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+.athlete-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    padding: 24px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: box-shadow 0.2s, transform 0.2s;
+    animation: cardIn 0.4s ease-out both;
+}
+
+.athlete-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-3px);
+}
+
+.athlete-card-avatar { margin-bottom: 14px; }
+
+.athlete-card-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 4px;
+}
+
+.athlete-card-email {
+    font-size: 0.78rem;
+    color: var(--color-text-2);
+    margin-bottom: 14px;
+    word-break: break-all;
+}
+
+.athlete-card-stats {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.athlete-stat-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 7px 12px;
+    background: var(--color-surface-alt);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    min-width: 64px;
+}
+
+.athlete-stat-chip span:first-child {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.2;
+}
+
+.athlete-stat-chip span:last-child {
+    font-size: 0.68rem;
+    color: var(--color-text-3);
+    font-weight: 500;
+}
+
+.athlete-card-actions {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+    border-top: 1px solid var(--color-border);
+    padding-top: 14px;
+    margin-top: auto;
+}
+
+.athlete-card:nth-child(2) { animation-delay: 0.05s; }
+.athlete-card:nth-child(3) { animation-delay: 0.10s; }
+.athlete-card:nth-child(4) { animation-delay: 0.15s; }
+.athlete-card:nth-child(5) { animation-delay: 0.20s; }
+.athlete-card:nth-child(6) { animation-delay: 0.25s; }
+
+/* ── Athlete profile hero ─────────────────────────────────── */
+.profile-hero {
+    background: linear-gradient(130deg, var(--color-orange-muted) 0%, var(--color-surface) 60%);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    padding: 28px 28px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 22px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.profile-hero-info { flex: 1; min-width: 200px; }
+
+.profile-hero-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 4px;
+}
+
+.profile-hero-sub {
+    font-size: 0.85rem;
+    color: var(--color-text-2);
+    margin-bottom: 14px;
+}
+
+.profile-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.profile-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 99px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-2);
+}
+
+.profile-chip i { color: var(--color-orange); font-size: 0.85rem; }
+
+.profile-hero-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+/* ── Detail grid ──────────────────────────────────────────── */
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+}
+
+@media (max-width: 800px) { .detail-grid { grid-template-columns: 1fr; } }
+
+.detail-table { width: 100%; border-collapse: collapse; }
+
+.detail-table tr + tr td,
+.detail-table tr + tr th { border-top: 1px solid var(--color-border); }
+
+.detail-table th {
+    padding: 12px 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    width: 130px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.detail-table td {
+    padding: 12px 0;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    vertical-align: middle;
+}
+
+/* ── Animations ───────────────────────────────────────────── */
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

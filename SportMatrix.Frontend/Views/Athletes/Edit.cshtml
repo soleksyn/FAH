@@ -1,95 +1,105 @@
 @model SportMatrix.Frontend.Models.AthleteEditViewModel
 @{
-    ViewData["Title"] = "Athleten bearbeiten";
+    ViewData["Title"] = "Edit Athlete";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Athleten bearbeiten</h2>
-        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Zurück
+<div class="page-header">
+    <div>
+        <h1>Edit Athlete</h1>
+        <p>Update the athlete's personal information and body metrics.</p>
+    </div>
+    <div class="page-header-actions">
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-ghost">
+            <i class="bi bi-arrow-left"></i> Back
         </a>
     </div>
-
-    @if (Model.Error != null)
-    {
-        <div class="alert alert-danger">
-            @Model.Error
-        </div>
-    }
-
-    @if (Model.Loading)
-    {
-        <div class="text-center p-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Wird geladen...</span>
-            </div>
-        </div>
-    }
-
-    @if (!Model.Loading)
-    {
-        <div class="card">
-            <div class="card-body">
-                <form method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <input type="hidden" asp-for="Id" />
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label asp-for="FirstName" class="form-label">Vorname *</label>
-                            <input asp-for="FirstName" class="form-control" />
-                            <span asp-validation-for="FirstName" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label asp-for="LastName" class="form-label">Nachname *</label>
-                            <input asp-for="LastName" class="form-control" />
-                            <span asp-validation-for="LastName" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label">E-Mail *</label>
-                        <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="DateOfBirth" class="form-label">Geburtsdatum *</label>
-                        <input asp-for="DateOfBirth" type="date" class="form-control" />
-                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Weight" class="form-label">Gewicht (kg) *</label>
-                            <input asp-for="Weight" type="number" step="0.1" class="form-control" />
-                            <span asp-validation-for="Weight" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Height" class="form-label">Größe (cm) *</label>
-                            <input asp-for="Height" type="number" step="0.1" class="form-control" />
-                            <span asp-validation-for="Height" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end mt-4">
-                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary me-2">Abbrechen</a>
-                        <button type="submit" class="btn btn-primary" disabled="@(Model.Submitting ? "disabled" : null)">
-                            @if (Model.Submitting)
-                            {
-                                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                            }
-                            Speichern
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    }
 </div>
+
+@if (Model.Error != null)
+{
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>@Model.Error</span>
+    </div>
+}
+
+@if (Model.Loading)
+{
+    <div class="loading-state">
+        <div class="spinner spinner-lg"></div>
+        <span>Loading athlete…</span>
+    </div>
+}
+else
+{
+    <div class="form-card" style="max-width:640px;">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="margin:20px 20px 0; @(ViewData.ModelState.IsValid ? "display:none" : "")"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-section">
+                <div class="form-section-title">Identity</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="FirstName" class="form-label">First Name <span style="color:var(--color-danger)">*</span></label>
+                        <input asp-for="FirstName" class="form-control" placeholder="Anna" />
+                        <div asp-validation-for="FirstName" class="form-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LastName" class="form-label">Last Name <span style="color:var(--color-danger)">*</span></label>
+                        <input asp-for="LastName" class="form-control" placeholder="Schmidt" />
+                        <div asp-validation-for="LastName" class="form-error"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="form-label">Email <span style="color:var(--color-danger)">*</span></label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="anna@example.com" />
+                    <div asp-validation-for="Email" class="form-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DateOfBirth" class="form-label">Date of Birth <span style="color:var(--color-danger)">*</span></label>
+                    <input asp-for="DateOfBirth" type="date" class="form-control" />
+                    <div asp-validation-for="DateOfBirth" class="form-error"></div>
+                </div>
+            </div>
+
+            <div class="form-section" style="padding-top:20px;padding-bottom:20px;">
+                <div class="form-section-title">Body Metrics</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Weight" class="form-label">Weight (kg) <span style="color:var(--color-danger)">*</span></label>
+                        <input asp-for="Weight" type="number" step="0.1" min="20" max="300" class="form-control" />
+                        <div asp-validation-for="Weight" class="form-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Height" class="form-label">Height (cm) <span style="color:var(--color-danger)">*</span></label>
+                        <input asp-for="Height" type="number" step="0.1" min="100" max="250" class="form-control" />
+                        <div asp-validation-for="Height" class="form-error"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-ghost">Cancel</a>
+                <button type="submit" class="btn btn-orange" disabled="@(Model.Submitting ? "disabled" : null)">
+                    @if (Model.Submitting)
+                    {
+                        <span class="spinner"></span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-check2"></i>
+                    }
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

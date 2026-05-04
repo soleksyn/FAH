@@ -3,49 +3,102 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Fitness Analytics Hub</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <meta name="description" content="SportMatrix — Personal fitness analytics and AI-powered training insights." />
+    <title>@ViewData["Title"] — SportMatrix</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <!-- SportMatrix stylesheets -->
+    <link rel="stylesheet" href="~/css/tokens.css"     asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout.css"     asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboard.css"  asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/athletes.css"   asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-custom-background">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                <img src="~/images/logo.png" alt="Fitness Analytics Hub Logo" height="40" width="40" class="me-2" />
-                <span>Fitness Analytics Hub</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Athletes" asp-action="Index">
-                            <i class="bi bi-people"></i> Athleten
-                        </a>
-                    </li>
-                </ul>
+
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var currentAction     = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+}
+
+<!-- Mobile sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="app-shell">
+
+    <!-- ── Sidebar ──────────────────────────────────────────── -->
+    <aside class="sidebar" id="appSidebar">
+
+        <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
+            <div class="sidebar-brand-icon">
+                <i class="bi bi-activity"></i>
             </div>
+            <div class="sidebar-brand-label">
+                <span class="sidebar-brand-name">SportMatrix</span>
+                <span class="sidebar-brand-sub">Analytics Hub</span>
+            </div>
+        </a>
+
+        <nav class="sidebar-nav">
+            <span class="nav-section-label">Navigation</span>
+
+            <a class="nav-link-item @(currentController == "Dashboard" ? "active" : "")"
+               asp-controller="Dashboard" asp-action="Index">
+                <i class="bi bi-speedometer2"></i>
+                Dashboard
+            </a>
+
+            <a class="nav-link-item @(currentController == "Athletes" ? "active" : "")"
+               asp-controller="Athletes" asp-action="Index">
+                <i class="bi bi-people"></i>
+                Athletes
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            &copy; 2025 SportMatrix
         </div>
-    </nav>
+    </aside>
 
-    <main>
-        @RenderBody()
-    </main>
+    <!-- ── Main wrapper ─────────────────────────────────────── -->
+    <div class="main-wrapper">
 
-    <footer class="bg-light text-center text-lg-start mt-5">
-        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05)">
-            &copy; 2025 Fitness Analytics Hub
-        </div>
-    </footer>
+        <!-- Topbar -->
+        <header class="topbar">
+            <button class="topbar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                <i class="bi bi-list"></i>
+            </button>
+            <span class="topbar-title">@ViewData["Title"]</span>
+            <div class="topbar-right">
+                <span style="font-size:0.8rem; color:var(--color-text-2);">
+                    <i class="bi bi-circle-fill" style="color:var(--color-mint);font-size:0.5rem;vertical-align:middle;margin-right:4px;"></i>
+                    Live
+                </span>
+            </div>
+        </header>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+        <!-- Main content -->
+        <main class="main-content">
+            @RenderBody()
+        </main>
+
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<!-- SportMatrix JS -->
+<script src="~/js/charts.js" asp-append-version="true"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

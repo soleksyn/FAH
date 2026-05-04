@@ -1,0 +1,185 @@
+/* ============================================================
+   SportMatrix Dashboard Specifics
+   ============================================================ */
+
+/* ── Motivation Banner ──────────────────────────────────── */
+.motivation-banner {
+    background: linear-gradient(135deg, var(--color-orange) 0%, #FB923C 100%);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.2);
+}
+
+.motivation-banner-icon { font-size: 2.5rem; opacity: 0.9; }
+.motivation-banner-body h3 { margin: 0 0 4px 0; font-size: 1.25rem; font-weight: 700; }
+.motivation-banner-body p { margin: 0; opacity: 0.95; font-size: 0.95rem; font-style: italic; }
+
+/* ── Stat Cards ─────────────────────────────────────────── */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: 0.2s;
+}
+
+.stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--color-orange-muted); }
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.stat-icon.orange { background: var(--color-orange-muted); color: var(--color-orange); }
+.stat-icon.mint   { background: var(--color-mint-muted);   color: var(--color-mint); }
+
+.stat-info { display: flex; flex-direction: column; }
+.stat-number { font-size: 1.5rem; font-weight: 700; color: var(--color-text); line-height: 1; }
+.stat-label { font-size: 0.8rem; color: var(--color-text-3); font-weight: 500; margin-top: 4px; }
+
+/* ── Activity List ──────────────────────────────────────── */
+.activity-list { display: flex; flex-direction: column; gap: 12px; }
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    transition: 0.2s;
+}
+
+.activity-item:hover { background-color: var(--color-surface-alt); }
+
+.activity-sport-dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.sport-run     { background: #FEE2E2; color: #DC2626; }
+.sport-ride    { background: #E0F2FE; color: #0284C7; }
+.sport-swim    { background: #CCFBF1; color: #0D9488; }
+.sport-walk    { background: #F3F4F6; color: #4B5563; }
+.sport-hike    { background: #FEF3C7; color: #D97706; }
+.sport-workout { background: #F5F3FF; color: #7C3AED; }
+.sport-yoga    { background: #FDF2F8; color: #DB2777; }
+.sport-other   { background: #F3F4F6; color: #4B5563; }
+
+.activity-info { flex: 1; min-width: 0; }
+.activity-name { font-weight: 600; font-size: 0.9rem; color: var(--color-text); margin-bottom: 2px; }
+.activity-meta { font-size: 0.75rem; color: var(--color-text-3); display: flex; gap: 12px; }
+.activity-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* ── AI Panel ───────────────────────────────────────────── */
+.ai-panel {
+    background: #064E3B; /* Deep Emerald */
+    border-radius: var(--radius-lg);
+    color: #ECFDF5;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-panel-header {
+    background: rgba(16, 185, 129, 0.1);
+    padding: 20px 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.ai-panel-header i { color: #34D399; }
+
+.ai-panel-body { padding: 24px; flex: 1; overflow-y: auto; }
+
+.insight-block { margin-bottom: 24px; }
+.insight-block:last-child { margin-bottom: 0; }
+.insight-block-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #6EE7B7; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+
+.insight-list { display: flex; flex-direction: column; gap: 10px; }
+.insight-list li { padding-left: 18px; position: relative; font-size: 0.9rem; line-height: 1.4; opacity: 0.9; }
+.insight-list li::before { content: '→'; position: absolute; left: 0; color: #10B981; }
+
+.formatted-analysis { font-size: 0.9rem; line-height: 1.6; color: #D1FAE5; }
+.formatted-analysis p { margin-bottom: 12px; }
+
+.score-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 99px; margin-top: 8px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 99px; }
+.score-excellent { background: #10B981; }
+.score-good      { background: #34D399; }
+.score-fair      { background: #FBBF24; }
+.score-poor      { background: #EF4444; }
+
+.quick-actions {
+    background: rgba(0,0,0,0.2);
+    padding: 16px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.quick-action-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.quick-action-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+/* ── Dashboard Grid ─────────────────────────────────────── */
+.dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    margin-bottom: 32px;
+    align-items: start;
+}
+
+@media (max-width: 1100px) { .dash-grid { grid-template-columns: 1fr; } }
+
+/* ── Charts Grid ────────────────────────────────────────── */
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+@media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
+
+.chart-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 24px; }
+.chart-card h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.chart-card h3 i { color: var(--color-orange); }
+.chart-card h3 i.mint { color: var(--color-mint); }
+
+.chart-card-wide { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 24px; margin-bottom: 32px; }
+.chart-card-wide h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.chart-card-wide h3 i.mint { color: var(--color-mint); }

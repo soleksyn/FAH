@@ -1,8 +1,8 @@
-namespace SportMatrix.AIAssistant.Application.DTOs;
+ï»¿namespace SportMatrix.AIAssistant.Application.DTOs;
 
 /// <summary>
-/// AthleteProfile DTO für gRPC-JSON
-/// (Entspricht dem gRPC AthleteProfile als JSON)
+/// AthleteProfile DTO for gRPC-JSON
+/// (Mirrors the gRPC AthleteProfile as JSON)
 /// </summary>
 public class GrpcJsonAthleteProfileDto
 {

@@ -1,5 +1,3 @@
-using SportMatrix.AIAssistant.Application.DTOs;
-
 namespace SportMatrix.AIAssistant.Application.DTOs;
 
 public class WorkoutAnalysisRequestDto

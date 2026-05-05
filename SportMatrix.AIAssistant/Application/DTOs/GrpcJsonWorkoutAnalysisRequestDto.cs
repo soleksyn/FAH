@@ -1,7 +1,7 @@
-namespace SportMatrix.AIAssistant.Application.DTOs;
+ï»¿namespace SportMatrix.AIAssistant.Application.DTOs;
 
 /// <summary>
-/// Request DTO für gRPC-JSON WorkoutAnalysis
+/// Request DTO for gRPC-JSON WorkoutAnalysis
 /// </summary>
 public class GrpcJsonWorkoutAnalysisRequestDto
 {

@@ -1,4 +1,4 @@
-namespace SportMatrix.Infrastructure.Services;
+﻿namespace SportMatrix.Infrastructure.Services;
 
 using System.Globalization;
 using System.Text;
@@ -23,7 +23,7 @@ public class AIAssistantClientService : IAIAssistantClientService
         this.logger = logger;
         this.configuration = configuration;
 
-        // AIAssistant Base URL aus Configuration
+        // AIAssistant Base URL from configuration
         string aiAssistantUrl = this.configuration["AIAssistant:BaseUrl"] ?? "http://localhost:5169";
         this.httpClient.BaseAddress = new Uri(aiAssistantUrl);
         this.httpClient.Timeout = TimeSpan.FromSeconds(30);
@@ -37,7 +37,7 @@ public class AIAssistantClientService : IAIAssistantClientService
             "Requesting motivation for athlete: {AthleteName}",
             request.AthleteProfile?.Name ?? "Unknown");
 
-        // Konvertiere zu AIAssistant DTO Format
+        // Convert to AIAssistant DTO format
         AIAssistantMotivationRequest aiRequest = new AIAssistantMotivationRequest
         {
             AthleteProfile = new AIAssistantAthleteProfile
@@ -61,7 +61,7 @@ public class AIAssistantClientService : IAIAssistantClientService
         string json = JsonSerializer.Serialize(aiRequest);
         StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        HttpResponseMessage response = await this.httpClient.PostAsync("/api/MotivationCoach/motivate/huggingface", content, cancellationToken);
+        HttpResponseMessage response = await this.httpClient.PostAsync("/api/MotivationCoach/motivate", content, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -86,7 +86,7 @@ public class AIAssistantClientService : IAIAssistantClientService
                            tips.EnumerateArray().Select(t => t.GetString()).Where(s => s != null).Cast<string>().ToList() :
                            null,
             GeneratedAt = DateTime.UtcNow,
-            Source = "AIAssistant-HuggingFace",
+            Source = "AIAssistant-Gemini",
         };
     }
 
@@ -96,7 +96,7 @@ public class AIAssistantClientService : IAIAssistantClientService
             "Requesting workout analysis for {WorkoutCount} workouts, type: {AnalysisType}",
             request.RecentWorkouts?.Count ?? 0, request.AnalysisType ?? "General");
 
-        // Konvertiere zu AIAssistant DTO Format
+        // Convert to AIAssistant DTO format
         AIAssistantWorkoutAnalysisRequest aiRequest = new AIAssistantWorkoutAnalysisRequest
         {
             AthleteProfile = request.AthleteProfile != null ? new AIAssistantAthleteProfile
@@ -121,8 +121,7 @@ public class AIAssistantClientService : IAIAssistantClientService
         string json = JsonSerializer.Serialize(aiRequest);
         StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        // var response = await _httpClient.PostAsync("/api/WorkoutAnalysis/analyze/huggingface", content, cancellationToken);
-        HttpResponseMessage response = await this.httpClient.PostAsync("/api/WorkoutAnalysis/analyze/googlegemini", content, cancellationToken);
+        HttpResponseMessage response = await this.httpClient.PostAsync("/api/WorkoutAnalysis/analyze", content, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -150,7 +149,7 @@ public class AIAssistantClientService : IAIAssistantClientService
                             recs.EnumerateArray().Select(r => r.GetString()).Where(s => s != null).Cast<string>().ToList() :
                             new List<string>(),
             GeneratedAt = DateTime.UtcNow,
-            Source = "AIAssistant-HuggingFace",
+            Source = "AIAssistant-Gemini",
         };
     }
 
@@ -217,21 +216,21 @@ public class AIAssistantClientService : IAIAssistantClientService
 
     public Task<AIWorkoutAnalysisResponseDto> GetPerformanceTrendsAsync(int athleteId, CancellationToken cancellationToken, string timeFrame = "month")
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException("Performance trends are not supported via the HTTP client. Use gRPC or gRPC-JSON client instead.");
     }
 
     public Task<AIWorkoutAnalysisResponseDto> GetTrainingRecommendationsAsync(int athleteId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException("Training recommendations are not supported via the HTTP client. Use gRPC or gRPC-JSON client instead.");
     }
 
     public Task<AIWorkoutAnalysisResponseDto> AnalyzeHealthMetricsAsync(int athleteId, List<AIWorkoutDataDto> recentWorkouts, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException("Health metrics analysis is not supported via the HTTP client. Use gRPC or gRPC-JSON client instead.");
     }
 
     public Task<AIWorkoutAnalysisResponseDto> GetGoogleGeminiWorkoutAnalysisAsync(AIWorkoutAnalysisRequestDto request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException("GoogleGemini-specific analysis is not supported via the HTTP client. Use gRPC or gRPC-JSON client instead.");
     }
 }

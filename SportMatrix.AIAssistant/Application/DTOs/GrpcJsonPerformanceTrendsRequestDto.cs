@@ -1,9 +1,9 @@
-namespace SportMatrix.AIAssistant.Application.DTOs;
+ï»¿namespace SportMatrix.AIAssistant.Application.DTOs;
 
 using System.ComponentModel.DataAnnotations;
 
 /// <summary>
-/// Request DTO für Performance Trends
+/// Request DTO for Performance Trends
 /// </summary>
 public class GrpcJsonPerformanceTrendsRequestDto
 {

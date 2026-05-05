@@ -1,4 +1,4 @@
-using SportMatrix.Application.Interfaces;
+ï»¿using SportMatrix.Application.Interfaces;
 using SportMatrix.Infrastructure.Configuration;
 using SportMatrix.Infrastructure.Extensions;
 using SportMatrix.Infrastructure.Persistence;
@@ -16,20 +16,17 @@ public static class InfrastructureServiceRegistration
         services.AddDbContext<ApplicationDbContext>(options =>
                 DatabaseConfiguration.ConfigureDatabase(options, configuration));
 
-        // Register DbContext Interface
+        // Register DbContext interface
         services.AddScoped<IApplicationDbContext>(provider =>
             provider.GetRequiredService<ApplicationDbContext>());
 
-        // Service registrieren
-        services.AddScoped<IAIAssistantClientService, AIAssistantClientService>();
-
-        // HttpClient für AIAssistant registrieren
+        // Register AIAssistant HTTP client
         services.AddHttpClient<IAIAssistantClientService, AIAssistantClientService>(client =>
         {
             client.BaseAddress = new Uri(configuration["AIAssistant:BaseUrl"] ?? "http://localhost:5169");
         });
 
-        // HealthChecks für die Infrastruktur hinzufügen
+        // Add infrastructure health checks
         services.AddHealthChecks()
             .AddInfrastructureHealthChecks(configuration);
 

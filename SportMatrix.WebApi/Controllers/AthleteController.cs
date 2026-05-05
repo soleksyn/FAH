@@ -51,9 +51,7 @@ public class AthleteController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        {
-            await this.athleteService.DeleteAthleteAsync(id, cancellationToken);
-            return this.NoContent();
-        }
+        await this.athleteService.DeleteAthleteAsync(id, cancellationToken);
+        return this.NoContent();
     }
 }

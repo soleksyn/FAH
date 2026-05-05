@@ -3,7 +3,6 @@
 using System.Text.RegularExpressions;
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
-using SportMatrix.AIAssistant.Application.DTOs;
 
 public class MotivationCoachService : IMotivationCoachService
 {
@@ -42,7 +41,6 @@ public class MotivationCoachService : IMotivationCoachService
         {
             this.logger.LogError(ex, "Error generating motivational message");
 
-            // Fallback motivational message
             return new MotivationResponseDto
             {
                 MotivationalMessage = this.GetFallbackMotivation(request),
@@ -57,8 +55,6 @@ public class MotivationCoachService : IMotivationCoachService
             };
         }
     }
-
-
 
     private string BuildMotivationPrompt(MotivationRequestDto request)
     {
@@ -75,7 +71,6 @@ public class MotivationCoachService : IMotivationCoachService
             "The athlete is currently struggling with motivation and needs extra encouragement." :
             "The athlete is looking for additional motivation to stay on track.";
 
-        // Optimiert für moderne AI Models (HuggingFace, OpenAI, etc.)
         return $@"Create a motivational fitness message for {athleteName}.
 
 Athlete Profile:
@@ -96,15 +91,13 @@ Response:";
 
     private MotivationResponseDto ParseMotivationResponse(string aiResponse)
     {
-        MotivationResponseDto response = new MotivationResponseDto
+        return new MotivationResponseDto
         {
             MotivationalMessage = this.ExtractMotivationalMessage(aiResponse),
             Quote = this.ExtractQuote(aiResponse),
             ActionableTips = this.ExtractTips(aiResponse),
             GeneratedAt = DateTime.UtcNow,
         };
-
-        return response;
     }
 
     private string ExtractMotivationalMessage(string aiResponse)
@@ -114,7 +107,7 @@ Response:";
             return "You're doing great! Keep up the excellent work with your fitness journey.";
         }
 
-        // Extrahiere Hauptnachricht (ersten Absatz oder bis zum Quote/Tips)
+        // Extract main message (first paragraph or until Quote/Tips section)
         string[] lines = aiResponse.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         List<string> messageLines = new List<string>();
 
@@ -122,7 +115,7 @@ Response:";
         {
             string cleanLine = line.Trim();
 
-            // Stoppe bei strukturierten Abschnitten
+            // Stop at structured sections
             if (cleanLine.StartsWith("Quote:", StringComparison.OrdinalIgnoreCase) ||
                 cleanLine.StartsWith("Tips:", StringComparison.OrdinalIgnoreCase) ||
                 cleanLine.StartsWith("Actionable", StringComparison.OrdinalIgnoreCase) ||
@@ -132,7 +125,7 @@ Response:";
                 break;
             }
 
-            // Ignoriere reine Quotes in Anführungszeichen am Anfang von Zeilen
+            // Skip standalone quoted strings
             if (cleanLine.StartsWith('"') && cleanLine.EndsWith('"') && cleanLine.Length > 20)
             {
                 continue;
@@ -147,7 +140,7 @@ Response:";
         string result = messageLines.Any() ? string.Join(" ", messageLines) :
                     "You're doing great! Keep up the excellent work with your fitness journey.";
 
-        // Begrenze die Länge
+        // Limit length
         if (result.Length > 300)
         {
             string[] sentences = result.Split('.', StringSplitOptions.RemoveEmptyEntries);
@@ -164,7 +157,7 @@ Response:";
             return null;
         }
 
-        // Suche nach Zitaten in Anführungszeichen
+        // Search for quoted strings
         MatchCollection quoteMatches = System.Text.RegularExpressions.Regex.Matches(
             aiResponse, @"""([^""]{10,})""", RegexOptions.None, TimeSpan.FromMilliseconds(100));
 
@@ -172,7 +165,7 @@ Response:";
         {
             string quote = match.Groups[1].Value.Trim();
 
-            // Filter motivational quotes (no technical texts)
+            // Filter motivational quotes (exclude technical texts)
             if (quote.Length >= 15 && quote.Length <= 150 &&
                 (quote.Contains("success") || quote.Contains("achieve") || quote.Contains("goal") ||
                  quote.Contains("dream") || quote.Contains("believe") || quote.Contains("strong") ||
@@ -191,7 +184,7 @@ Response:";
                 string quoteLine = quoteParts[1].Split('\n')[0].Trim().Trim('"', '-', '*').Trim();
                 if (!string.IsNullOrWhiteSpace(quoteLine) && quoteLine.Length >= 15)
                 {
-                    return quoteLine; // ? No keyword check anymore
+                    return quoteLine;
                 }
             }
         }
@@ -208,7 +201,7 @@ Response:";
 
         List<string> tips = new List<string>();
 
-        // Suche nach "Tips:" oder ähnlichen Labels
+        // Search for "Tips:" or similar labels
         string tipsSection = string.Empty;
         string lowerResponse = aiResponse.ToLower();
 
@@ -239,7 +232,7 @@ Response:";
                     tips.Add(cleanLine);
                     if (tips.Count >= 3)
                     {
-                        break; // Maximal 3 Tips
+                        break;
                     }
                 }
             }
@@ -262,11 +255,7 @@ Response:";
             $"Amazing work, {athleteName}! Your commitment to {primaryGoal} is paying off. Stay strong and keep moving forward!",
         };
 
-        using System.Security.Cryptography.RandomNumberGenerator rng = System.Security.Cryptography.RandomNumberGenerator.Create();
-        byte[] randomBytes = new byte[4];
-        rng.GetBytes(randomBytes);
-        int randomIndex = Math.Abs(BitConverter.ToInt32(randomBytes, 0)) % motivations.Length;
+        int randomIndex = Random.Shared.Next(motivations.Length);
         return motivations[randomIndex];
     }
 }
-

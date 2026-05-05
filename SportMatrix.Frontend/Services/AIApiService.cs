@@ -6,10 +6,12 @@ namespace SportMatrix.Frontend.Services;
 public class AIApiService
 {
     private readonly HttpClient _httpClient;
+    private readonly DemoDataService _demoDataService;
 
-    public AIApiService(HttpClient httpClient)
+    public AIApiService(HttpClient httpClient, DemoDataService demoDataService)
     {
         _httpClient = httpClient;
+        _demoDataService = demoDataService;
     }
 
     public async Task<AIAnalysisDto?> AnalyzeWorkoutAsync(int athleteId, List<WorkoutDataDto> recentWorkouts, string analysisType = "Performance")
@@ -84,35 +86,9 @@ public class AIApiService
         return MapToAnalysis(aiResponse);
     }
 
-    private static List<WorkoutDataDto> GetDemoWorkouts()
+    private List<WorkoutDataDto> GetDemoWorkouts()
     {
-        return
-        [
-            new WorkoutDataDto
-            {
-                Date = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-ddTHH:mm:ss"),
-                ActivityType = "Run",
-                Distance = 5.2,
-                MovingTime = "00:28:00",
-                Calories = 420
-            },
-            new WorkoutDataDto
-            {
-                Date = DateTime.UtcNow.AddDays(-2).ToString("yyyy-MM-ddTHH:mm:ss"),
-                ActivityType = "Ride",
-                Distance = 24.8,
-                MovingTime = "01:15:00",
-                Calories = 890
-            },
-            new WorkoutDataDto
-            {
-                Date = DateTime.UtcNow.AddDays(-3).ToString("yyyy-MM-ddTHH:mm:ss"),
-                ActivityType = "Run",
-                Distance = 3.1,
-                MovingTime = "00:18:00",
-                Calories = 245
-            }
-        ];
+        return _demoDataService.GetWorkouts();
     }
 
 

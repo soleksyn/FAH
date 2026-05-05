@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 package sportmatrix;
 
@@ -9,9 +9,9 @@ message AthleteProfile {
 }
 
 message Workout {
-  string date = 1;              // DateTime als string
+  string date = 1;              // DateTime as string
   string activity_type = 2;     // "Running", "Cycling", etc.
-  double distance = 3;          // Kilometer
-  int32 duration = 4;           // Minuten
-  int32 calories = 5;           // Verbrannte Kalorien
+  double distance = 3;          // Kilometers
+  int32 duration = 4;           // Minutes
+  int32 calories = 5;           // Calories burned
 }

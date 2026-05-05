@@ -1,9 +1,9 @@
-using System.ComponentModel.DataAnnotations;
+ï»¿using System.ComponentModel.DataAnnotations;
 
 namespace SportMatrix.AIAssistant.Application.DTOs;
 
 /// <summary>
-/// Request DTO für Training Recommendations
+/// Request DTO for Training Recommendations
 /// </summary>
 public class GrpcJsonTrainingRecommendationsRequestDto
 {

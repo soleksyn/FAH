@@ -1,12 +1,10 @@
 ﻿namespace SportMatrix.AIAssistant.UI.API.Services;
 
+using Grpc.Core;
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
 using SportMatrix.AIAssistant.Extensions;
-using SportMatrix;
-using SportMatrix.AIAssistant.Application.DTOs;
-using SportMatrix.AIAssistant.Extensions;
-using Grpc.Core;
+using SportMatrix.AIAssistant.Infrastructure.Providers;
 
 public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServiceBase
 {
@@ -28,64 +26,30 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
         try
         {
             this.logger.LogInformation(
-                "gRPC: Received workout analysis request for {WorkoutCount} workouts",
-                request.RecentWorkouts?.Count ?? 0);
+                "gRPC: Received workout analysis request for {WorkoutCount} workouts, type: {AnalysisType}",
+                request.RecentWorkouts.Count, request.AnalysisType);
 
-            // Konvertiere gRPC Request zu Application DTO
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisRequestDto analysisRequest = request.ToWorkoutAnalysisRequestDto();
+            // Convert gRPC Request to Application DTO
+            WorkoutAnalysisRequestDto analysisRequest = request.ToWorkoutAnalysisRequestDto();
 
-            // Rufe den echten HuggingFace/GoogleGemini Service auf!
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response;
+            WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(
+                analysisRequest, context.CancellationToken);
 
-            // Bestimme welcher AI-Service verwendet werden soll basierend auf Request
-            string aiProvider = request.PreferredAiProvider?.ToLower() ?? "huggingface";
+            Sportmatrix.WorkoutAnalysisResponse grpcResponse = this.ToGrpcResponse(response);
 
-            if (aiProvider == "googlegemini")
-            {
-                response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
-            }
-            else
-            {
-                response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
-            }
-
-            // Konvertiere zur?ck zu gRPC Response
-            Sportmatrix.WorkoutAnalysisResponse grpcResponse = new global::Sportmatrix.WorkoutAnalysisResponse
-            {
-                Analysis = response.Analysis ?? string.Empty,
-                GeneratedAt = response.GeneratedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                Source = response.Provider ?? $"{aiProvider}-AI",
-            };
-
-            // Key Insights hinzuf?gen
-            if (response.KeyInsights != null)
-            {
-                grpcResponse.KeyInsights.AddRange(response.KeyInsights);
-            }
-
-            // Recommendations hinzuf?gen
-            if (response.Recommendations != null)
-            {
-                grpcResponse.Recommendations.AddRange(response.Recommendations);
-            }
-
-            this.logger.LogInformation("gRPC: Successfully generated workout analysis response using {Provider}", aiProvider);
+            this.logger.LogInformation("gRPC: Successfully generated workout analysis response");
             return grpcResponse;
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "gRPC: Error generating workout analysis");
-
-            // gRPC Exception werfen
-            throw new RpcException(new Status(
-                StatusCode.Internal,
-                $"Failed to generate workout analysis: {ex.Message}"));
+            this.logger.LogError(ex, "gRPC: Error analyzing workouts");
+            throw new RpcException(new Status(StatusCode.Internal, $"Failed to analyze workouts: {ex.Message}"));
         }
     }
 
-    // Zus?tzlicher Service f?r Performance Trends
-    public override async Task<global::Sportmatrix.WorkoutAnalysisResponse> GetPerformanceTrends(
-        global::Sportmatrix.PerformanceTrendsRequest request,
+    // Performance Trends Service
+    public override async Task<Sportmatrix.WorkoutAnalysisResponse> GetPerformanceTrends(
+        Sportmatrix.PerformanceTrendsRequest request,
         ServerCallContext context)
     {
         try
@@ -94,8 +58,7 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 "gRPC: Received performance trends request for athlete: {AthleteId}",
                 request.AthleteId);
 
-            // Konvertiere zu Sportmatrix.WorkoutAnalysisRequest
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisRequestDto analysisRequest = new SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisRequestDto
+            WorkoutAnalysisRequestDto analysisRequest = new WorkoutAnalysisRequestDto
             {
                 AnalysisType = "Trends",
                 RecentWorkouts = this.GetDemoWorkouts(request.AthleteId, request.TimeFrame),
@@ -107,40 +70,23 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 },
             };
 
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
+            WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(
+                analysisRequest, context.CancellationToken);
 
-            Sportmatrix.WorkoutAnalysisResponse grpcResponse = new global::Sportmatrix.WorkoutAnalysisResponse
-            {
-                Analysis = response.Analysis ?? string.Empty,
-                GeneratedAt = response.GeneratedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                Source = response.Provider ?? "Gemini-AI",
-                AnalysisType = "PerformanceTrends",
-            };
-
-            if (response.KeyInsights != null)
-            {
-                grpcResponse.KeyInsights.AddRange(response.KeyInsights);
-            }
-
-            if (response.Recommendations != null)
-            {
-                grpcResponse.Recommendations.AddRange(response.Recommendations);
-            }
+            Sportmatrix.WorkoutAnalysisResponse grpcResponse = this.ToGrpcResponse(response, "PerformanceTrends");
 
             return grpcResponse;
         }
         catch (Exception ex)
         {
             this.logger.LogError(ex, "gRPC: Error getting performance trends");
-            throw new RpcException(new Status(
-                StatusCode.Internal,
-                $"Failed to get performance trends: {ex.Message}"));
+            throw new RpcException(new Status(StatusCode.Internal, $"Failed to get performance trends: {ex.Message}"));
         }
     }
 
     // Training Recommendations Service
-    public override async Task<global::Sportmatrix.WorkoutAnalysisResponse> GetTrainingRecommendations(
-        global::Sportmatrix.TrainingRecommendationsRequest request,
+    public override async Task<Sportmatrix.WorkoutAnalysisResponse> GetTrainingRecommendations(
+        Sportmatrix.TrainingRecommendationsRequest request,
         ServerCallContext context)
     {
         try
@@ -149,7 +95,7 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 "gRPC: Received training recommendations request for athlete: {AthleteId}",
                 request.AthleteId);
 
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisRequestDto analysisRequest = new SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisRequestDto
+            WorkoutAnalysisRequestDto analysisRequest = new WorkoutAnalysisRequestDto
             {
                 AnalysisType = "Recommendations",
                 RecentWorkouts = this.GetDemoWorkouts(request.AthleteId, "week"),
@@ -161,40 +107,23 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 },
             };
 
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
+            WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(
+                analysisRequest, context.CancellationToken);
 
-            Sportmatrix.WorkoutAnalysisResponse grpcResponse = new global::Sportmatrix.WorkoutAnalysisResponse
-            {
-                Analysis = response.Analysis ?? string.Empty,
-                GeneratedAt = response.GeneratedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                Source = response.Provider ?? "Gemini-AI",
-                AnalysisType = "TrainingRecommendations",
-            };
-
-            if (response.KeyInsights != null)
-            {
-                grpcResponse.KeyInsights.AddRange(response.KeyInsights);
-            }
-
-            if (response.Recommendations != null)
-            {
-                grpcResponse.Recommendations.AddRange(response.Recommendations);
-            }
+            Sportmatrix.WorkoutAnalysisResponse grpcResponse = this.ToGrpcResponse(response, "TrainingRecommendations");
 
             return grpcResponse;
         }
         catch (Exception ex)
         {
             this.logger.LogError(ex, "gRPC: Error getting training recommendations");
-            throw new RpcException(new Status(
-                StatusCode.Internal,
-                $"Failed to get training recommendations: {ex.Message}"));
+            throw new RpcException(new Status(StatusCode.Internal, $"Failed to get training recommendations: {ex.Message}"));
         }
     }
 
     // Health Metrics Analysis Service
-    public override async Task<global::Sportmatrix.WorkoutAnalysisResponse> AnalyzeHealthMetrics(
-        global::Sportmatrix.HealthAnalysisRequest request,
+    public override async Task<Sportmatrix.WorkoutAnalysisResponse> AnalyzeHealthMetrics(
+        Sportmatrix.HealthAnalysisRequest request,
         ServerCallContext context)
     {
         try
@@ -203,195 +132,83 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 "gRPC: Received health metrics analysis request for athlete: {AthleteId}",
                 request.AthleteId);
 
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisRequestDto analysisRequest = new SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisRequestDto
+            WorkoutAnalysisRequestDto analysisRequest = new WorkoutAnalysisRequestDto
             {
                 AnalysisType = "Health",
-                RecentWorkouts = request.RecentWorkouts
-                    .Select(w => w.ToWorkoutDataDto())
-                    .ToList(),
+                RecentWorkouts = request.RecentWorkouts.Select(w => new WorkoutDataDto
+                {
+                    Date = DateTime.Parse(w.Date),
+                    ActivityType = w.ActivityType,
+                    Distance = w.Distance,
+                    Duration = w.Duration,
+                    Calories = w.Calories,
+                }).ToList(),
                 AthleteProfile = this.GetDemoAthleteProfile(request.AthleteId),
                 AdditionalContext = new Dictionary<string, object>
                 {
                     { "focus", "injury_prevention" },
-                    { "health_analysis", true },
                     { "athleteId", request.AthleteId },
                 },
             };
 
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
+            WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(
+                analysisRequest, context.CancellationToken);
 
-            Sportmatrix.WorkoutAnalysisResponse grpcResponse = new global::Sportmatrix.WorkoutAnalysisResponse
-            {
-                Analysis = response.Analysis ?? string.Empty,
-                GeneratedAt = response.GeneratedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                Source = response.Provider ?? "Gemini-AI",
-                AnalysisType = "HealthMetrics",
-            };
-
-            if (response.KeyInsights != null)
-            {
-                grpcResponse.KeyInsights.AddRange(response.KeyInsights);
-            }
-
-            if (response.Recommendations != null)
-            {
-                grpcResponse.Recommendations.AddRange(response.Recommendations);
-            }
+            Sportmatrix.WorkoutAnalysisResponse grpcResponse = this.ToGrpcResponse(response, "HealthMetrics");
 
             return grpcResponse;
         }
         catch (Exception ex)
         {
             this.logger.LogError(ex, "gRPC: Error analyzing health metrics");
-            throw new RpcException(new Status(
-                StatusCode.Internal,
-                $"Failed to analyze health metrics: {ex.Message}"));
+            throw new RpcException(new Status(StatusCode.Internal, $"Failed to analyze health metrics: {ex.Message}"));
         }
     }
 
-    // Separate GoogleGemini Analysis Service
-    public override async Task<global::Sportmatrix.WorkoutAnalysisResponse> AnalyzeGoogleGeminiWorkouts(
-        global::Sportmatrix.WorkoutAnalysisRequest request,
+    // Health Check Service
+    public override Task<Sportmatrix.HealthCheckResponse> CheckHealth(
+        Sportmatrix.HealthCheckRequest request,
         ServerCallContext context)
     {
-        try
+        this.logger.LogInformation("gRPC: Health check request received");
+
+        Sportmatrix.HealthCheckResponse response = new Sportmatrix.HealthCheckResponse
         {
-            this.logger.LogInformation(
-                "gRPC: Received GoogleGemini workout analysis request for {WorkoutCount} workouts",
-                request.RecentWorkouts?.Count ?? 0);
+            IsHealthy = true,
+            Message = "Workout analysis service is healthy",
+            Timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+        };
 
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisRequestDto analysisRequest = request.ToWorkoutAnalysisRequestDto();
-
-            // Zwinge GoogleGemini Service
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
-
-            Sportmatrix.WorkoutAnalysisResponse grpcResponse = new global::Sportmatrix.WorkoutAnalysisResponse
-            {
-                Analysis = response.Analysis ?? string.Empty,
-                GeneratedAt = response.GeneratedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                Source = response.Provider ?? "GoogleGemini-AI",
-            };
-
-            if (response.KeyInsights != null)
-            {
-                grpcResponse.KeyInsights.AddRange(response.KeyInsights);
-            }
-
-            if (response.Recommendations != null)
-            {
-                grpcResponse.Recommendations.AddRange(response.Recommendations);
-            }
-
-            this.logger.LogInformation("gRPC: Successfully generated GoogleGemini workout analysis response");
-            return grpcResponse;
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex, "gRPC: Error generating GoogleGemini workout analysis");
-            throw new RpcException(new Status(
-                StatusCode.Internal,
-                $"Failed to generate GoogleGemini workout analysis: {ex.Message}"));
-        }
+        return Task.FromResult(response);
     }
 
-    // Health Check f?r gRPC
-    public override async Task<global::Sportmatrix.HealthCheckResponse> CheckHealth(
-        global::Sportmatrix.HealthCheckRequest request,
-        ServerCallContext context)
+    private Sportmatrix.WorkoutAnalysisResponse ToGrpcResponse(
+        WorkoutAnalysisResponseDto response, string? analysisType = null)
     {
-        try
+        Sportmatrix.WorkoutAnalysisResponse grpcResponse = new Sportmatrix.WorkoutAnalysisResponse
         {
-            // Einfacher Test-Request
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisRequestDto testRequest = new SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisRequestDto
-            {
-                AnalysisType = "Health Check",
-                RecentWorkouts = new List<WorkoutDataDto>
-                {
-                    new WorkoutDataDto
-                    {
-                        Date = DateTime.Now.AddDays(-1),
-                        ActivityType = "Run",
-                        Distance = 5.0,
-                        Duration = 1800,
-                        Calories = 350,
-                    },
-                },
-                AthleteProfile = new AthleteProfileDto
-                {
-                    Name = "Test User",
-                    FitnessLevel = "Intermediate",
-                    PrimaryGoal = "Health Check",
-                },
-            };
+            Analysis = response.Analysis ?? string.Empty,
+            GeneratedAt = response.GeneratedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+            Source = response.Provider ?? "Gemini-AI",
+            AnalysisType = analysisType ?? string.Empty,
+        };
 
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(testRequest, context.CancellationToken);
-
-            return new Sportmatrix.HealthCheckResponse
-            {
-                IsHealthy = !string.IsNullOrEmpty(result.Analysis),
-                Message = "Workout analysis service is responding",
-                Timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-            };
-        }
-        catch (Exception ex)
+        if (response.KeyInsights != null)
         {
-            this.logger.LogError(ex, "gRPC: Health check failed");
-            return new Sportmatrix.HealthCheckResponse
-            {
-                IsHealthy = false,
-                Message = $"Health check failed: {ex.Message}",
-                Timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-            };
+            grpcResponse.KeyInsights.AddRange(response.KeyInsights);
         }
+
+        if (response.Recommendations != null)
+        {
+            grpcResponse.Recommendations.AddRange(response.Recommendations);
+        }
+
+        return grpcResponse;
     }
 
     private List<WorkoutDataDto> GetDemoWorkouts(int athleteId, string timeFrame)
-    {
-        return new List<WorkoutDataDto>
-        {
-            new WorkoutDataDto
-            {
-                Date = DateTime.Now.AddDays(-1),
-                ActivityType = "Run",
-                Distance = 5.2,
-                Duration = 1800,
-                Calories = 350,
-                MetricsData = new Dictionary<string, double> { { "heartRate", 145 } },
-            },
-            new WorkoutDataDto
-            {
-                Date = DateTime.Now.AddDays(-3),
-                ActivityType = "Ride",
-                Distance = 24.8,
-                Duration = 4500,
-                Calories = 890,
-                MetricsData = new Dictionary<string, double> { { "heartRate", 132 } },
-            },
-            new WorkoutDataDto
-            {
-                Date = DateTime.Now.AddDays(-5),
-                ActivityType = "Run",
-                Distance = 3.1,
-                Duration = 1080,
-                Calories = 245,
-                MetricsData = new Dictionary<string, double> { { "heartRate", 128 } },
-            },
-        };
-    }
+        => DemoDataProvider.GetDemoWorkouts();
 
     private AthleteProfileDto GetDemoAthleteProfile(int athleteId)
-    {
-        return new AthleteProfileDto
-        {
-            Id = athleteId.ToString(),
-            Name = "Demo User",
-            FitnessLevel = "Intermediate",
-            PrimaryGoal = "Endurance Improvement",
-            Preferences = new Dictionary<string, object>
-            {
-                { "preferredActivities", new[] { "Run", "Ride" } },
-                { "trainingDays", 4 },
-            },
-        };
-    }
+        => DemoDataProvider.GetDemoAthleteProfile(athleteId);
 }

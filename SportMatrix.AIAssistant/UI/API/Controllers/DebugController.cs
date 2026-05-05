@@ -8,26 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class DebugController : ControllerBase
 {
-    private readonly IConfiguration configuration;
     private readonly ILogger<DebugController> logger;
 
-    public DebugController(IConfiguration configuration, ILogger<DebugController> logger)
+    public DebugController(ILogger<DebugController> logger)
     {
-        this.configuration = configuration;
         this.logger = logger;
-    }
-
-    [HttpGet("config-check")]
-    public ActionResult ConfigCheck()
-    {
-        string? apiKey = this.configuration["GoogleAI:ApiKey"];
-        return this.Ok(new
-        {
-            hasApiKey = !string.IsNullOrEmpty(apiKey),
-            apiKeyLength = apiKey?.Length ?? 0,
-            apiKeyPreview = !string.IsNullOrEmpty(apiKey) && apiKey.Length > 10 ? $"{apiKey.Substring(0, 10)}..." : "NULL",
-            environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
-        });
     }
 
     [HttpGet("test-gemini-service")]
@@ -43,7 +28,7 @@ public class DebugController : ControllerBase
                 {
                     Name = "TestUser",
                     FitnessLevel = "Intermediate",
-                    PrimaryGoal = "General Fitness"
+                    PrimaryGoal = "General Fitness",
                 }
             };
 
@@ -54,7 +39,6 @@ public class DebugController : ControllerBase
                 message = "Gemini Service Test",
                 hasMotivation = !string.IsNullOrEmpty(result.MotivationalMessage),
                 generatedAt = result.GeneratedAt,
-                response = result
             });
         }
         catch (Exception ex)
@@ -71,7 +55,7 @@ public class DebugController : ControllerBase
         {
             status = "healthy",
             message = "Debug controller is responding",
-            timestamp = DateTime.UtcNow
+            timestamp = DateTime.UtcNow,
         });
     }
 }

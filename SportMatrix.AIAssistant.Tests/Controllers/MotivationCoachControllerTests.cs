@@ -2,9 +2,7 @@
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
-using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.UI.API.Controllers;
-using SportMatrix.AIAssistant.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -154,53 +152,7 @@ public class MotivationCoachControllerTests
 
     #endregion
 
-    #region GetHuggingFaceMotivation Tests
-
-    [Fact]
-    public async Task GetHuggingFaceMotivation_WithValidRequest_ReturnsOkWithMotivationResponse()
-    {
-        // Arrange
-        MotivationRequestDto request = new MotivationRequestDto
-        {
-            AthleteProfile = new AthleteProfileDto
-            {
-                Name = "HuggingFace Test",
-                FitnessLevel = "Expert",
-                PrimaryGoal = "Competition",
-            },
-        };
-
-        MotivationResponseDto expectedResponse = new MotivationResponseDto
-        {
-            MotivationalMessage = "Champion mindset! You're training for excellence.",
-            Quote = "Champions are made in the gym, legends are made through dedication.",
-            ActionableTips = new List<string>
-            {
-                "Visualize your competition success",
-                "Focus on technique perfection",
-                "Trust your training process",
-            },
-            GeneratedAt = DateTime.UtcNow,
-        };
-
-        this.mockMotivationService
-            .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
-            .ReturnsAsync(expectedResponse);
-
-        // Act
-        ActionResult<MotivationResponseDto> result = await this.controller.GetHuggingFaceMotivation(request, CancellationToken.None);
-
-        // Assert
-        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result.Result);
-        MotivationResponseDto response = Assert.IsType<MotivationResponseDto>(okResult.Value);
-
-        Assert.Contains("Champion", response.MotivationalMessage);
-        Assert.Contains("competition", response.ActionableTips[0], StringComparison.OrdinalIgnoreCase);
-    }
-
-    #endregion
-
-    #region HealthCheck Tests
+        #region HealthCheck Tests
 
     [Fact]
     public async Task HealthCheck_WhenServiceIsHealthy_ReturnsOkWithHealthyStatus()
@@ -230,7 +182,7 @@ public class MotivationCoachControllerTests
         System.Reflection.PropertyInfo? timestampProperty = responseType.GetProperty("timestamp");
 
         Assert.Equal("healthy", statusProperty?.GetValue(response));
-        Assert.Equal("HuggingFace service is responding", messageProperty?.GetValue(response));
+        Assert.Equal("Motivation service is responding", messageProperty?.GetValue(response));
         Assert.NotNull(timestampProperty?.GetValue(response));
     }
 
@@ -359,3 +311,4 @@ public class MotivationCoachControllerTests
 
     #endregion
 }
+

@@ -1,4 +1,4 @@
-namespace SportMatrix.Infrastructure.Services;
+ï»¿namespace SportMatrix.Infrastructure.Services;
 
 using System.Text;
 using System.Text.Json;
@@ -22,7 +22,7 @@ public class GrpcJsonClientService : IAIAssistantClientService
         this.logger = logger;
         this.configuration = configuration;
 
-        // AIAssistant Base URL für gRPC-JSON Endpunkte
+        // AIAssistant Base URL for gRPC-JSON endpoints
         string aiAssistantUrl = this.configuration["AIAssistant:BaseUrl"] ?? "http://localhost:5169";
         this.httpClient.BaseAddress = new Uri(aiAssistantUrl);
         this.httpClient.Timeout = TimeSpan.FromSeconds(30);
@@ -36,7 +36,7 @@ public class GrpcJsonClientService : IAIAssistantClientService
             "gRPC-JSON: Requesting motivation for athlete: {AthleteName}",
             request.AthleteProfile?.Name ?? "Unknown");
 
-        // Erstelle JSON im gRPC-Format (nicht REST-Format!)
+        // Create JSON in gRPC format (not REST format)
         var grpcJsonRequest = new
         {
             athleteProfile = new
@@ -68,7 +68,7 @@ public class GrpcJsonClientService : IAIAssistantClientService
         string responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
         JsonElement grpcJsonResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
 
-        // Konvertiere gRPC-JSON Response zurück zu DTO
+        // Convert gRPC-JSON response back to DTO
         return new AIMotivationResponseDto
         {
             MotivationalMessage = grpcJsonResponse.TryGetProperty("motivationalMessage", out JsonElement msgProp)
@@ -93,7 +93,7 @@ public class GrpcJsonClientService : IAIAssistantClientService
             request.RecentWorkouts?.Count ?? 0,
             request.AnalysisType ?? "General");
 
-        // Erstelle JSON im gRPC-Format
+        // Create JSON in gRPC format
         var grpcJsonRequest = new
         {
             athleteProfile = request.AthleteProfile != null ? new
@@ -159,7 +159,7 @@ public class GrpcJsonClientService : IAIAssistantClientService
             "gRPC-JSON: Requesting GoogleGemini workout analysis for {WorkoutCount} workouts",
             request.RecentWorkouts?.Count ?? 0);
 
-        // Erstelle JSON im gRPC-Format (gleich wie GetWorkoutAnalysisAsync, aber explizit GoogleGemini)
+        // Create JSON in gRPC format (same as GetWorkoutAnalysisAsync, but explicitly GoogleGemini)
         var grpcJsonRequest = new
         {
             athleteProfile = request.AthleteProfile != null ? new
@@ -523,3 +523,4 @@ public class GrpcJsonClientService : IAIAssistantClientService
 
     #endregion
 }
+

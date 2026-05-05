@@ -4,6 +4,10 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
+    <!-- Suppress AutoMapper GHSA-rvv3-g6hj-g44x - mitigated via MaxDepth=64 in ApplicationServiceRegistration -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-rvv3-g6hj-g44x" />
+  </ItemGroup>
+  <ItemGroup>
     <!-- Entity Framework -->
     <PackageVersion Include="AsyncFixer" Version="1.6.0" />
     <PackageVersion Include="Google.GenAI" Version="1.6.1" />
@@ -46,9 +50,5 @@
     <PackageVersion Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0" />
     <!-- Swagger -->
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-    <!-- StyleCop -->
-    <PackageVersion Include="StyleCop.Analyzers" Version="1.1.118" />
-    <!-- Async Fixer -->
-    <PackageVersion Include="AsyncFixer" Version="1.6.0" />
   </ItemGroup>
 </Project>

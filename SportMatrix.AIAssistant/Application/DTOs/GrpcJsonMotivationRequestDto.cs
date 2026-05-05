@@ -1,8 +1,8 @@
-namespace SportMatrix.AIAssistant.Application.DTOs;
+ï»¿namespace SportMatrix.AIAssistant.Application.DTOs;
 
 /// <summary>
-/// Request DTO für gRPC-JSON MotivationService
-/// (Entspricht dem gRPC MotivationRequest als JSON)
+/// Request DTO for gRPC-JSON MotivationService
+/// (Mirrors the gRPC MotivationRequest as JSON)
 /// </summary>
 public class GrpcJsonMotivationRequestDto
 {

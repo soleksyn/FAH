@@ -1,6 +1,5 @@
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Domain.Models;
-using SportMatrix.AIAssistant.Application.DTOs;
 
 namespace SportMatrix.AIAssistant.Extensions;
 

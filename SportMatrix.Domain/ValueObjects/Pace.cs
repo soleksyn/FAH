@@ -1,4 +1,4 @@
-namespace SportMatrix.Domain.ValueObjects;
+ï»¿namespace SportMatrix.Domain.ValueObjects;
 
 public class Pace : ValueObject
 {
@@ -6,7 +6,7 @@ public class Pace : ValueObject
 
     private Pace()
     {
-    } // Für EF Core
+    } // For EF Core
 
     public Pace(TimeSpan valuePerKilometer)
     {
@@ -25,7 +25,7 @@ public class Pace : ValueObject
         return new Pace(TimeSpan.FromSeconds(timePerKm));
     }
 
-    // Helper für Anzeige
+    // Display helper
     public string ToDisplayString()
     {
         return $"{this.ValuePerKilometer:mm\\:ss} min/km";

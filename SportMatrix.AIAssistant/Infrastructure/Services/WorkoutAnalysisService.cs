@@ -2,7 +2,6 @@
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
-using SportMatrix.AIAssistant.Infrastructure.Services;
 
 public class WorkoutAnalysisService : IWorkoutAnalysisService
 {
@@ -52,6 +51,7 @@ public class WorkoutAnalysisService : IWorkoutAnalysisService
             return this.GetFallbackAnalysis(request, "Gemini-AI");
         }
     }
+
     private string BuildAnalysisPrompt(WorkoutAnalysisRequestDto request)
     {
         if (request.RecentWorkouts == null || !request.RecentWorkouts.Any())
@@ -66,16 +66,13 @@ public class WorkoutAnalysisService : IWorkoutAnalysisService
         string athleteContext = request.AthleteProfile != null ?
             $"\nAthlete Level: {request.AthleteProfile.FitnessLevel}\nPrimary Goal: {request.AthleteProfile.PrimaryGoal}" : string.Empty;
 
-        // Specific prompt based on analysis type
-        string analysisPrompt = request.AnalysisType?.ToLower() switch
+        return request.AnalysisType?.ToLower() switch
         {
             "health" => this.BuildHealthAnalysisPrompt(workoutsData, athleteContext),
             "performance" => this.BuildPerformanceAnalysisPrompt(workoutsData, athleteContext),
             "trends" => this.BuildTrendsAnalysisPrompt(workoutsData, athleteContext),
             _ => this.BuildGeneralAnalysisPrompt(workoutsData, athleteContext, request.AnalysisType ?? "General")
         };
-
-        return analysisPrompt;
     }
 
     private string BuildHealthAnalysisPrompt(string workoutsData, string athleteContext)
@@ -195,39 +192,37 @@ Provide practical, actionable insights for fitness improvement.";
 
     private WorkoutAnalysisResponseDto ParseAnalysisResponse(string aiResponse, string? analysisType)
     {
-        WorkoutAnalysisResponseDto response = new WorkoutAnalysisResponseDto
+        return new WorkoutAnalysisResponseDto
         {
             Analysis = this.ExtractAnalysisSection(aiResponse),
             KeyInsights = this.ExtractKeyInsights(aiResponse),
             Recommendations = this.ExtractRecommendations(aiResponse),
             GeneratedAt = DateTime.UtcNow,
         };
-
-        return response;
     }
 
     private string ExtractAnalysisSection(string aiResponse)
     {
         if (string.IsNullOrWhiteSpace(aiResponse))
         {
-            return this.GetDefaultAnalysis();
+            return "Unable to generate analysis at this time. Please try again later.";
         }
 
-        // Try structured extraction first
         string structuredAnalysis = this.TryExtractStructuredAnalysis(aiResponse);
         if (!string.IsNullOrEmpty(structuredAnalysis))
         {
             return this.LimitAnalysisLength(structuredAnalysis);
         }
 
-        // Fallback: Free text extraction
-        string fallbackAnalysis = this.ExtractFallbackAnalysis(aiResponse);
-        return this.LimitAnalysisLength(fallbackAnalysis);
+        return this.LimitAnalysisLength(this.ExtractFallbackAnalysis(aiResponse));
     }
 
     private string TryExtractStructuredAnalysis(string aiResponse)
     {
-        string[] analysisHeaders = this.GetAnalysisHeaders();
+        string[] analysisHeaders = new[]
+        {
+            "ANALYSIS:", "HEALTH ANALYSIS:", "PERFORMANCE ANALYSIS:", "TRENDS ANALYSIS:",
+        };
 
         foreach (string header in analysisHeaders)
         {
@@ -237,7 +232,7 @@ Provide practical, actionable insights for fitness improvement.";
             }
 
             string analysisSection = this.ExtractSectionContent(aiResponse, header);
-            if (this.IsValidAnalysis(analysisSection))
+            if (!string.IsNullOrWhiteSpace(analysisSection) && analysisSection.Length > 20)
             {
                 return analysisSection;
             }
@@ -254,7 +249,7 @@ Provide practical, actionable insights for fitness improvement.";
             return string.Empty;
         }
 
-        string[] stopMarkers = this.GetStopMarkers();
+        string[] stopMarkers = new[] { "KEY INSIGHTS:", "RECOMMENDATIONS:" };
         string analysisSection = analysisParts[1].Split(stopMarkers, StringSplitOptions.RemoveEmptyEntries)[0];
 
         return analysisSection.Trim();
@@ -264,7 +259,7 @@ Provide practical, actionable insights for fitness improvement.";
     {
         string[] lines = aiResponse.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         List<string> analysisLines = new List<string>();
-        string[] stopMarkers = this.GetStopMarkers();
+        string[] stopMarkers = new[] { "KEY INSIGHTS:", "RECOMMENDATIONS:" };
 
         foreach (string line in lines)
         {
@@ -274,7 +269,8 @@ Provide practical, actionable insights for fitness improvement.";
                 continue;
             }
 
-            if (this.ShouldStopAtLine(cleanLine, stopMarkers))
+            if (stopMarkers.Any(marker =>
+                cleanLine.StartsWith(marker, StringComparison.OrdinalIgnoreCase)))
             {
                 break;
             }
@@ -289,7 +285,7 @@ Provide practical, actionable insights for fitness improvement.";
 
         return analysisLines.Any()
             ? string.Join(" ", analysisLines)
-            : this.GetDefaultAnalysis();
+            : "Unable to generate analysis at this time. Please try again later.";
     }
 
     private string LimitAnalysisLength(string analysis)
@@ -301,38 +297,6 @@ Provide practical, actionable insights for fitness improvement.";
 
         string[] sentences = analysis.Split('.', StringSplitOptions.RemoveEmptyEntries);
         return string.Join(". ", sentences.Take(4)) + ".";
-    }
-
-    private bool IsValidAnalysis(string analysis)
-    {
-        return !string.IsNullOrWhiteSpace(analysis) && analysis.Length > 20;
-    }
-
-    private bool ShouldStopAtLine(string line, string[] stopMarkers)
-    {
-        return stopMarkers.Any(marker =>
-            line.StartsWith(marker, StringComparison.OrdinalIgnoreCase));
-    }
-
-    private string GetDefaultAnalysis()
-    {
-        return "Unable to generate analysis at this time. Please try again later.";
-    }
-
-    private string[] GetAnalysisHeaders()
-    {
-        return new[]
-        {
-        "ANALYSIS:", "HEALTH ANALYSIS:", "PERFORMANCE ANALYSIS:", "TRENDS ANALYSIS:",
-        };
-    }
-
-    private string[] GetStopMarkers()
-    {
-        return new[]
-        {
-        "KEY INSIGHTS:", "RECOMMENDATIONS:",
-        };
     }
 
     private List<string>? ExtractKeyInsights(string aiResponse)
@@ -396,7 +360,11 @@ Provide practical, actionable insights for fitness improvement.";
 
     private int FindNextHeaderIndex(string section, string currentHeader)
     {
-        string[] allHeaders = this.GetAllSectionHeaders();
+        string[] allHeaders = new[]
+        {
+            "ANALYSIS:", "KEY INSIGHTS:", "RECOMMENDATIONS:", "ADVICE:",
+            "HEALTH ANALYSIS:", "PERFORMANCE ANALYSIS:", "TRENDS ANALYSIS:",
+        };
 
         foreach (string nextHeader in allHeaders)
         {
@@ -421,13 +389,17 @@ Provide practical, actionable insights for fitness improvement.";
 
         foreach (string line in lines)
         {
-            string cleanedItem = this.CleanLineItem(line);
+            string cleanedItem = line.Trim()
+                .TrimStart('-', '*', '•', '1', '2', '3', '4', '5', '.', ' ')
+                .Trim();
 
-            if (this.IsValidListItem(cleanedItem))
+            if (!string.IsNullOrWhiteSpace(cleanedItem) &&
+                cleanedItem.Length > 15 &&
+                cleanedItem.Length < 200)
             {
                 items.Add(cleanedItem);
 
-                if (items.Count >= 5) // Maximal 5 Items
+                if (items.Count >= 5)
                 {
                     break;
                 }
@@ -435,31 +407,6 @@ Provide practical, actionable insights for fitness improvement.";
         }
 
         return items;
-    }
-
-    private string CleanLineItem(string line)
-    {
-        return line.Trim()
-            .TrimStart('-', '*', '•', '1', '2', '3', '4', '5', '.', ' ')
-            .Trim();
-    }
-
-    private bool IsValidListItem(string item)
-    {
-        return !string.IsNullOrWhiteSpace(item) &&
-               item.Length > 15 &&
-               item.Length < 200;
-    }
-
-    private string[] GetAllSectionHeaders()
-    {
-        return new[]
-        {
-        "ANALYSE:", "WICHTIGE ERKENNTNISSE:", "EMPFEHLUNGEN:", "RATSCHLÄGE:",
-        "GESUNDHEITSANALYSE:", "LEISTUNGSANALYSE:", "TRENDANALYSE:",
-        "ANALYSIS:", "KEY INSIGHTS:", "RECOMMENDATIONS:", "ADVICE:",
-        "HEALTH ANALYSIS:", "PERFORMANCE ANALYSIS:", "TRENDS ANALYSIS:",
-        };
     }
 
     private WorkoutAnalysisResponseDto GetFallbackAnalysis(WorkoutAnalysisRequestDto request, string provider = "Unknown")
@@ -474,23 +421,23 @@ Provide practical, actionable insights for fitness improvement.";
 
         string analysis = analysisType.ToLower() switch
         {
-            "health" => $"Basierend auf Ihren {workoutCount} letzten Trainingseinheiten scheint Ihre Trainingsbelastung gut ausgewogen zu sein. " +
-                       $"Die Gesamtdistanz von {totalDistance:F1}km über {TimeSpan.FromSeconds(totalDuration):h\\:mm} zeigt gutes Herz-Kreislauf-Engagement. " +
-                       $"No concerning overtraining patterns detected. Your average calorie consumption of {avgCalories:F0} per unit indicates appropriate training intensity.",
+            "health" => $"Based on your {workoutCount} recent training sessions, your training load appears well-balanced. " +
+                       $"The total distance of {totalDistance:F1}km over {TimeSpan.FromSeconds(totalDuration):h\\:mm} shows good cardiovascular engagement. " +
+                       $"No concerning overtraining patterns detected. Your average calorie consumption of {avgCalories:F0} per session indicates appropriate training intensity.",
 
-            "performance" => $"Ihre Leistungsdaten zeigen {workoutCount} absolvierte Trainingseinheiten mit {totalDistance:F1}km Gesamtdistanz. " +
-                           $"Die Trainingskonsistenz erscheint stark mit variierenden Trainingsarten. " +
-                           $"Die durchschnittliche Einheitsdauer von {TimeSpan.FromSeconds(workoutCount > 0 ? totalDuration / workoutCount : 0):h\\:mm} deutet auf guten Ausdaueraufbau hin. " +
-                           $"Leistungsmetriken zeigen stetigen Fortschritt in Richtung Ihrer Ziele.",
+            "performance" => $"Your performance data shows {workoutCount} completed training sessions with {totalDistance:F1}km total distance. " +
+                           $"Training consistency appears strong with varying training types. " +
+                           $"The average session duration of {TimeSpan.FromSeconds(workoutCount > 0 ? totalDuration / workoutCount : 0):h\\:mm} indicates good endurance development. " +
+                           $"Performance metrics show steady progress toward your goals.",
 
-            "trends" => $"Die Trainingstrendanalyse zeigt {workoutCount} Trainingseinheiten über den letzten Zeitraum. " +
-                       $"Der Gesamtdistanzfortschritt auf {totalDistance:F1}km zeigt positive Trainingskonsistenz. " +
-                       $"Trainingshäufigkeits- und Dauermuster deuten auf nachhaltige Trainingsgewohnheiten hin. " +
-                       $"Kalorienverbrauchstrends deuten auf effektives Energiemanagement hin.",
+            "trends" => $"Training trend analysis shows {workoutCount} training sessions over the recent period. " +
+                       $"Total distance progress to {totalDistance:F1}km shows positive training consistency. " +
+                       $"Training frequency and duration patterns suggest sustainable training habits. " +
+                       $"Calorie consumption trends indicate effective energy management.",
 
-            _ => $"Umfassende Analyse Ihrer {workoutCount} letzten Trainingseinheiten über {totalDistance:F1}km zeigt exzellente Trainingskonsistenz. " +
-                $"Ihre {analysisType.ToLower()}-Metriken deuten auf stetigen Fortschritt in Richtung Ihrer Fitnessziele hin. " +
-                $"Trainingsbelastung und Regenerationsbalance scheinen angemessen für kontinuierliche Verbesserung."
+            _ => $"Comprehensive analysis of your {workoutCount} recent training sessions over {totalDistance:F1}km shows excellent training consistency. " +
+                $"Your {analysisType.ToLower()} metrics indicate steady progress toward your fitness goals. " +
+                $"Training load and recovery balance appear appropriate for continued improvement."
         };
 
         List<string> insights = analysisType.ToLower() switch
@@ -504,14 +451,14 @@ Provide practical, actionable insights for fitness improvement.";
             },
             "performance" => new List<string>
             {
-                $"{totalDistance:F1}km total distance achieved over {workoutCount} units",
+                $"{totalDistance:F1}km total distance achieved over {workoutCount} sessions",
                 "Training consistency shows strong commitment to performance goals",
                 $"Average training intensity of {avgCalories:F0} calories is performance-oriented",
                 "Training variety supports diverse athletic development",
             },
             "trends" => new List<string>
             {
-                $"Training frequency of {workoutCount} units shows consistent habit formation",
+                $"Training frequency of {workoutCount} sessions shows consistent habit formation",
                 "Distance and duration trends indicate application of progressive overload",
                 "Calorie consumption patterns indicate effective training intensity management",
                 "Overall trajectory indicates sustained fitness improvement",

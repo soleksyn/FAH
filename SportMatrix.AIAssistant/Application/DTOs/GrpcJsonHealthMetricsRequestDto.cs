@@ -1,9 +1,9 @@
-namespace SportMatrix.AIAssistant.Application.DTOs;
+ï»¿namespace SportMatrix.AIAssistant.Application.DTOs;
 
 using System.ComponentModel.DataAnnotations;
 
 /// <summary>
-/// Request DTO für Health Metrics Analysis
+/// Request DTO for Health Metrics Analysis
 /// </summary>
 public class GrpcJsonHealthMetricsRequestDto
 {

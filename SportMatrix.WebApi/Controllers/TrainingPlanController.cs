@@ -22,7 +22,7 @@ public class TrainingPlanController : ControllerBase
         TrainingPlanDto? trainingPlan = await this.trainingPlanService.GetTrainingPlanByIdAsync(id, cancellationToken);
         if (trainingPlan == null)
         {
-            return this.NotFound($"Trainingsplan mit ID {id} wurde nicht gefunden.");
+            return this.NotFound($"Training plan with ID {id} was not found.");
         }
 
         return this.Ok(trainingPlan);

@@ -1,4 +1,4 @@
-namespace SportMatrix.Application.Services;
+ï»¿namespace SportMatrix.Application.Services;
 
 using AutoMapper;
 using SportMatrix.Application.DTOs;
@@ -55,7 +55,7 @@ public class ActivityService : IActivityService
         await this.context.Activities.AddAsync(activity, cancellationToken);
         await this.context.SaveChangesAsync(cancellationToken);
 
-        // Activity mit Athlete laden für das Mapping
+        // Load activity with Athlete for mapping
         Activity activityWithAthlete = await this.context.Activities
             .Include(a => a.Athlete)
             .FirstAsync(a => a.Id == activity.Id, cancellationToken);
@@ -76,7 +76,7 @@ public class ActivityService : IActivityService
         this.mapper.Map(activityDto, activity);
         activity.UpdatedAt = DateTime.Now;
 
-        // _context.Activities.Update(activity); // Nicht nötig - EF Core tracked automatisch!
+        // EF Core tracks changes automatically - no need to call Update()
         await this.context.SaveChangesAsync(cancellationToken);
     }
 
@@ -95,7 +95,7 @@ public class ActivityService : IActivityService
 
     public async Task<ActivityStatisticsDto> GetAthleteActivityStatisticsAsync(int athleteId, CancellationToken cancellationToken)
     {
-        // Prüfen ob Athlet existiert
+        // Verify athlete exists
         bool athleteExists = await this.context.Athletes.AnyAsync(a => a.Id == athleteId, cancellationToken);
 
         if (!athleteExists)
@@ -115,7 +115,7 @@ public class ActivityService : IActivityService
         return new ActivityStatisticsDto
         {
             TotalActivities = activities.Count,
-            TotalDistance = activities.Sum(a => a.Distance),
+            TotalDistance = activities.Sum(a => a.Distance) / 1000.0, // Convert meters to kilometers
             TotalDuration = TimeSpan.FromSeconds(activities.Sum(a => a.MovingTime)),
             TotalElevationGain = activities.Sum(a => a.TotalElevationGain),
             ActivitiesByType = activities
@@ -124,6 +124,13 @@ public class ActivityService : IActivityService
             ActivitiesByMonth = activities
             .GroupBy(a => a.StartDateLocal.Month)
             .ToDictionary(g => g.Key, g => g.Count()),
+            AverageDistance = activities.Any() ? activities.Average(a => a.Distance) / 1000.0 : (double?)null, // Convert meters to kilometers
+            LongestDistance = activities.Any() ? activities.Max(a => a.Distance) / 1000.0 : (double?)null, // Convert meters to kilometers
+            MostCommonSport = activities
+                .GroupBy(a => a.SportType)
+                .OrderByDescending(g => g.Count())
+                .Select(g => g.Key)
+                .FirstOrDefault()
         };
     }
 

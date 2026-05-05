@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using SportMatrix.Application.Interfaces;
 using SportMatrix.Application.Mapping;
 using SportMatrix.Application.Services;
@@ -10,11 +10,11 @@ public static class ApplicationServiceRegistration
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Registriere AutoMapper
+        // Register AutoMapper
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
         services.AddTransient<MappingProfile>();
 
-        // Registriere Services
+        // Register services
         services.AddScoped<IActivityService, ActivityService>();
         services.AddScoped<IAthleteService, AthleteService>();
         services.AddScoped<ITrainingPlanService, TrainingPlanService>();

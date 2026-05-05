@@ -8,4 +8,7 @@ public class ActivityStatisticsDto
     public double TotalElevationGain { get; set; }
     public Dictionary<string, int> ActivitiesByType { get; set; } = new Dictionary<string, int>();
     public Dictionary<int, int> ActivitiesByMonth { get; set; } = new Dictionary<int, int>();
+    public double? AverageDistance { get; set; }
+    public double? LongestDistance { get; set; }
+    public string? MostCommonSport { get; set; }
 }

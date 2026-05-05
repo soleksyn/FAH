@@ -13,14 +13,14 @@ DELETE FROM "Activities";
 DELETE FROM "Athletes";
 
 -- 2. INSERT ATHLETES
-INSERT INTO "Athletes" ("Id", "FirstName", "LastName", "Username", "Email", "City", "Country", "ProfilePictureUrl", "CreatedAt", "UpdatedAt")
+INSERT INTO "Athletes" ("Id", "FirstName", "LastName", "Username", "Email", "DateOfBirth", "Weight", "Height", "City", "Country", "ProfilePictureUrl", "CreatedAt", "UpdatedAt")
 VALUES 
-(1, 'John', 'Doe', 'johndoe', 'john.doe@example.com', 'Kyiv', 'Ukraine', 'https://example.com/john.jpg', '2026-01-01 00:00:00', '2026-01-01 00:00:00'),
-(2, 'Jane', 'Smith', 'janesmith', 'jane.smith@example.com', 'Lviv', 'Ukraine', 'https://example.com/jane.jpg', '2026-01-05 00:00:00', '2026-01-05 00:00:00'),
-(3, 'Oleksandr', 'Petrenko', 'oleksandrp', 'oleksandr.petrenko@example.com', 'Odessa', 'Ukraine', 'https://example.com/oleksandr.jpg', '2026-01-15 00:00:00', '2026-01-15 00:00:00'),
-(4, 'Maria', 'Kovalenko', 'mariak', 'maria.kovalenko@example.com', 'Kharkiv', 'Ukraine', 'https://example.com/maria.jpg', '2026-01-20 00:00:00', '2026-01-20 00:00:00'),
-(5, 'Andriy', 'Bohdan', 'andriyb', 'andriy.bohdan@example.com', 'Dnipro', 'Ukraine', 'https://example.com/andriy.jpg', '2026-02-01 00:00:00', '2026-02-01 00:00:00'),
-(6, 'Anna', 'Schmidt', 'annas', 'anna.schmidt@example.com', 'Berlin', 'Germany', 'https://example.com/anna.jpg', '2026-02-15 00:00:00', '2026-02-15 00:00:00');
+(1, 'John', 'Doe', 'johndoe', 'john.doe@example.com', '1990-05-14 00:00:00', 78.5, 182, 'Kyiv', 'Ukraine', 'https://example.com/john.jpg', '2026-01-01 00:00:00', '2026-01-01 00:00:00'),
+(2, 'Jane', 'Smith', 'janesmith', 'jane.smith@example.com', '1993-09-22 00:00:00', 62.3, 168, 'Lviv', 'Ukraine', 'https://example.com/jane.jpg', '2026-01-05 00:00:00', '2026-01-05 00:00:00'),
+(3, 'Oleksandr', 'Petrenko', 'oleksandrp', 'oleksandr.petrenko@example.com', '1988-03-10 00:00:00', 84.1, 186, 'Odessa', 'Ukraine', 'https://example.com/oleksandr.jpg', '2026-01-15 00:00:00', '2026-01-15 00:00:00'),
+(4, 'Maria', 'Kovalenko', 'mariak', 'maria.kovalenko@example.com', '1995-11-03 00:00:00', 58.7, 165, 'Kharkiv', 'Ukraine', 'https://example.com/maria.jpg', '2026-01-20 00:00:00', '2026-01-20 00:00:00'),
+(5, 'Andriy', 'Bohdan', 'andriyb', 'andriy.bohdan@example.com', '1991-07-28 00:00:00', 91.2, 180, 'Dnipro', 'Ukraine', 'https://example.com/andriy.jpg', '2026-02-01 00:00:00', '2026-02-01 00:00:00'),
+(6, 'Anna', 'Schmidt', 'annas', 'anna.schmidt@example.com', '1997-01-18 00:00:00', 60.4, 170, 'Berlin', 'Germany', 'https://example.com/anna.jpg', '2026-02-15 00:00:00', '2026-02-15 00:00:00');
 
 -- 3. INSERT ACTIVITIES
 -- We are creating a rich history for each athlete over the past few weeks (April - May 2026)

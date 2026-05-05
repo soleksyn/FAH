@@ -12,6 +12,9 @@ public class Athlete
     public string LastName { get; set; } = string.Empty;
     public string? Username { get; set; }
     public string? Email { get; set; }
+    public DateTime DateOfBirth { get; set; }
+    public double Weight { get; set; }
+    public double Height { get; set; }
     public string? City { get; set; }
     public string? Country { get; set; }
     public string? ProfilePictureUrl { get; set; }

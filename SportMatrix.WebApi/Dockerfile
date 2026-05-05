@@ -1,51 +1,50 @@
-﻿# Base image f�r .NET 8 Apps
+﻿# Base image for .NET 8 runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
 
-# Build image f�r .NET 8 SDK
+# Build image for .NET 8 SDK
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Zentrale Build-Konfiguration kopieren
+# Copy central build configuration
 COPY ["Directory.Build.props", "Directory.Packages.props", "./"]
 
-# Projekt-Dateien kopieren (angepasst an Ihre Struktur)
-COPY ["FitnessAnalyticsHub.WebApi/FitnessAnalyticsHub.WebApi.csproj", "FitnessAnalyticsHub.WebApi/"]
-COPY ["FitnessAnalyticsHub.Application/FitnessAnalyticsHub.Application.csproj", "FitnessAnalyticsHub.Application/"]
-COPY ["FitnessAnalyticsHub.Domain/FitnessAnalyticsHub.Domain.csproj", "FitnessAnalyticsHub.Domain/"]
-COPY ["FitnessAnalyticsHub.Infrastructure/FitnessAnalyticsHub.Infrastructure.csproj", "FitnessAnalyticsHub.Infrastructure/"]
+# Copy project files
+COPY ["SportMatrix.WebApi/SportMatrix.WebApi.csproj", "SportMatrix.WebApi/"]
+COPY ["SportMatrix.Application/SportMatrix.Application.csproj", "SportMatrix.Application/"]
+COPY ["SportMatrix.Domain/SportMatrix.Domain.csproj", "SportMatrix.Domain/"]
+COPY ["SportMatrix.Infrastructure/SportMatrix.Infrastructure.csproj", "SportMatrix.Infrastructure/"]
 
-# NuGet Pakete wiederherstellen
-RUN dotnet restore "FitnessAnalyticsHub.WebApi/FitnessAnalyticsHub.WebApi.csproj"
+# Restore NuGet packages
+RUN dotnet restore "SportMatrix.WebApi/SportMatrix.WebApi.csproj"
 
-# Copy only source code directories
-COPY ["FitnessAnalyticsHub.WebApi/", "FitnessAnalyticsHub.WebApi/"]
-COPY ["FitnessAnalyticsHub.Application/", "FitnessAnalyticsHub.Application/"]
-COPY ["FitnessAnalyticsHub.Domain/", "FitnessAnalyticsHub.Domain/"]
-COPY ["FitnessAnalyticsHub.Infrastructure/", "FitnessAnalyticsHub.Infrastructure/"]
+# Copy source code
+COPY ["SportMatrix.WebApi/", "SportMatrix.WebApi/"]
+COPY ["SportMatrix.Application/", "SportMatrix.Application/"]
+COPY ["SportMatrix.Domain/", "SportMatrix.Domain/"]
+COPY ["SportMatrix.Infrastructure/", "SportMatrix.Infrastructure/"]
 
-# Zur WebApi wechseln und bauen
-WORKDIR "/src/FitnessAnalyticsHub.WebApi"
-RUN dotnet build "FitnessAnalyticsHub.WebApi.csproj" -c Release -o /app/build
+# Build the application
+WORKDIR "/src/SportMatrix.WebApi"
+RUN dotnet build "SportMatrix.WebApi.csproj" -c Release -o /app/build
 
-# App ver�ffentlichen
+# Publish stage
 FROM build AS publish
-RUN dotnet publish "FitnessAnalyticsHub.WebApi.csproj" -c Release -o /app/publish
+RUN dotnet publish "SportMatrix.WebApi.csproj" -c Release -o /app/publish
 
-# Finales Image erstellen
+# Final runtime image
 FROM base AS final
 WORKDIR /app
 
-# Files kopieren (als root)
+# Copy published files
 COPY --from=publish /app/publish .
 
-
-# Standard ASP.NET Core Umgebungsvariablen
+# Standard ASP.NET Core environment variables
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:8080
 
-# Explizit non-root user verwenden
+# Use non-root user explicitly
 USER 1001
 
-ENTRYPOINT ["dotnet", "FitnessAnalyticsHub.WebApi.dll"]
+ENTRYPOINT ["dotnet", "SportMatrix.WebApi.dll"]

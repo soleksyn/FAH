@@ -2,10 +2,8 @@
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
-using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Tests.Base;
 using SportMatrix.AIAssistant.UI.API.Controllers;
-using SportMatrix.AIAssistant.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -142,7 +140,7 @@ public class GrpcJsonControllerTests : AIAssistantControllerTestBase<GrpcJsonCon
             .ReturnsAsync(serviceResponse);
 
         // Act
-        ActionResult result = await this.controller.AnalyzeWorkoutsAsync(request, CancellationToken.None);
+        ActionResult result = await this.controller.GetWorkoutAnalysisAsync(request, CancellationToken.None);
 
         // Assert
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
@@ -291,3 +289,4 @@ public class GrpcJsonControllerTests : AIAssistantControllerTestBase<GrpcJsonCon
         Assert.NotNull(okResult.Value);
     }
 }
+

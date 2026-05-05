@@ -1,12 +1,11 @@
 ﻿namespace SportMatrix.AIAssistant.UI.API.Services;
 
-using SportMatrix;
-using global::SportMatrix.AIAssistant.Application.Interfaces;
-using global::SportMatrix.AIAssistant.Extensions;
 using Grpc.Core;
-using Sportmatrix;
+using SportMatrix.AIAssistant.Application.DTOs;
+using SportMatrix.AIAssistant.Application.Interfaces;
+using SportMatrix.AIAssistant.Extensions;
 
-public class MotivationGrpcService : MotivationService.MotivationServiceBase
+public class MotivationGrpcService : Sportmatrix.MotivationService.MotivationServiceBase
 {
     private readonly IMotivationCoachService motivationCoachService;
     private readonly ILogger<MotivationGrpcService> logger;
@@ -19,7 +18,9 @@ public class MotivationGrpcService : MotivationService.MotivationServiceBase
         this.logger = logger;
     }
 
-    public override async Task<Sportmatrix.MotivationResponse> GetMotivation(Sportmatrix.MotivationRequest request, ServerCallContext context)
+    public override async Task<Sportmatrix.MotivationResponse> GetMotivation(
+        Sportmatrix.MotivationRequest request,
+        ServerCallContext context)
     {
         try
         {
@@ -27,21 +28,23 @@ public class MotivationGrpcService : MotivationService.MotivationServiceBase
                 "gRPC: Received motivation request for athlete: {Name}",
                 request.AthleteProfile?.Name ?? "Unknown");
 
-            // Konvertiere gRPC Request zu Application DTO
-            SportMatrix.AIAssistant.Application.DTOs.MotivationRequestDto motivationRequest = request.ToMotivationRequestDto();
+            // Convert gRPC Request to Application DTO
+            MotivationRequestDto motivationRequest = request.ToMotivationRequestDto();
 
-            // Rufe den HuggingFace Service auf!
-            global::SportMatrix.AIAssistant.Application.DTOs.MotivationResponseDto response = await this.motivationCoachService.GenerateMotivationAsync(motivationRequest, context.CancellationToken);
+            // Call the motivation service
+            MotivationResponseDto response = await this.motivationCoachService.GenerateMotivationAsync(
+                motivationRequest, context.CancellationToken);
 
-            // Konvertiere zur?ck zu gRPC Response
+            // Convert back to gRPC Response
             Sportmatrix.MotivationResponse grpcResponse = new Sportmatrix.MotivationResponse
             {
                 MotivationalMessage = response.MotivationalMessage ?? string.Empty,
                 Quote = response.Quote ?? string.Empty,
                 GeneratedAt = response.GeneratedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                Source = "Gemini-AI",
             };
 
-            // ActionableTips hinzuf?gen
+            // Add ActionableTips
             if (response.ActionableTips != null)
             {
                 grpcResponse.ActionableTips.AddRange(response.ActionableTips);
@@ -53,12 +56,7 @@ public class MotivationGrpcService : MotivationService.MotivationServiceBase
         catch (Exception ex)
         {
             this.logger.LogError(ex, "gRPC: Error generating motivation");
-
-            // gRPC Exception werfen
-            throw new RpcException(new Status(
-                StatusCode.Internal,
-                $"Failed to generate motivation: {ex.Message}"));
+            throw new RpcException(new Status(StatusCode.Internal, $"Failed to generate motivation: {ex.Message}"));
         }
     }
 }
-

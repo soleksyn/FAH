@@ -21,11 +21,11 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
     {
         this.logger = logger;
 
-        // gRPC Channel erstellen (wie HttpClient, aber f�r gRPC)
+        // Create gRPC channel
         string grpcUrl = configuration["AIAssistant:GrpcUrl"] ?? "http://localhost:5001";
         this.channel = GrpcChannel.ForAddress(grpcUrl);
 
-        // Client erstellen!
+        // Create gRPC clients
         this.motivationClient = new Sportmatrix.MotivationService.MotivationServiceClient(this.channel);
         this.workoutServiceClient = new Sportmatrix.WorkoutService.WorkoutServiceClient(this.channel);
 
@@ -52,10 +52,10 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
                 ContextualInfo = request.ContextualInfo ?? string.Empty,
             };
 
-            // gRPC-Call
+            // gRPC call
             MotivationResponse grpcResponse = await this.motivationClient.GetMotivationAsync(grpcRequest, cancellationToken: cancellationToken);
 
-            // gRPC-Response zu DTO konvertieren
+            // Convert gRPC response to DTO
             AIMotivationResponseDto response = new AIMotivationResponseDto
             {
                 MotivationalMessage = grpcResponse.MotivationalMessage,
@@ -84,16 +84,14 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
 
         try
         {
-            // Konvertiere DTO zu gRPC Request
+            // Convert DTO to gRPC request
             WorkoutAnalysisRequest grpcRequest = new WorkoutAnalysisRequest
             {
                 AnalysisType = request.AnalysisType ?? "General",
-
-                // PreferredAiProvider = request.PreferredAiProvider ?? "huggingface"
                 PreferredAiProvider = "googlegemini",
             };
 
-            // AthleteProfile hinzuf�gen
+            // Add AthleteProfile
             if (request.AthleteProfile != null)
             {
                 grpcRequest.AthleteProfile = new AthleteProfile
@@ -104,7 +102,7 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
                 };
             }
 
-            // Workouts hinzuf�gen
+            // Add workouts
             if (request.RecentWorkouts != null)
             {
                 foreach (AIWorkoutDataDto workout in request.RecentWorkouts)
@@ -118,49 +116,27 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
                         Calories = workout.Calories,
                     };
 
-                    // MetricsData hinzuf�gen
-                    // if (workout.MetricsData != null)
-                    // {
-                    //    foreach (var metric in workout.MetricsData)
-                    //    {
-                    //        grpcWorkout.MetricsData.Add(metric.Key, metric.Value);
-                    //    }
-                    // }
                     grpcRequest.RecentWorkouts.Add(grpcWorkout);
                 }
             }
 
-            // gRPC-Call durchf�hren!
             WorkoutAnalysisResponse grpcResponse = await this.workoutServiceClient.GetWorkoutAnalysisAsync(grpcRequest, cancellationToken: cancellationToken);
 
-            // gRPC-Response zu DTO konvertieren
-            AIWorkoutAnalysisResponseDto response = new AIWorkoutAnalysisResponseDto
-            {
-                Analysis = grpcResponse.Analysis,
-                KeyInsights = grpcResponse.KeyInsights.ToList(),
-                Recommendations = grpcResponse.Recommendations.ToList(),
-                GeneratedAt = DateTime.TryParse(grpcResponse.GeneratedAt, out DateTime parsedDate)
-                    ? parsedDate : DateTime.UtcNow,
-                Source = grpcResponse.Source,
+            AIWorkoutAnalysisResponseDto response = this.ToAnalysisResponse(grpcResponse);
 
-                // AnalysisType = grpcResponse.AnalysisType
-            };
-
-            this.logger.LogInformation("gRPC: Workout analysis response received successfully from {Source}", response.Source);
+            this.logger.LogInformation("gRPC: Workout analysis response received successfully");
             return response;
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "gRPC: Error getting workout analysis");
+            this.logger.LogError(ex, "gRPC: Error analyzing workouts");
             throw;
         }
     }
 
     public async Task<AIWorkoutAnalysisResponseDto> GetPerformanceTrendsAsync(int athleteId, CancellationToken cancellationToken, string timeFrame = "month")
     {
-        this.logger.LogInformation(
-            "gRPC: Requesting performance trends for athlete: {AthleteId}, timeFrame: {TimeFrame}",
-            athleteId, timeFrame);
+        this.logger.LogInformation("gRPC: Requesting performance trends for athlete: {AthleteId}", athleteId);
 
         try
         {
@@ -172,17 +148,7 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
 
             WorkoutAnalysisResponse grpcResponse = await this.workoutServiceClient.GetPerformanceTrendsAsync(grpcRequest, cancellationToken: cancellationToken);
 
-            AIWorkoutAnalysisResponseDto response = new AIWorkoutAnalysisResponseDto
-            {
-                Analysis = grpcResponse.Analysis,
-                KeyInsights = grpcResponse.KeyInsights.ToList(),
-                Recommendations = grpcResponse.Recommendations.ToList(),
-                GeneratedAt = DateTime.TryParse(grpcResponse.GeneratedAt, out DateTime parsedDate)
-                    ? parsedDate : DateTime.UtcNow,
-                Source = grpcResponse.Source,
-
-                // AnalysisType = grpcResponse.AnalysisType
-            };
+            AIWorkoutAnalysisResponseDto response = this.ToAnalysisResponse(grpcResponse);
 
             this.logger.LogInformation("gRPC: Performance trends response received successfully");
             return response;
@@ -207,17 +173,7 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
 
             WorkoutAnalysisResponse grpcResponse = await this.workoutServiceClient.GetTrainingRecommendationsAsync(grpcRequest, cancellationToken: cancellationToken);
 
-            AIWorkoutAnalysisResponseDto response = new AIWorkoutAnalysisResponseDto
-            {
-                Analysis = grpcResponse.Analysis,
-                KeyInsights = grpcResponse.KeyInsights.ToList(),
-                Recommendations = grpcResponse.Recommendations.ToList(),
-                GeneratedAt = DateTime.TryParse(grpcResponse.GeneratedAt, out DateTime parsedDate)
-                    ? parsedDate : DateTime.UtcNow,
-                Source = grpcResponse.Source,
-
-                // AnalysisType = grpcResponse.AnalysisType
-            };
+            AIWorkoutAnalysisResponseDto response = this.ToAnalysisResponse(grpcResponse);
 
             this.logger.LogInformation("gRPC: Training recommendations response received successfully");
             return response;
@@ -240,7 +196,7 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
                 AthleteId = athleteId,
             };
 
-            // Workouts hinzuf�gen
+            // Add workouts
             if (recentWorkouts != null)
             {
                 foreach (AIWorkoutDataDto workout in recentWorkouts)
@@ -254,30 +210,13 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
                         Calories = workout.Calories,
                     };
 
-                    // if (workout.MetricsData != null)
-                    // {
-                    //    foreach (var metric in workout.MetricsData)
-                    //    {
-                    //        grpcWorkout.MetricsData.Add(metric.Key, metric.Value);
-                    //    }
-                    // }
                     grpcRequest.RecentWorkouts.Add(grpcWorkout);
                 }
             }
 
             WorkoutAnalysisResponse grpcResponse = await this.workoutServiceClient.AnalyzeHealthMetricsAsync(grpcRequest, cancellationToken: cancellationToken);
 
-            AIWorkoutAnalysisResponseDto response = new AIWorkoutAnalysisResponseDto
-            {
-                Analysis = grpcResponse.Analysis,
-                KeyInsights = grpcResponse.KeyInsights.ToList(),
-                Recommendations = grpcResponse.Recommendations.ToList(),
-                GeneratedAt = DateTime.TryParse(grpcResponse.GeneratedAt, out DateTime parsedDate)
-                    ? parsedDate : DateTime.UtcNow,
-                Source = grpcResponse.Source,
-
-                // AnalysisType = grpcResponse.AnalysisType
-            };
+            AIWorkoutAnalysisResponseDto response = this.ToAnalysisResponse(grpcResponse);
 
             this.logger.LogInformation("gRPC: Health metrics analysis response received successfully");
             return response;
@@ -298,14 +237,14 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
 
         try
         {
-            // Konvertiere DTO zu gRPC Request
+            // Convert DTO to gRPC request
             WorkoutAnalysisRequest grpcRequest = new WorkoutAnalysisRequest
             {
                 AnalysisType = request.AnalysisType ?? "General",
-                PreferredAiProvider = "googlegemini", // Zwinge GoogleGemini
+                PreferredAiProvider = "googlegemini",
             };
 
-            // AthleteProfile hinzuf�gen
+            // Add AthleteProfile
             if (request.AthleteProfile != null)
             {
                 grpcRequest.AthleteProfile = new AthleteProfile
@@ -316,7 +255,7 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
                 };
             }
 
-            // Workouts hinzuf�gen
+            // Add workouts
             if (request.RecentWorkouts != null)
             {
                 foreach (AIWorkoutDataDto workout in request.RecentWorkouts)
@@ -330,31 +269,14 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
                         Calories = workout.Calories,
                     };
 
-                    // if (workout.MetricsData != null)
-                    // {
-                    //    foreach (var metric in workout.MetricsData)
-                    //    {
-                    //        grpcWorkout.MetricsData.Add(metric.Key, metric.Value);
-                    //    }
-                    // }
                     grpcRequest.RecentWorkouts.Add(grpcWorkout);
                 }
             }
 
-            // Verwende die GoogleGemini-spezifische Methode
-            WorkoutAnalysisResponse grpcResponse = await this.workoutServiceClient.AnalyzeGoogleGeminiWorkoutsAsync(grpcRequest, cancellationToken: cancellationToken);
+            // Use the standard workout analysis method
+            WorkoutAnalysisResponse grpcResponse = await this.workoutServiceClient.GetWorkoutAnalysisAsync(grpcRequest, cancellationToken: cancellationToken);
 
-            AIWorkoutAnalysisResponseDto response = new AIWorkoutAnalysisResponseDto
-            {
-                Analysis = grpcResponse.Analysis,
-                KeyInsights = grpcResponse.KeyInsights.ToList(),
-                Recommendations = grpcResponse.Recommendations.ToList(),
-                GeneratedAt = DateTime.TryParse(grpcResponse.GeneratedAt, out DateTime parsedDate)
-                    ? parsedDate : DateTime.UtcNow,
-                Source = grpcResponse.Source,
-
-                // AnalysisType = grpcResponse.AnalysisType
-            };
+            AIWorkoutAnalysisResponseDto response = this.ToAnalysisResponse(grpcResponse);
 
             this.logger.LogInformation("gRPC: GoogleGemini workout analysis response received successfully");
             return response;
@@ -370,7 +292,7 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
     {
         try
         {
-            // gRPC Health-Check durchf�hren
+            // Perform gRPC health check
             HealthCheckRequest grpcRequest = new HealthCheckRequest();
             HealthCheckResponse grpcResponse = await this.workoutServiceClient.CheckHealthAsync(grpcRequest, cancellationToken: cancellationToken);
 
@@ -385,6 +307,19 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
             this.logger.LogWarning(ex, "gRPC: Health check failed");
             return false;
         }
+    }
+
+    private AIWorkoutAnalysisResponseDto ToAnalysisResponse(WorkoutAnalysisResponse grpcResponse)
+    {
+        return new AIWorkoutAnalysisResponseDto
+        {
+            Analysis = grpcResponse.Analysis,
+            KeyInsights = grpcResponse.KeyInsights.ToList(),
+            Recommendations = grpcResponse.Recommendations.ToList(),
+            GeneratedAt = DateTime.TryParse(grpcResponse.GeneratedAt, out DateTime parsedDate)
+                ? parsedDate : DateTime.UtcNow,
+            Source = grpcResponse.Source,
+        };
     }
 
     public void Dispose()

@@ -2,8 +2,6 @@
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
-using SportMatrix.AIAssistant.Application.DTOs;
-using SportMatrix.AIAssistant.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -31,7 +29,7 @@ public class MotivationCoachController : ControllerBase
                 "Generating motivational message for athlete: {Name}",
                 request.AthleteProfile.Name);
 
-            // Nutze HuggingFace (alte OpenAI/Claude Methoden sind jetzt redirects)
+            // Uses Gemini AI for motivation generation
             MotivationResponseDto result = await this.motivationCoachService.GenerateMotivationAsync(request, cancellationToken);
             return this.Ok(result);
         }
@@ -42,34 +40,12 @@ public class MotivationCoachController : ControllerBase
         }
     }
 
-    // New specific HuggingFace endpoint (optional)
-    [HttpPost("motivate/huggingface")]
-    public async Task<ActionResult<MotivationResponseDto>> GetHuggingFaceMotivation(
-        [FromBody] MotivationRequestDto request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            this.logger.LogInformation(
-                "Generating HuggingFace motivational message for athlete: {Name}",
-                request.AthleteProfile.Name);
-
-            MotivationResponseDto result = await this.motivationCoachService.GenerateMotivationAsync(request, cancellationToken);
-            return this.Ok(result);
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex, "Error generating HuggingFace motivational message");
-            return this.StatusCode(500, "An error occurred while generating motivational message");
-        }
-    }
-
-    // Health Check für HuggingFace Service
+    // Health check for the motivation service
     [HttpGet("health")]
     public async Task<ActionResult> HealthCheck(CancellationToken cancellationToken)
     {
         try
         {
-            // Einfache Test-Anfrage
             MotivationRequestDto testRequest = new MotivationRequestDto
             {
                 AthleteProfile = new AthleteProfileDto
@@ -86,7 +62,7 @@ public class MotivationCoachController : ControllerBase
             return this.Ok(new
             {
                 status = "healthy",
-                message = "HuggingFace service is responding",
+                message = "Motivation service is responding",
                 timestamp = DateTime.UtcNow,
             });
         }

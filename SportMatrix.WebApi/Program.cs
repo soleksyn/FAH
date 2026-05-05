@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using SportMatrix.Application;
 using SportMatrix.Application.Interfaces;
 using SportMatrix.Infrastructure;
@@ -19,7 +19,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
 
-// Learn more about configuring Swagger
+// Configure Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -27,7 +27,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Fitness Analytics Hub API",
         Version = "v1",
-        Description = "Backend API f?r die FitnessAnalyticsHub-Anwendung",
+        Description = "Backend API for the FitnessAnalyticsHub application",
     });
 });
 
@@ -48,30 +48,24 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
-// Base HealthChecks
+// Base health checks
 builder.Services.AddHealthChecks()
     .AddCheck("api", () => HealthCheckResult.Healthy(), tags: new[] { "service" });
 
-// UI f?r HealthChecks
+// Health Checks UI
 builder.Services.AddHealthChecksUI(setup =>
 {
-    setup.SetEvaluationTimeInSeconds(60); // Alle 60 Sekunden pr?fen
-    setup.MaximumHistoryEntriesPerEndpoint(50); // 50 Eintr?ge in der Historie speichern
+    setup.SetEvaluationTimeInSeconds(60);
+    setup.MaximumHistoryEntriesPerEndpoint(50);
 })
 .AddInMemoryStorage();
 
-
-
-// ==========================================
-// AIAssistant Client Services Registrierung
-// ==========================================
-
-// Alle drei Client-Implementierungen registrieren
+// AIAssistant Client Services Registration
 builder.Services.AddHttpClient<AIAssistantClientService>();
 builder.Services.AddScoped<GrpcAIAssistantClientService>();
 builder.Services.AddHttpClient<GrpcJsonClientService>();
 
-// Konfigurierbare Service-Auswahl basierend auf appsettings.json
+// Configurable service selection based on appsettings.json
 builder.Services.AddScoped<IAIAssistantClientService>(provider =>
 {
     IConfiguration configuration = provider.GetRequiredService<IConfiguration>();
@@ -89,7 +83,6 @@ builder.Services.AddScoped<IAIAssistantClientService>(provider =>
     };
 });
 
-
 WebApplication app = builder.Build();
 
 // Exception Handling
@@ -100,7 +93,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Fitness Analytics Hub API v1");
-    c.RoutePrefix = string.Empty; // Um Swagger als Startseite zu setzen
+    c.RoutePrefix = string.Empty; // Set Swagger as the start page
 });
 
 app.UseCors("AllowAll");
@@ -109,13 +102,13 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-// HealthChecks Endpoints
+// Health Check Endpoints
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
 });
 
-// Gruppierte HealthChecks nach Tags
+// Grouped health checks by tags
 app.MapHealthChecks("/health/infrastructure", new HealthCheckOptions
 {
     Predicate = check => check.Tags.Contains("infrastructure"),
@@ -130,7 +123,7 @@ app.MapHealthChecksUI(options =>
 
 app.MapControllers();
 
-// Zeige beim Start an, welcher AIAssistant Client verwendet wird
+// Log which AIAssistant client type is being used
 ILogger<Program> logger = app.Services.GetRequiredService<ILogger<Program>>();
 IConfiguration config = app.Services.GetRequiredService<IConfiguration>();
 string clientType = config["AIAssistant:ClientType"] ?? "Http";

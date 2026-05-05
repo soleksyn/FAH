@@ -4,9 +4,13 @@ namespace SportMatrix.Frontend.Models;
 
 public class AthleteCreateViewModel
 {
-    [Required(ErrorMessage = "Name ist erforderlich.")]
-    [MaxLength(100, ErrorMessage = "Name darf maximal 100 Zeichen lang sein.")]
-    public string Name { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Vorname ist erforderlich.")]
+    [MaxLength(50, ErrorMessage = "Vorname darf maximal 50 Zeichen lang sein.")]
+    public string FirstName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Nachname ist erforderlich.")]
+    [MaxLength(50, ErrorMessage = "Nachname darf maximal 50 Zeichen lang sein.")]
+    public string LastName { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "E-Mail ist erforderlich.")]
     [EmailAddress(ErrorMessage = "Bitte gib eine gültige E-Mail-Adresse ein.")]

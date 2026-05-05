@@ -89,7 +89,8 @@ public class AthletesController : Controller
         {
             var request = new CreateAthleteRequest
             {
-                Name = model.Name,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
                 Email = model.Email,
                 DateOfBirth = model.DateOfBirth,
                 Weight = model.Weight,
@@ -163,7 +164,8 @@ public class AthletesController : Controller
             var request = new UpdateAthleteRequest
             {
                 Id = model.Id,
-                Name = $"{model.FirstName} {model.LastName}",
+                FirstName = model.FirstName,
+                LastName = model.LastName,
                 Email = model.Email,
                 DateOfBirth = model.DateOfBirth,
                 Weight = model.Weight,

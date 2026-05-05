@@ -30,10 +30,17 @@
         <div class="form-section">
             <div class="form-section-title">Identity</div>
 
-            <div class="form-group">
-                <label asp-for="Name" class="form-label">Full Name <span style="color:var(--color-danger)">*</span></label>
-                <input asp-for="Name" class="form-control" placeholder="e.g. Anna Schmidt" />
-                <div asp-validation-for="Name" class="form-error"></div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="FirstName" class="form-label">First Name <span style="color:var(--color-danger)">*</span></label>
+                    <input asp-for="FirstName" class="form-control" placeholder="Anna" />
+                    <div asp-validation-for="FirstName" class="form-error"></div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="LastName" class="form-label">Last Name <span style="color:var(--color-danger)">*</span></label>
+                    <input asp-for="LastName" class="form-control" placeholder="Schmidt" />
+                    <div asp-validation-for="LastName" class="form-error"></div>
+                </div>
             </div>
 
             <div class="form-group">

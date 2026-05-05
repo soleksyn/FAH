@@ -1,8 +1,5 @@
-using SportMatrix.AIAssistant.Application.DTOs;
-using SportMatrix.AIAssistant.Application.DTOs;
+ï»¿using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Domain.Models;
-using SportMatrix.AIAssistant.Application.DTOs;
-using SportMatrix.AIAssistant.Extensions;
 
 namespace SportMatrix.AIAssistant.Extensions;
 
@@ -27,9 +24,9 @@ public static class GrpcMappingExtensions
         return new MotivationRequestDto
         {
             AthleteProfile = grpcRequest.AthleteProfile.ToAthleteProfileDto(),
-            LastWorkout = null, // Erstmal null - wird nicht über gRPC übertragen
-            UpcomingWorkoutType = null, // Erstmal null
-            IsStruggling = false, // Default
+            LastWorkout = null,
+            UpcomingWorkoutType = null,
+            IsStruggling = false,
         };
     }
 

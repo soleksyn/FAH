@@ -12,12 +12,6 @@ public static class DatabaseConfiguration
 
         switch (provider.ToLower())
         {
-            case "sqlite":
-                ConfigureSqlite(options, connectionString ?? "Data Source=FitnessAnalytics.db");
-                break;
-            case "sqlserver":
-                options.UseSqlServer(connectionString);
-                break;
             default:
                 ConfigureSqlite(options, connectionString ?? "Data Source=FitnessAnalytics.db");
                 break;

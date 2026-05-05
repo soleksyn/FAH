@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+ï»¿using System.ComponentModel.DataAnnotations;
 using SportMatrix.AIAssistant.Application.DTOs;
 
 namespace SportMatrix.AIAssistant.Application.DTOs;
@@ -10,7 +10,7 @@ public class HealthAnalysisRequestDto
     public List<WorkoutDataDto> RecentWorkouts { get; set; } = new();
 
     /// <summary>
-    /// Zusätzliche Gesundheitsmetriken (optional)
+    /// Additional health metrics (optional)
     /// </summary>
     public Dictionary<string, object>? HealthMetrics { get; set; }
 

@@ -1,4 +1,4 @@
-syntax = "proto3";
+ï»¿syntax = "proto3";
 
 import "common.proto";
 
@@ -6,10 +6,9 @@ package sportmatrix;
 
 service WorkoutService {
   rpc GetWorkoutAnalysis(WorkoutAnalysisRequest) returns (WorkoutAnalysisResponse);
-  rpc AnalyzeGoogleGeminiWorkouts(WorkoutAnalysisRequest) returns (WorkoutAnalysisResponse);  
   rpc GetPerformanceTrends(PerformanceTrendsRequest) returns (WorkoutAnalysisResponse);
-  rpc GetTrainingRecommendations(TrainingRecommendationsRequest) returns (WorkoutAnalysisResponse);  
-  rpc AnalyzeHealthMetrics(HealthAnalysisRequest) returns (WorkoutAnalysisResponse); 
+  rpc GetTrainingRecommendations(TrainingRecommendationsRequest) returns (WorkoutAnalysisResponse);
+  rpc AnalyzeHealthMetrics(HealthAnalysisRequest) returns (WorkoutAnalysisResponse);
   rpc CheckHealth(HealthCheckRequest) returns (HealthCheckResponse);
 }
 
@@ -18,7 +17,7 @@ message WorkoutAnalysisRequest {
   string analysis_type = 1;
   repeated Workout recent_workouts = 2;
   AthleteProfile athlete_profile = 3;
-  string preferred_ai_provider = 4; // "huggingface" oder "googlegemini"
+  string preferred_ai_provider = 4; // "googlegemini"
 }
 
 message PerformanceTrendsRequest {
@@ -27,7 +26,7 @@ message PerformanceTrendsRequest {
 }
 
 message HealthCheckRequest {
-  // Leer für jetzt
+  // Empty for now
 }
 
 message TrainingRecommendationsRequest {

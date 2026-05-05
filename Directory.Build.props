@@ -9,7 +9,7 @@
 		<CodeAnalysisRuleSet>styleguide.ruleset</CodeAnalysisRuleSet>
 	</PropertyGroup>
 	
-	<!-- Central Package Management aktiviert -->
+	<!-- Central Package Management enabled -->
 	<PropertyGroup>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>

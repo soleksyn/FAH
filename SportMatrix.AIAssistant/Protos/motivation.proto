@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 import "common.proto";
 
@@ -10,17 +10,17 @@ service MotivationService {
 
 // Request
 message MotivationRequest {
-  AthleteProfile athlete_profile = 1;     // Import aus common.proto
-  repeated Workout recent_workouts = 2;   // Liste von Workouts
+  AthleteProfile athlete_profile = 1;     // Imported from common.proto
+  repeated Workout recent_workouts = 2;   // List of workouts
   string preferred_tone = 3;              // "Encouraging", etc.
-  string contextual_info = 4;             // Zusätzliche Infos
+  string contextual_info = 4;             // Additional context
 }
 
 // Response
 message MotivationResponse {
-  string motivational_message = 1;        // Hauptnachricht
-  string quote = 2;                       // Optionales Zitat
-  repeated string actionable_tips = 3;    // Liste von Tipps
-  string generated_at = 4;                // Timestamp als string
-  string source = 5;                      // "AIAssistant-HuggingFace"
+  string motivational_message = 1;        // Main message
+  string quote = 2;                       // Optional quote
+  repeated string actionable_tips = 3;    // List of tips
+  string generated_at = 4;                // Timestamp as string
+  string source = 5;                      // "AIAssistant-Gemini"
 }

@@ -1,11 +1,11 @@
-using SportMatrix.AIAssistant.Domain.Models;
+ï»¿using SportMatrix.AIAssistant.Domain.Models;
 using SportMatrix.AIAssistant.Application.DTOs;
 
 namespace SportMatrix.AIAssistant.Extensions;
 
 public static class AthleteProfileExtensions
 {
-    // Domain ? DTO (für Services die Domain Models zurückgeben)
+    // Domain to DTO
     public static AthleteProfileDto ToDto(this AthleteProfile domain)
     {
         return new AthleteProfileDto
@@ -18,7 +18,7 @@ public static class AthleteProfileExtensions
         };
     }
 
-    // DTO ? Domain (für Services die Domain Models erwarten)
+    // DTO to Domain
     public static AthleteProfile ToDomain(this AthleteProfileDto dto)
     {
         return new AthleteProfile
@@ -31,16 +31,16 @@ public static class AthleteProfileExtensions
         };
     }
 
-    // GrpcJson ? DTO (für deinen Controller)
+    // GrpcJson to DTO
     public static AthleteProfileDto ToAthleteProfileDto(this GrpcJsonAthleteProfileDto grpcProfile)
     {
         return new AthleteProfileDto
         {
-            Id = Guid.NewGuid().ToString(),  // Neue ID generieren
+            Id = Guid.NewGuid().ToString(),
             Name = grpcProfile.Name ?? string.Empty,
             FitnessLevel = grpcProfile.FitnessLevel,
             PrimaryGoal = grpcProfile.PrimaryGoal,
-            Preferences = null,  // gRPC-JSON has no Preferences
+            Preferences = null,
         };
     }
 
@@ -53,7 +53,7 @@ public static class AthleteProfileExtensions
             Name = grpcProfile.Name ?? string.Empty,
             FitnessLevel = grpcProfile.FitnessLevel ?? string.Empty,
             PrimaryGoal = grpcProfile.PrimaryGoal ?? string.Empty,
-            Preferences = null, // gRPC has no Preferences
+            Preferences = null,
         };
     }
 }

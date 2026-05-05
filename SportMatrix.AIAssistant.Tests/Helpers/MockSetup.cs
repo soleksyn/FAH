@@ -347,7 +347,7 @@ public static class MockSetup
         Mock<IWorkoutAnalysisService> mock = new Mock<IWorkoutAnalysisService>();
 
         mock.Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
-            .ThrowsAsync(new Exception("HuggingFace service error"));
+            .ThrowsAsync(new Exception("AI service error"));
 
         mock.Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
             .ThrowsAsync(new Exception("GoogleGemini service error"));
@@ -616,4 +616,5 @@ public static class MockSetup
 
     #endregion
 }
+
 

@@ -1,4 +1,4 @@
-namespace SportMatrix.Tests.Services;
+﻿namespace SportMatrix.Tests.Services;
 
 using AutoMapper;
 using SportMatrix.Application;
@@ -18,7 +18,7 @@ public class TrainingPlanServiceTests : IDisposable
 
     public TrainingPlanServiceTests()
     {
-        // InMemory Database erstellen
+        // Create in-memory database
         DbContextOptions<ApplicationDbContext> options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;

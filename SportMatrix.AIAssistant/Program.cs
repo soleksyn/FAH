@@ -1,96 +1,62 @@
-﻿using Microsoft.Extensions.Options;
-using SportMatrix.AIAssistant.Application.Interfaces;
+﻿using SportMatrix.AIAssistant.Application.Interfaces;
 using SportMatrix.AIAssistant.Infrastructure.Configuration;
 using SportMatrix.AIAssistant.Infrastructure.Services;
-using SportMatrix.AIAssistant.UI.API.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add Options
-builder.Services.Configure<GoogleAIOptions>(builder.Configuration.GetSection(GoogleAIOptions.SectionName));
+// Configure Google AI options
+builder.Services.Configure<GoogleAIOptions>(
+    builder.Configuration.GetSection("GoogleAI"));
 
-// Add services to the container.
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-    });
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new()
-    {
-        Title = "Fitness Analytics Hub - AI Assistant",
-        Version = "v1",
-        Description = "AI-powered fitness analytics via Gemini",
-    });
-});
-
-// CORS configuration
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngularApp", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
-});
-
-// AI Service (uses Google.GenAI SDK internally)
+// Register AI services
 builder.Services.AddScoped<IAIPromptService, GoogleGeminiService>();
-
-// gRPC Services
-builder.Services.AddGrpc();
-
-// Application Services
 builder.Services.AddScoped<IMotivationCoachService, MotivationCoachService>();
 builder.Services.AddScoped<IWorkoutAnalysisService, WorkoutAnalysisService>();
 
-// Logging
-builder.Services.AddLogging(logging =>
+// Add gRPC services
+builder.Services.AddGrpc();
+
+// Add controllers for REST API
+builder.Services.AddControllers();
+
+// Add Swagger for development
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Configure CORS for Angular frontend
+builder.Services.AddCors(options =>
 {
-    logging.AddConsole();
-    logging.AddDebug();
+    options.AddPolicy("AllowAngularApp",
+        policy => policy
+            .WithOrigins("http://localhost:4200")
+            .AllowAnyMethod()
+            .AllowAnyHeader());
 });
+
+// Add health checks
+builder.Services.AddHealthChecks();
 
 WebApplication app = builder.Build();
 
-// gRPC Services
-app.MapGrpcService<MotivationGrpcService>();
-app.MapGrpcService<WorkoutAnalysisGrpcService>();
-
-// gRPC-Reflection
-app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client.");
-
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "AI Assistant API v1");
-    });
+    app.UseSwaggerUI();
 }
 
-app.UseExceptionHandler("/error");
-
-// app.UseHttpsRedirection(); // Disabled to allow HTTP connections from frontend
+app.UseHttpsRedirection();
 app.UseCors("AllowAngularApp");
 app.UseAuthorization();
+
+// Map controllers
 app.MapControllers();
 
-// Health check endpoint
-app.MapGet("/health", () => new
-{
-    status = "healthy",
-    service = "AI Assistant",
-    timestamp = DateTime.UtcNow,
-});
+// Map gRPC services
+app.MapGrpcService<SportMatrix.AIAssistant.UI.API.Services.MotivationGrpcService>();
+app.MapGrpcService<SportMatrix.AIAssistant.UI.API.Services.WorkoutAnalysisGrpcService>();
 
-Console.WriteLine("AI Assistant Service starting...");
-Console.WriteLine("Using Google Gemini for AI processing");
+// Map health check endpoint
+app.MapHealthChecks("/health");
 
 app.Run();

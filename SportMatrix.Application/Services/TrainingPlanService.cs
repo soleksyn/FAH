@@ -1,4 +1,4 @@
-namespace SportMatrix.Application.Services;
+ï»¿namespace SportMatrix.Application.Services;
 
 using AutoMapper;
 using SportMatrix.Application.DTOs;
@@ -22,10 +22,10 @@ public class TrainingPlanService : ITrainingPlanService
     public async Task<TrainingPlanDto?> GetTrainingPlanByIdAsync(int id, CancellationToken cancellationToken)
     {
         TrainingPlan? trainingPlan = await this.context.TrainingPlans
-            .Include(tp => tp.Athlete) // Athlete für AthleteName
-            .Include(tp => tp.PlannedActivities) // PlannedActivities
-                .ThenInclude(pa => pa.CompletedActivity) // CompletedActivity wenn vorhanden
-                    .ThenInclude(ca => ca.Athlete) // Athlete der CompletedActivity
+            .Include(tp => tp.Athlete)
+            .Include(tp => tp.PlannedActivities)
+                .ThenInclude(pa => pa.CompletedActivity)
+                    .ThenInclude(ca => ca.Athlete)
             .FirstOrDefaultAsync(tp => tp.Id == id, cancellationToken);
 
         if (trainingPlan == null)
@@ -56,7 +56,7 @@ public class TrainingPlanService : ITrainingPlanService
         await this.context.TrainingPlans.AddAsync(trainingPlan, cancellationToken);
         await this.context.SaveChangesAsync(cancellationToken);
 
-        // TrainingPlan mit Athlete laden für das Mapping
+        // Load TrainingPlan with Athlete for mapping
         TrainingPlan trainingPlanWithAthlete = await this.context.TrainingPlans
             .Include(tp => tp.Athlete)
             .FirstAsync(tp => tp.Id == trainingPlan.Id, cancellationToken);
@@ -77,7 +77,7 @@ public class TrainingPlanService : ITrainingPlanService
         this.mapper.Map(trainingPlanDto, trainingPlan);
         trainingPlan.UpdatedAt = DateTime.Now;
 
-        // Kein Update() nötig - EF Core tracked automatisch!
+        // EF Core tracks changes automatically - no need to call Update()
         await this.context.SaveChangesAsync(cancellationToken);
     }
 
@@ -126,7 +126,7 @@ public class TrainingPlanService : ITrainingPlanService
 
         this.mapper.Map(plannedActivityDto, plannedActivity);
 
-        // Kein Update() nötig - EF Core tracked automatisch!
+        // EF Core tracks changes automatically - no need to call Update()
         await this.context.SaveChangesAsync(cancellationToken);
     }
 
@@ -165,7 +165,7 @@ public class TrainingPlanService : ITrainingPlanService
         plannedActivity.CompletedActivityId = activityId;
         await this.context.SaveChangesAsync(cancellationToken);
 
-        // PlannedActivity mit CompletedActivity laden für das Mapping
+        // Load PlannedActivity with CompletedActivity for mapping
         PlannedActivity plannedActivityWithActivity = await this.context.PlannedActivities
             .Include(pa => pa.CompletedActivity)
                 .ThenInclude(ca => ca.Athlete)

@@ -2,7 +2,7 @@
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
-using SportMatrix.AIAssistant.Application.DTOs;
+using SportMatrix.AIAssistant.Infrastructure.Providers;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -37,26 +37,6 @@ public class WorkoutAnalysisController : ControllerBase
         }
     }
 
-    [HttpPost("analyze/googlegemini")]
-    public async Task<ActionResult<WorkoutAnalysisResponseDto>> AnalyzeGoogleGeminiWorkouts(
-        [FromBody] WorkoutAnalysisRequestDto request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            this.logger.LogInformation(
-                "Analyzing workouts with GoogleGemini for analysis type: {AnalysisType}",
-                request.AnalysisType);
-
-            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(request, cancellationToken);
-            return this.Ok(result);
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex, "Error analyzing workouts with GoogleGemini");
-            return this.StatusCode(500, "An error occurred while analyzing workouts");
-        }
-    }
-
     // Performance Trends Endpoint
     [HttpGet("performance-trends/{athleteId}")]
     public async Task<ActionResult<WorkoutAnalysisResponseDto>> AnalyzePerformanceTrends(
@@ -71,12 +51,12 @@ public class WorkoutAnalysisController : ControllerBase
                 athleteId,
                 timeFrame);
 
-            // Erstelle Request für Performance Trends
+            // Build request for performance trends
             WorkoutAnalysisRequestDto request = new WorkoutAnalysisRequestDto
             {
                 AnalysisType = "Trends",
-                RecentWorkouts = this.GetDemoWorkouts(athleteId, timeFrame), // Später durch echte Daten ersetzen
-                AthleteProfile = this.GetDemoAthleteProfile(athleteId), // Später durch echte Daten ersetzen
+                RecentWorkouts = this.GetDemoWorkouts(athleteId, timeFrame), // TODO: replace with real data
+                AthleteProfile = this.GetDemoAthleteProfile(athleteId), // TODO: replace with real data
                 AdditionalContext = new Dictionary<string, object>
                 {
                     { "timeFrame", timeFrame },
@@ -157,13 +137,13 @@ public class WorkoutAnalysisController : ControllerBase
         }
     }
 
-    // Health Check für WorkoutAnalysis Service
+    // Health check for workout analysis service
     [HttpGet("health")]
     public async Task<ActionResult> HealthCheck(CancellationToken cancellationToken)
     {
         try
         {
-            // Einfache Test-Anfrage
+            // Simple test request
             WorkoutAnalysisRequestDto testRequest = new WorkoutAnalysisRequestDto
             {
                 AnalysisType = "Health Check",
@@ -209,54 +189,10 @@ public class WorkoutAnalysisController : ControllerBase
     }
 
     private List<WorkoutDataDto> GetDemoWorkouts(int athleteId, string timeFrame)
-    {
-        return new List<WorkoutDataDto>
-        {
-            new WorkoutDataDto
-            {
-                Date = DateTime.Now.AddDays(-1),
-                ActivityType = "Run",
-                Distance = 5.2,
-                Duration = 1800,
-                Calories = 350,
-                MetricsData = new Dictionary<string, double> { { "heartRate", 145 } },
-            },
-            new WorkoutDataDto
-            {
-                Date = DateTime.Now.AddDays(-3),
-                ActivityType = "Ride",
-                Distance = 24.8,
-                Duration = 4500,
-                Calories = 890,
-                MetricsData = new Dictionary<string, double> { { "heartRate", 132 } },
-            },
-            new WorkoutDataDto
-            {
-                Date = DateTime.Now.AddDays(-5),
-                ActivityType = "Run",
-                Distance = 3.1,
-                Duration = 1080,
-                Calories = 245,
-                MetricsData = new Dictionary<string, double> { { "heartRate", 128 } },
-            },
-        };
-    }
+        => DemoDataProvider.GetDemoWorkouts();
 
     private AthleteProfileDto GetDemoAthleteProfile(int athleteId)
-    {
-        return new AthleteProfileDto
-        {
-            Id = athleteId.ToString(),
-            Name = "Demo User",
-            FitnessLevel = "Intermediate",
-            PrimaryGoal = "Endurance Improvement",
-            Preferences = new Dictionary<string, object>
-            {
-                { "preferredActivities", new[] { "Run", "Ride" } },
-                { "trainingDays", 4 },
-            },
-        };
-    }
+        => DemoDataProvider.GetDemoAthleteProfile(athleteId);
 }
 
 

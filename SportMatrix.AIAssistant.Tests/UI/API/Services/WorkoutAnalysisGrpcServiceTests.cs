@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.Tests.UI.API.Services
+﻿namespace SportMatrix.AIAssistant.Tests.UI.API.Services
 {
     using SportMatrix.AIAssistant.Application.DTOs;
     using SportMatrix.AIAssistant.Application.Interfaces;
@@ -51,7 +51,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockWorkoutAnalysisService
-                .Setup(s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+                .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -66,10 +66,10 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             Assert.Equal("HuggingFace", result.Source);
 
             this.mockWorkoutAnalysisService.Verify(
-                s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
+                s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
                 Times.Once);
             this.mockWorkoutAnalysisService.Verify(
-                s => s.AnalyzeGoogleGeminiWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
+                s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
                 Times.Never);
         }
 
@@ -93,7 +93,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockWorkoutAnalysisService
-                .Setup(s => s.AnalyzeGoogleGeminiWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+                .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -106,10 +106,10 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             Assert.Equal("GoogleGemini", result.Source);
 
             this.mockWorkoutAnalysisService.Verify(
-                s => s.AnalyzeGoogleGeminiWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
+                s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
                 Times.Once);
             this.mockWorkoutAnalysisService.Verify(
-                s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
+                s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
                 Times.Never);
         }
 
@@ -130,7 +130,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockWorkoutAnalysisService
-                .Setup(s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+                .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -140,7 +140,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
 
             // Assert
             this.mockWorkoutAnalysisService.Verify(
-                s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
+                s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
                 Times.Once);
         }
 
@@ -151,7 +151,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             Sportmatrix.WorkoutAnalysisRequest grpcRequest = new global::Sportmatrix.WorkoutAnalysisRequest();
 
             this.mockWorkoutAnalysisService
-                .Setup(s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+                .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
                 .ThrowsAsync(new InvalidOperationException("Analysis service failed"));
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -189,7 +189,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockWorkoutAnalysisService
-                .Setup(s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+                .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -204,7 +204,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
 
             // Verify service was called with correct analysis type
             this.mockWorkoutAnalysisService.Verify(
-                s => s.AnalyzeHuggingFaceWorkoutsAsync(
+                s => s.AnalyzeWorkoutsAsync(
                     It.Is<WorkoutAnalysisRequestDto>(req =>
                         req.AnalysisType == "Trends" &&
                         req.AdditionalContext!.ContainsKey("athleteId") &&
@@ -236,7 +236,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockWorkoutAnalysisService
-                .Setup(s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+                .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -249,7 +249,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             Assert.Equal(2, result.Recommendations.Count);
 
             this.mockWorkoutAnalysisService.Verify(
-                s => s.AnalyzeHuggingFaceWorkoutsAsync(
+                s => s.AnalyzeWorkoutsAsync(
                     It.Is<WorkoutAnalysisRequestDto>(req =>
                         req.AnalysisType == "Recommendations" &&
                         req.AdditionalContext!.ContainsKey("focus") &&
@@ -287,7 +287,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockWorkoutAnalysisService
-                .Setup(s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+                .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -300,7 +300,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             Assert.Equal("Health metrics are within normal range", result.Analysis);
 
             this.mockWorkoutAnalysisService.Verify(
-                s => s.AnalyzeHuggingFaceWorkoutsAsync(
+                s => s.AnalyzeWorkoutsAsync(
                     It.Is<WorkoutAnalysisRequestDto>(req =>
                         req.AnalysisType == "Health" &&
                         req.AdditionalContext!.ContainsKey("focus") &&
@@ -310,10 +310,10 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
 
         #endregion
 
-        #region AnalyzeGoogleGeminiWorkouts Tests
+        #region AnalyzeWorkouts Tests
 
         [Fact]
-        public async Task AnalyzeGoogleGeminiWorkouts_WithValidRequest_CallsGoogleGeminiService()
+        public async Task AnalyzeWorkouts_WithValidRequest_CallsGoogleGeminiService()
         {
             // Arrange
             Sportmatrix.WorkoutAnalysisRequest grpcRequest = new global::Sportmatrix.WorkoutAnalysisRequest
@@ -329,19 +329,19 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockWorkoutAnalysisService
-                .Setup(s => s.AnalyzeGoogleGeminiWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+                .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
 
             // Act
-            Sportmatrix.WorkoutAnalysisResponse result = await this.service.AnalyzeGoogleGeminiWorkouts(grpcRequest, context);
+            Sportmatrix.WorkoutAnalysisResponse result = await this.service.GetWorkoutAnalysis(grpcRequest, context);
 
             // Assert
             Assert.Equal("GoogleGemini", result.Source);
 
             this.mockWorkoutAnalysisService.Verify(
-                s => s.AnalyzeGoogleGeminiWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
+                s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None),
                 Times.Once);
         }
 
@@ -362,7 +362,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockWorkoutAnalysisService
-                .Setup(s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+                .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -383,7 +383,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             Sportmatrix.HealthCheckRequest grpcRequest = new global::Sportmatrix.HealthCheckRequest();
 
             this.mockWorkoutAnalysisService
-                .Setup(s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+                .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
                 .ThrowsAsync(new Exception("Service is down"));
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -436,3 +436,5 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
         #endregion
     }
 }
+
+

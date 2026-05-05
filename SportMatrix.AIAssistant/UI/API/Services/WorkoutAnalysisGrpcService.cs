@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.UI.API.Services;
+﻿namespace SportMatrix.AIAssistant.UI.API.Services;
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
@@ -42,11 +42,11 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
 
             if (aiProvider == "googlegemini")
             {
-                response = await this.workoutAnalysisService.AnalyzeGoogleGeminiWorkoutsAsync(analysisRequest, context.CancellationToken);
+                response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
             }
             else
             {
-                response = await this.workoutAnalysisService.AnalyzeHuggingFaceWorkoutsAsync(analysisRequest, context.CancellationToken);
+                response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
             }
 
             // Konvertiere zur?ck zu gRPC Response
@@ -107,13 +107,13 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 },
             };
 
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeHuggingFaceWorkoutsAsync(analysisRequest, context.CancellationToken);
+            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
 
             Sportmatrix.WorkoutAnalysisResponse grpcResponse = new global::Sportmatrix.WorkoutAnalysisResponse
             {
                 Analysis = response.Analysis ?? string.Empty,
                 GeneratedAt = response.GeneratedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                Source = response.Provider ?? "HuggingFace-AI",
+                Source = response.Provider ?? "Gemini-AI",
                 AnalysisType = "PerformanceTrends",
             };
 
@@ -161,13 +161,13 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 },
             };
 
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeHuggingFaceWorkoutsAsync(analysisRequest, context.CancellationToken);
+            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
 
             Sportmatrix.WorkoutAnalysisResponse grpcResponse = new global::Sportmatrix.WorkoutAnalysisResponse
             {
                 Analysis = response.Analysis ?? string.Empty,
                 GeneratedAt = response.GeneratedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                Source = response.Provider ?? "HuggingFace-AI",
+                Source = response.Provider ?? "Gemini-AI",
                 AnalysisType = "TrainingRecommendations",
             };
 
@@ -218,13 +218,13 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 },
             };
 
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeHuggingFaceWorkoutsAsync(analysisRequest, context.CancellationToken);
+            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
 
             Sportmatrix.WorkoutAnalysisResponse grpcResponse = new global::Sportmatrix.WorkoutAnalysisResponse
             {
                 Analysis = response.Analysis ?? string.Empty,
                 GeneratedAt = response.GeneratedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                Source = response.Provider ?? "HuggingFace-AI",
+                Source = response.Provider ?? "Gemini-AI",
                 AnalysisType = "HealthMetrics",
             };
 
@@ -263,7 +263,7 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
             SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisRequestDto analysisRequest = request.ToWorkoutAnalysisRequestDto();
 
             // Zwinge GoogleGemini Service
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeGoogleGeminiWorkoutsAsync(analysisRequest, context.CancellationToken);
+            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, context.CancellationToken);
 
             Sportmatrix.WorkoutAnalysisResponse grpcResponse = new global::Sportmatrix.WorkoutAnalysisResponse
             {
@@ -324,7 +324,7 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 },
             };
 
-            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeHuggingFaceWorkoutsAsync(testRequest, context.CancellationToken);
+            SportMatrix.AIAssistant.Application.DTOs.WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(testRequest, context.CancellationToken);
 
             return new Sportmatrix.HealthCheckResponse
             {

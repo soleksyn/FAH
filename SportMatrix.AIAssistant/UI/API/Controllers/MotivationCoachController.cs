@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.UI.API.Controllers;
+﻿namespace SportMatrix.AIAssistant.UI.API.Controllers;
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
@@ -32,7 +32,7 @@ public class MotivationCoachController : ControllerBase
                 request.AthleteProfile.Name);
 
             // Nutze HuggingFace (alte OpenAI/Claude Methoden sind jetzt redirects)
-            MotivationResponseDto result = await this.motivationCoachService.GetHuggingFaceMotivationalMessageAsync(request, cancellationToken);
+            MotivationResponseDto result = await this.motivationCoachService.GenerateMotivationAsync(request, cancellationToken);
             return this.Ok(result);
         }
         catch (Exception ex)
@@ -53,7 +53,7 @@ public class MotivationCoachController : ControllerBase
                 "Generating HuggingFace motivational message for athlete: {Name}",
                 request.AthleteProfile.Name);
 
-            MotivationResponseDto result = await this.motivationCoachService.GetHuggingFaceMotivationalMessageAsync(request, cancellationToken);
+            MotivationResponseDto result = await this.motivationCoachService.GenerateMotivationAsync(request, cancellationToken);
             return this.Ok(result);
         }
         catch (Exception ex)
@@ -63,7 +63,7 @@ public class MotivationCoachController : ControllerBase
         }
     }
 
-    // Health Check f�r HuggingFace Service
+    // Health Check für HuggingFace Service
     [HttpGet("health")]
     public async Task<ActionResult> HealthCheck(CancellationToken cancellationToken)
     {
@@ -81,7 +81,7 @@ public class MotivationCoachController : ControllerBase
                 IsStruggling = false,
             };
 
-            MotivationResponseDto result = await this.motivationCoachService.GetHuggingFaceMotivationalMessageAsync(testRequest, cancellationToken);
+            MotivationResponseDto result = await this.motivationCoachService.GenerateMotivationAsync(testRequest, cancellationToken);
 
             return this.Ok(new
             {

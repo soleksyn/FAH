@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.UI.API.Services;
+﻿namespace SportMatrix.AIAssistant.UI.API.Services;
 
 using SportMatrix;
 using global::SportMatrix.AIAssistant.Application.Interfaces;
@@ -31,7 +31,7 @@ public class MotivationGrpcService : MotivationService.MotivationServiceBase
             SportMatrix.AIAssistant.Application.DTOs.MotivationRequestDto motivationRequest = request.ToMotivationRequestDto();
 
             // Rufe den HuggingFace Service auf!
-            global::SportMatrix.AIAssistant.Application.DTOs.MotivationResponseDto response = await this.motivationCoachService.GetHuggingFaceMotivationalMessageAsync(motivationRequest, context.CancellationToken);
+            global::SportMatrix.AIAssistant.Application.DTOs.MotivationResponseDto response = await this.motivationCoachService.GenerateMotivationAsync(motivationRequest, context.CancellationToken);
 
             // Konvertiere zur?ck zu gRPC Response
             Sportmatrix.MotivationResponse grpcResponse = new Sportmatrix.MotivationResponse
@@ -61,3 +61,4 @@ public class MotivationGrpcService : MotivationService.MotivationServiceBase
         }
     }
 }
+

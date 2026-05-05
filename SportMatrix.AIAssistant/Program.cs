@@ -1,10 +1,13 @@
+ï»¿using Microsoft.Extensions.Options;
 using SportMatrix.AIAssistant.Application.Interfaces;
-using SportMatrix.AIAssistant.Infrastructure.Services;
-using SportMatrix.AIAssistant.UI.API.Services;
+using SportMatrix.AIAssistant.Infrastructure.Configuration;
 using SportMatrix.AIAssistant.Infrastructure.Services;
 using SportMatrix.AIAssistant.UI.API.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+// Add Options
+builder.Services.Configure<GoogleAIOptions>(builder.Configuration.GetSection(GoogleAIOptions.SectionName));
 
 // Add services to the container.
 builder.Services.AddControllers()
@@ -20,7 +23,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Fitness Analytics Hub - AI Assistant",
         Version = "v1",
-        Description = "AI-powered fitness analytics",
+        Description = "AI-powered fitness analytics via Gemini",
     });
 });
 
@@ -29,34 +32,20 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", policy =>
     {
-        policy.WithOrigins("http://localhost:4200", "https://localhost:4200") // Angular dev server
+        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
     });
 });
 
-// HTTP Clients registrieren
-builder.Services.AddHttpClient<HuggingFaceService>();
-builder.Services.AddHttpClient<GoogleGeminiService>();
+// AI Service (uses Google.GenAI SDK internally)
+builder.Services.AddScoped<IAIPromptService, GoogleGeminiService>();
 
-// gRPC Services hinzufügen
+// gRPC Services
 builder.Services.AddGrpc();
 
-builder.Services.AddScoped<IAIPromptService>(provider =>
-{
-    string defaultProvider = builder.Configuration["AI:DefaultProvider"] ?? "GoogleGemini";
-    return defaultProvider.ToLower() switch
-    {
-        "huggingface" => provider.GetRequiredService<HuggingFaceService>(),
-        "googlegemini" => provider.GetRequiredService<GoogleGeminiService>(),
-        _ => provider.GetRequiredService<GoogleGeminiService>()
-    };
-});
-builder.Services.AddScoped<HuggingFaceService>();
-builder.Services.AddScoped<GoogleGeminiService>();
-
-// Application Services registrieren
+// Application Services
 builder.Services.AddScoped<IMotivationCoachService, MotivationCoachService>();
 builder.Services.AddScoped<IWorkoutAnalysisService, WorkoutAnalysisService>();
 
@@ -69,12 +58,12 @@ builder.Services.AddLogging(logging =>
 
 WebApplication app = builder.Build();
 
-// gRPC Services registrieren
+// gRPC Services
 app.MapGrpcService<MotivationGrpcService>();
 app.MapGrpcService<WorkoutAnalysisGrpcService>();
 
-// gRPC-Reflection für Debugging
-app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+// gRPC-Reflection
+app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client.");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -88,13 +77,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandler("/error");
 
-app.UseHttpsRedirection();
-
-// CORS aktivieren
+// app.UseHttpsRedirection(); // Disabled to allow HTTP connections from frontend
 app.UseCors("AllowAngularApp");
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 // Health check endpoint
@@ -105,8 +90,7 @@ app.MapGet("/health", () => new
     timestamp = DateTime.UtcNow,
 });
 
-Console.WriteLine("?? AI Assistant Service starting...");
-Console.WriteLine("?? Using HuggingFace / GoogleGemini for AI processing");
-Console.WriteLine("?? Swagger UI available at: https://localhost:7276");
+Console.WriteLine("AI Assistant Service starting...");
+Console.WriteLine("Using Google Gemini for AI processing");
 
 app.Run();

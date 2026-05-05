@@ -1,6 +1,5 @@
 using SportMatrix.Frontend.Models.ApiClient;
 using System.Net.Http.Json;
-using System.Text.Json.Serialization;
 
 namespace SportMatrix.Frontend.Services;
 
@@ -15,72 +14,74 @@ public class AIApiService
 
     public async Task<AIAnalysisDto?> AnalyzeWorkoutAsync(int athleteId, List<WorkoutDataDto> recentWorkouts, string analysisType = "Performance")
     {
-        var request = new AIWorkoutAnalysisRequest
+        var request = new WorkoutAnalysisRequestDto
         {
-            AthleteProfile = new AthleteProfile
+            AthleteProfile = new AthleteProfileDto
             {
                 Name = "Fitness Enthusiast",
                 FitnessLevel = "Intermediate",
                 PrimaryGoal = "Performance Improvement"
             },
-            RecentWorkouts = recentWorkouts.Select(w => new AIWorkoutItem
+            RecentWorkouts = recentWorkouts.Select(w => new WorkoutDataDtoBackend
             {
-                Date = w.Date,
+                Date = DateTime.TryParse(w.Date, out var date) ? date : DateTime.UtcNow,
                 ActivityType = w.ActivityType,
                 Distance = w.Distance,
-                MovingTime = ParseMovingTime(w.MovingTime),
-                Calories = w.Calories ?? 0
+                Duration = ParseMovingTime(w.MovingTime),
+                Calories = w.Calories
             }).ToList(),
-            AnalysisType = analysisType,
-            FocusAreas = ["endurance", "consistency"]
+            AnalysisType = analysisType
         };
 
-        var response = await _httpClient.PostAsJsonAsync("/api/AI/analysis", request);
+        var response = await _httpClient.PostAsJsonAsync("/api/WorkoutAnalysis/analyze", request);
         if (!response.IsSuccessStatusCode)
             return null;
 
-        var aiResponse = await response.Content.ReadFromJsonAsync<AIResponseDto>();
+        var aiResponse = await response.Content.ReadFromJsonAsync<WorkoutAnalysisResponseDto>();
         return MapToAnalysis(aiResponse);
     }
 
     public async Task<AIAnalysisDto?> AnalyzePerformanceTrendsAsync(int athleteId, string timeFrame = "month")
     {
-        return await AnalyzeWorkoutAsync(athleteId, GetDemoWorkouts(), "Trends");
+        var response = await _httpClient.GetAsync($"/api/WorkoutAnalysis/performance-trends/{athleteId}?timeFrame={Uri.EscapeDataString(timeFrame)}");
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        var aiResponse = await response.Content.ReadFromJsonAsync<WorkoutAnalysisResponseDto>();
+        return MapToAnalysis(aiResponse);
     }
 
     public async Task<AIAnalysisDto?> GetTrainingRecommendationsAsync(int athleteId)
     {
-        var request = new AIMotivationRequest
-        {
-            AthleteProfile = new AthleteProfile
-            {
-                Name = "Fitness Enthusiast",
-                FitnessLevel = "Intermediate",
-                PrimaryGoal = "Training Improvement"
-            },
-            RecentWorkouts = GetDemoWorkouts().Select(w => new AIWorkoutItem
-            {
-                Date = w.Date,
-                ActivityType = w.ActivityType,
-                Distance = w.Distance,
-                MovingTime = ParseMovingTime(w.MovingTime),
-                Calories = w.Calories ?? 0
-            }).ToList(),
-            PreferredTone = "Motivational",
-            ContextualInfo = "Looking for training recommendations"
-        };
-
-        var response = await _httpClient.PostAsJsonAsync("/api/AI/motivation", request);
+        var response = await _httpClient.GetAsync($"/api/WorkoutAnalysis/recommendations/{athleteId}");
         if (!response.IsSuccessStatusCode)
             return null;
 
-        var aiResponse = await response.Content.ReadFromJsonAsync<AIResponseDto>();
-        return MapToMotivationAnalysis(aiResponse);
+        var aiResponse = await response.Content.ReadFromJsonAsync<WorkoutAnalysisResponseDto>();
+        return MapToAnalysis(aiResponse);
     }
 
     public async Task<AIAnalysisDto?> AnalyzeHealthMetricsAsync(int athleteId, List<WorkoutDataDto> workouts)
     {
-        return await AnalyzeWorkoutAsync(athleteId, workouts, "Health");
+        var request = new HealthAnalysisRequestDto
+        {
+            AthleteId = athleteId,
+            RecentWorkouts = workouts.Select(w => new WorkoutDataDtoBackend
+            {
+                Date = DateTime.TryParse(w.Date, out var date) ? date : DateTime.UtcNow,
+                ActivityType = w.ActivityType,
+                Distance = w.Distance,
+                Duration = ParseMovingTime(w.MovingTime),
+                Calories = w.Calories
+            }).ToList()
+        };
+
+        var response = await _httpClient.PostAsJsonAsync("/api/WorkoutAnalysis/health-analysis", request);
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        var aiResponse = await response.Content.ReadFromJsonAsync<WorkoutAnalysisResponseDto>();
+        return MapToAnalysis(aiResponse);
     }
 
     private static List<WorkoutDataDto> GetDemoWorkouts()
@@ -114,7 +115,8 @@ public class AIApiService
         ];
     }
 
-    private static AIAnalysisDto? MapToAnalysis(AIResponseDto? response)
+
+    private static AIAnalysisDto? MapToAnalysis(WorkoutAnalysisResponseDto? response)
     {
         if (response == null) return null;
         return new AIAnalysisDto
@@ -141,13 +143,13 @@ public class AIApiService
         };
     }
 
-    private static AIAnalysisDto? MapToMotivationAnalysis(AIResponseDto? response)
+    private static AIAnalysisDto? MapToMotivationAnalysis(WorkoutAnalysisResponseDto? response)
     {
         if (response == null) return null;
         return new AIAnalysisDto
         {
-            Analysis = response.MotivationalMessage ?? "Stay motivated and keep pushing your limits!",
-            KeyInsights = response.ActionableTips ??
+            Analysis = response.Analysis ?? "Stay motivated and keep pushing your limits!",
+            KeyInsights = response.KeyInsights ??
             [
                 "Consistency is key to success",
                 "Small improvements compound over time",
@@ -175,89 +177,48 @@ public class AIApiService
     }
 }
 
-public class AIWorkoutAnalysisRequest
+public class WorkoutAnalysisRequestDto
 {
-    [JsonPropertyName("athleteProfile")]
-    public AthleteProfile? AthleteProfile { get; set; }
-
-    [JsonPropertyName("recentWorkouts")]
-    public List<AIWorkoutItem> RecentWorkouts { get; set; } = [];
-
-    [JsonPropertyName("analysisType")]
+    public List<WorkoutDataDtoBackend> RecentWorkouts { get; set; } = [];
     public string AnalysisType { get; set; } = string.Empty;
+    public AthleteProfileDto? AthleteProfile { get; set; }
+    public Dictionary<string, object>? AdditionalContext { get; set; }
+}
 
-    [JsonPropertyName("focusAreas")]
+public class HealthAnalysisRequestDto
+{
+    public int AthleteId { get; set; }
+    public List<WorkoutDataDtoBackend> RecentWorkouts { get; set; } = [];
+    public Dictionary<string, object>? HealthMetrics { get; set; }
     public List<string>? FocusAreas { get; set; }
 }
 
-public class AIMotivationRequest
+
+public class AthleteProfileDto
 {
-    [JsonPropertyName("athleteProfile")]
-    public AthleteProfile? AthleteProfile { get; set; }
-
-    [JsonPropertyName("recentWorkouts")]
-    public List<AIWorkoutItem> RecentWorkouts { get; set; } = [];
-
-    [JsonPropertyName("preferredTone")]
-    public string? PreferredTone { get; set; }
-
-    [JsonPropertyName("contextualInfo")]
-    public string? ContextualInfo { get; set; }
-}
-
-public class AthleteProfile
-{
-    [JsonPropertyName("name")]
+    public string? Id { get; set; }
     public string Name { get; set; } = string.Empty;
-
-    [JsonPropertyName("fitnessLevel")]
-    public string FitnessLevel { get; set; } = string.Empty;
-
-    [JsonPropertyName("primaryGoal")]
-    public string PrimaryGoal { get; set; } = string.Empty;
+    public string? FitnessLevel { get; set; }
+    public string? PrimaryGoal { get; set; }
+    public Dictionary<string, object>? Preferences { get; set; }
 }
 
-public class AIWorkoutItem
+public class WorkoutDataDtoBackend
 {
-    [JsonPropertyName("date")]
-    public string Date { get; set; } = string.Empty;
-
-    [JsonPropertyName("activityType")]
+    public DateTime Date { get; set; }
     public string ActivityType { get; set; } = string.Empty;
-
-    [JsonPropertyName("distance")]
     public double Distance { get; set; }
-
-    [JsonPropertyName("movingTime")]
-    public int MovingTime { get; set; }
-
-    [JsonPropertyName("calories")]
-    public int Calories { get; set; }
+    public int Duration { get; set; }
+    public int? Calories { get; set; }
+    public Dictionary<string, double>? MetricsData { get; set; }
 }
 
-public class AIResponseDto
+public class WorkoutAnalysisResponseDto
 {
-    [JsonPropertyName("analysis")]
-    public string? Analysis { get; set; }
-
-    [JsonPropertyName("keyInsights")]
+    public string Analysis { get; set; } = string.Empty;
     public List<string>? KeyInsights { get; set; }
-
-    [JsonPropertyName("recommendations")]
     public List<string>? Recommendations { get; set; }
-
-    [JsonPropertyName("generatedAt")]
-    public string? GeneratedAt { get; set; }
-
-    [JsonPropertyName("source")]
-    public string? Source { get; set; }
-
-    [JsonPropertyName("motivationalMessage")]
-    public string? MotivationalMessage { get; set; }
-
-    [JsonPropertyName("actionableTips")]
-    public List<string>? ActionableTips { get; set; }
-
-    [JsonPropertyName("quote")]
-    public string? Quote { get; set; }
+    public string Provider { get; set; } = string.Empty;
+    public string RequestId { get; set; } = Guid.NewGuid().ToString();
+    public DateTime GeneratedAt { get; set; } = DateTime.UtcNow;
 }

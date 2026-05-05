@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.Tests.UI.API.Services
+﻿namespace SportMatrix.AIAssistant.Tests.UI.API.Services
 {
     using SportMatrix.AIAssistant.Application.DTOs;
     using SportMatrix.AIAssistant.Application.Interfaces;
@@ -51,7 +51,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockMotivationService
-                .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+                .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -122,7 +122,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockMotivationService
-                .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+                .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -158,7 +158,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockMotivationService
-                .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+                .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -168,7 +168,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
 
             // Assert - Verify the service was called with correct mapped data
             this.mockMotivationService.Verify(
-                s => s.GetHuggingFaceMotivationalMessageAsync(
+                s => s.GenerateMotivationAsync(
                     It.Is<MotivationRequestDto>(req =>
                         req.AthleteProfile.Name == "Mapping Test User" &&
                         req.AthleteProfile.FitnessLevel == "Advanced" &&
@@ -189,7 +189,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockMotivationService
-                .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+                .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
                 .ThrowsAsync(new InvalidOperationException("Service is down"));
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -232,7 +232,7 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
             };
 
             this.mockMotivationService
-                .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+                .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
                 .ReturnsAsync(serviceResponse);
 
             ServerCallContext context = new Mock<ServerCallContext>().Object;
@@ -264,3 +264,4 @@ namespace SportMatrix.AIAssistant.Tests.UI.API.Services
         #endregion
     }
 }
+

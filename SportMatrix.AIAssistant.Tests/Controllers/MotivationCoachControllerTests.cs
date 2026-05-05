@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.Tests.Controllers;
+﻿namespace SportMatrix.AIAssistant.Tests.Controllers;
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
@@ -55,7 +55,7 @@ public class MotivationCoachControllerTests
         };
 
         this.mockMotivationService
-            .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+            .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
             .ReturnsAsync(expectedResponse);
 
         // Act
@@ -71,7 +71,7 @@ public class MotivationCoachControllerTests
 
         // Verify service was called
         this.mockMotivationService.Verify(
-            s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None),
+            s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None),
             Times.Once);
     }
 
@@ -104,7 +104,7 @@ public class MotivationCoachControllerTests
         };
 
         this.mockMotivationService
-            .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+            .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
             .ReturnsAsync(expectedResponse);
 
         // Act
@@ -120,7 +120,7 @@ public class MotivationCoachControllerTests
 
         // Verify the request was passed correctly
         this.mockMotivationService.Verify(
-            s => s.GetHuggingFaceMotivationalMessageAsync(
+            s => s.GenerateMotivationAsync(
                 It.Is<MotivationRequestDto>(r => r.IsStruggling == true), CancellationToken.None),
             Times.Once);
     }
@@ -140,7 +140,7 @@ public class MotivationCoachControllerTests
         };
 
         this.mockMotivationService
-            .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+            .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
             .ThrowsAsync(new Exception("Service unavailable"));
 
         // Act
@@ -184,7 +184,7 @@ public class MotivationCoachControllerTests
         };
 
         this.mockMotivationService
-            .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+            .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
             .ReturnsAsync(expectedResponse);
 
         // Act
@@ -213,7 +213,7 @@ public class MotivationCoachControllerTests
         };
 
         this.mockMotivationService
-            .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+            .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
             .ReturnsAsync(healthyResponse);
 
         // Act
@@ -239,7 +239,7 @@ public class MotivationCoachControllerTests
     {
         // Arrange
         this.mockMotivationService
-            .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+            .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
             .ThrowsAsync(new Exception("Service down"));
 
         // Act
@@ -282,7 +282,7 @@ public class MotivationCoachControllerTests
         };
 
         this.mockMotivationService
-            .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+            .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
             .ReturnsAsync(response);
 
         // Act
@@ -345,7 +345,7 @@ public class MotivationCoachControllerTests
         };
 
         this.mockMotivationService
-            .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+            .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
             .ReturnsAsync(response);
 
         // Act

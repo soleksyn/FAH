@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.Tests.Infrastructure.Services;
+ï»¿namespace SportMatrix.AIAssistant.Tests.Infrastructure.Services;
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
@@ -147,10 +147,10 @@ Tips:
 
     #endregion
 
-    #region GetHuggingFaceMotivationalMessageAsync Tests
+    #region GenerateMotivationAsync Tests
 
     [Fact]
-    public async Task GetHuggingFaceMotivationalMessageAsync_CallsGenerateMotivationAsync()
+    public async Task GenerateMotivationAsync_CallsGenerateMotivationAsync()
     {
         // Arrange
         MotivationRequestDto request = CreateTestMotivationRequest();
@@ -161,7 +161,7 @@ Tips:
             .ReturnsAsync(aiResponse);
 
         // Act
-        MotivationResponseDto result = await this.service.GetHuggingFaceMotivationalMessageAsync(request, CancellationToken.None);
+        MotivationResponseDto result = await this.service.GenerateMotivationAsync(request, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -233,7 +233,7 @@ Tips:
         // Act
         await this.service.GenerateMotivationAsync(request, CancellationToken.None);
 
-        // Assert - Direkt über Verify prüfen
+        // Assert - Direkt Ã¼ber Verify prÃ¼fen
         this.mockAIPromptService.Verify(
             s => s.GetMotivationAsync(
                 It.Is<string>(prompt =>
@@ -335,7 +335,7 @@ Tips:
 Excellent progress!
 
 Actionable tips:
-• Focus on consistency over perfection
+â€¢ Focus on consistency over perfection
 - Celebrate small victories daily
 * Remember why you started this journey
 ";
@@ -435,7 +435,7 @@ Actionable tips:
         {
             AthleteProfile = new AthleteProfileDto
             {
-                Name = "María José-Smith",
+                Name = "MarÃ­a JosÃ©-Smith",
                 FitnessLevel = "Intermediate",
                 PrimaryGoal = "General Fitness",
             },
@@ -443,13 +443,13 @@ Actionable tips:
 
         this.mockAIPromptService
             .Setup(s => s.GetMotivationAsync(It.IsAny<string>(), CancellationToken.None))
-            .ReturnsAsync("¡Excelente trabajo, María!");
+            .ReturnsAsync("Â¡Excelente trabajo, MarÃ­a!");
 
         // Act
         MotivationResponseDto result = await this.service.GenerateMotivationAsync(request, CancellationToken.None);
 
         // Assert
-        Assert.Contains("María", result.MotivationalMessage);
+        Assert.Contains("MarÃ­a", result.MotivationalMessage);
     }
 
     [Fact]

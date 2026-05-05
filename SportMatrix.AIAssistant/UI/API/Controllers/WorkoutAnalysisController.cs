@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.UI.API.Controllers;
+ï»¿namespace SportMatrix.AIAssistant.UI.API.Controllers;
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
@@ -14,28 +14,25 @@ public class WorkoutAnalysisController : ControllerBase
 
     public WorkoutAnalysisController(
         IWorkoutAnalysisService workoutAnalysisService,
-        ILogger<WorkoutAnalysisController> logger, CancellationToken cancellationToken)
+        ILogger<WorkoutAnalysisController> logger)
     {
         this.workoutAnalysisService = workoutAnalysisService;
         this.logger = logger;
     }
 
-    [HttpPost("analyze/huggingface")]
-    public async Task<ActionResult<WorkoutAnalysisResponseDto>> AnalyzeHuggingFaceWorkouts(
+    [HttpPost("analyze")]
+    public async Task<ActionResult<WorkoutAnalysisResponseDto>> AnalyzeWorkouts(
         [FromBody] WorkoutAnalysisRequestDto request, CancellationToken cancellationToken)
     {
         try
         {
-            this.logger.LogInformation(
-                "Analyzing workouts with HuggingFace for analysis type: {AnalysisType}",
-                request.AnalysisType);
-
-            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeHuggingFaceWorkoutsAsync(request, cancellationToken);
+            this.logger.LogInformation("Analyzing workouts for analysis type: {AnalysisType}", request.AnalysisType);
+            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(request, cancellationToken);
             return this.Ok(result);
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Error analyzing workouts with HuggingFace");
+            this.logger.LogError(ex, "Error analyzing workouts");
             return this.StatusCode(500, "An error occurred while analyzing workouts");
         }
     }
@@ -50,7 +47,7 @@ public class WorkoutAnalysisController : ControllerBase
                 "Analyzing workouts with GoogleGemini for analysis type: {AnalysisType}",
                 request.AnalysisType);
 
-            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeGoogleGeminiWorkoutsAsync(request, cancellationToken);
+            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(request, cancellationToken);
             return this.Ok(result);
         }
         catch (Exception ex)
@@ -74,12 +71,12 @@ public class WorkoutAnalysisController : ControllerBase
                 athleteId,
                 timeFrame);
 
-            // Erstelle Request für Performance Trends
+            // Erstelle Request fÃ¼r Performance Trends
             WorkoutAnalysisRequestDto request = new WorkoutAnalysisRequestDto
             {
                 AnalysisType = "Trends",
-                RecentWorkouts = this.GetDemoWorkouts(athleteId, timeFrame), // Später durch echte Daten ersetzen
-                AthleteProfile = this.GetDemoAthleteProfile(athleteId), // Später durch echte Daten ersetzen
+                RecentWorkouts = this.GetDemoWorkouts(athleteId, timeFrame), // SpÃ¤ter durch echte Daten ersetzen
+                AthleteProfile = this.GetDemoAthleteProfile(athleteId), // SpÃ¤ter durch echte Daten ersetzen
                 AdditionalContext = new Dictionary<string, object>
                 {
                     { "timeFrame", timeFrame },
@@ -87,7 +84,7 @@ public class WorkoutAnalysisController : ControllerBase
                 },
             };
 
-            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeHuggingFaceWorkoutsAsync(request, cancellationToken);
+            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(request, cancellationToken);
             return this.Ok(result);
         }
         catch (Exception ex)
@@ -118,7 +115,7 @@ public class WorkoutAnalysisController : ControllerBase
                 },
             };
 
-            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeHuggingFaceWorkoutsAsync(request, cancellationToken);
+            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(request, cancellationToken);
             return this.Ok(result);
         }
         catch (Exception ex)
@@ -150,7 +147,7 @@ public class WorkoutAnalysisController : ControllerBase
                 },
             };
 
-            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeHuggingFaceWorkoutsAsync(analysisRequest, cancellationToken);
+            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(analysisRequest, cancellationToken);
             return this.Ok(result);
         }
         catch (Exception ex)
@@ -160,7 +157,7 @@ public class WorkoutAnalysisController : ControllerBase
         }
     }
 
-    // Health Check für WorkoutAnalysis Service
+    // Health Check fÃ¼r WorkoutAnalysis Service
     [HttpGet("health")]
     public async Task<ActionResult> HealthCheck(CancellationToken cancellationToken)
     {
@@ -189,7 +186,7 @@ public class WorkoutAnalysisController : ControllerBase
                 },
             };
 
-            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeHuggingFaceWorkoutsAsync(testRequest, cancellationToken);
+            WorkoutAnalysisResponseDto result = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(testRequest, cancellationToken);
 
             return this.Ok(new
             {
@@ -261,3 +258,5 @@ public class WorkoutAnalysisController : ControllerBase
         };
     }
 }
+
+

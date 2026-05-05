@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.Tests.Helpers;
+ï»¿namespace SportMatrix.AIAssistant.Tests.Helpers;
 
 using System.Net;
 using System.Text;
@@ -157,7 +157,7 @@ public static class MockSetup
     {
         Mock<IMotivationCoachService> mock = new Mock<IMotivationCoachService>();
 
-        mock.Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<AIAssistant.Application.DTOs.MotivationRequestDto>(), CancellationToken.None))
+        mock.Setup(s => s.GenerateMotivationAsync(It.IsAny<AIAssistant.Application.DTOs.MotivationRequestDto>(), CancellationToken.None))
             .ReturnsAsync(TestDataBuilder.MotivationResponse().Build());
 
         return mock;
@@ -181,10 +181,10 @@ public static class MockSetup
             RequestId = Guid.NewGuid().ToString(),
         };
 
-        mock.Setup(s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+        mock.Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
             .ReturnsAsync(defaultResponse);
 
-        mock.Setup(s => s.AnalyzeGoogleGeminiWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+        mock.Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
             .ReturnsAsync(new WorkoutAnalysisResponseDto
             {
                 Analysis = "GoogleGemini analysis response",
@@ -316,7 +316,7 @@ public static class MockSetup
         Assert.NotNull(response);
         Assert.True(
             response.Contains("temporarily unavailable") ||
-            response.Contains("vorübergehend nicht verfügbar") ||
+            response.Contains("vorÃ¼bergehend nicht verfÃ¼gbar") ||
             response.Contains("fallback") ||
             response.Contains("service unavailable"),
             "Response should indicate fallback behavior");
@@ -331,7 +331,7 @@ public static class MockSetup
         Assert.False(string.IsNullOrWhiteSpace(response));
         Assert.False(
             response.Contains("temporarily unavailable") ||
-            response.Contains("vorübergehend nicht verfügbar"),
+            response.Contains("vorÃ¼bergehend nicht verfÃ¼gbar"),
             "Response should not be a fallback message");
     }
 
@@ -346,10 +346,10 @@ public static class MockSetup
     {
         Mock<IWorkoutAnalysisService> mock = new Mock<IWorkoutAnalysisService>();
 
-        mock.Setup(s => s.AnalyzeHuggingFaceWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+        mock.Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
             .ThrowsAsync(new Exception("HuggingFace service error"));
 
-        mock.Setup(s => s.AnalyzeGoogleGeminiWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+        mock.Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
             .ThrowsAsync(new Exception("GoogleGemini service error"));
 
         return mock;
@@ -379,7 +379,7 @@ public static class MockSetup
             GeneratedAt = DateTime.UtcNow,
         };
 
-        mock.Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+        mock.Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
             .ReturnsAsync(defaultResponse);
 
         return mock;
@@ -616,3 +616,4 @@ public static class MockSetup
 
     #endregion
 }
+

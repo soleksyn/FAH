@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.UI.API.Controllers;
+ï»¿namespace SportMatrix.AIAssistant.UI.API.Controllers;
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
@@ -27,7 +27,7 @@ public class GrpcJsonController : ControllerBase
     }
 
     /// <summary>
-    /// gRPC-JSON Bridge für MotivationService.GetMotivationAsync
+    /// gRPC-JSON Bridge fÃ¼r MotivationService.GetMotivationAsync
     /// </summary>
     [HttpPost("MotivationService/GetMotivationAsync")]
     public async Task<ActionResult> GetMotivationAsync([FromBody] GrpcJsonMotivationRequestDto request, CancellationToken cancellationToken)
@@ -52,7 +52,7 @@ public class GrpcJsonController : ControllerBase
         };
 
         // Rufe den gleichen Service auf wie der gRPC Service
-        MotivationResponseDto response = await this.motivationCoachService.GetHuggingFaceMotivationalMessageAsync(motivationRequest, cancellationToken);
+        MotivationResponseDto response = await this.motivationCoachService.GenerateMotivationAsync(motivationRequest, cancellationToken);
 
         // Konvertiere Response zu gRPC-JSON Format
         var grpcJsonResponse = new
@@ -69,7 +69,7 @@ public class GrpcJsonController : ControllerBase
     }
 
     /// <summary>
-    /// Health Check für gRPC-JSON Bridge
+    /// Health Check fÃ¼r gRPC-JSON Bridge
     /// </summary>
     [HttpGet("health")]
     public Task<ActionResult> HealthCheckAsync(CancellationToken cancellationToken)
@@ -83,7 +83,7 @@ public class GrpcJsonController : ControllerBase
             {
                 "POST /grpc-json/MotivationService/GetMotivationAsync",
                 "POST /grpc-json/WorkoutService/GetWorkoutAnalysisAsync",
-                "POST /grpc-json/WorkoutService/AnalyzeGoogleGeminiWorkoutsAsync",
+                "POST /grpc-json/WorkoutService/AnalyzeWorkoutsAsync",
                 "POST /grpc-json/WorkoutService/GetPerformanceTrendsAsync",
                 "POST /grpc-json/WorkoutService/GetTrainingRecommendationsAsync",
                 "POST /grpc-json/WorkoutService/AnalyzeHealthMetricsAsync",
@@ -93,7 +93,7 @@ public class GrpcJsonController : ControllerBase
     }
 
     /// <summary>
-    /// gRPC-JSON Bridge für WorkoutService.GetWorkoutAnalysis
+    /// gRPC-JSON Bridge fÃ¼r WorkoutService.GetWorkoutAnalysis
     /// </summary>
     [HttpPost("WorkoutService/GetWorkoutAnalysisAsync")]
     public async Task<ActionResult> GetWorkoutAnalysisAsync([FromBody] GrpcJsonWorkoutAnalysisRequestDto request, CancellationToken cancellationToken)
@@ -106,7 +106,7 @@ public class GrpcJsonController : ControllerBase
         WorkoutAnalysisRequestDto workoutAnalysisRequest = request.ToWorkoutAnalysisRequestDto();
 
         // Rufe den Service auf (verwende GoogleGemini als Standard)
-        WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeGoogleGeminiWorkoutsAsync(workoutAnalysisRequest, cancellationToken);
+        WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(workoutAnalysisRequest, cancellationToken);
 
         // Konvertiere Response zu gRPC-JSON Format
         var grpcJsonResponse = new
@@ -123,10 +123,10 @@ public class GrpcJsonController : ControllerBase
     }
 
     /// <summary>
-    /// gRPC-JSON Bridge für WorkoutService.AnalyzeGoogleGeminiWorkouts
+    /// gRPC-JSON Bridge fÃ¼r WorkoutService.AnalyzeGoogleGeminiWorkouts
     /// </summary>
-    [HttpPost("WorkoutService/AnalyzeGoogleGeminiWorkoutsAsync")]
-    public async Task<ActionResult> AnalyzeGoogleGeminiWorkoutsAsync([FromBody] GrpcJsonWorkoutAnalysisRequestDto request, CancellationToken cancellationToken)
+    [HttpPost("WorkoutService/AnalyzeWorkoutsAsync")]
+    public async Task<ActionResult> AnalyzeWorkoutsAsync([FromBody] GrpcJsonWorkoutAnalysisRequestDto request, CancellationToken cancellationToken)
     {
         this.logger.LogInformation(
             "gRPC-JSON: Received GoogleGemini workout analysis request for {WorkoutCount} workouts",
@@ -142,7 +142,7 @@ public class GrpcJsonController : ControllerBase
         };
 
         // Verwende explizit GoogleGemini
-        WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeGoogleGeminiWorkoutsAsync(workoutAnalysisRequest, cancellationToken);
+        WorkoutAnalysisResponseDto response = await this.workoutAnalysisService.AnalyzeWorkoutsAsync(workoutAnalysisRequest, cancellationToken);
 
         // Konvertiere Response zu gRPC-JSON Format
         var grpcJsonResponse = new
@@ -159,8 +159,8 @@ public class GrpcJsonController : ControllerBase
     }
 
     /// <summary>
-    /// gRPC-JSON Bridge für WorkoutService.GetPerformanceTrends
-    /// Placeholder - könnte erweitert werden wenn Service verfügbar
+    /// gRPC-JSON Bridge fÃ¼r WorkoutService.GetPerformanceTrends
+    /// Placeholder - kÃ¶nnte erweitert werden wenn Service verfÃ¼gbar
     /// </summary>
     [HttpPost("WorkoutService/GetPerformanceTrendsAsync")]
     public Task<ActionResult> GetPerformanceTrendsAsync([FromBody] GrpcJsonPerformanceTrendsRequestDto request, CancellationToken cancellationToken)
@@ -169,7 +169,7 @@ public class GrpcJsonController : ControllerBase
             "gRPC-JSON: Received performance trends request for athlete: {AthleteId}",
             request.AthleteId);
 
-        // Da kein entsprechender Service verfügbar ist, geben wir einen Mock zurück
+        // Da kein entsprechender Service verfÃ¼gbar ist, geben wir einen Mock zurÃ¼ck
         var grpcJsonResponse = new
         {
             analysis = $"Performance trends analysis for athlete {request.AthleteId} over the past {request.TimeFrame} " +
@@ -196,8 +196,8 @@ public class GrpcJsonController : ControllerBase
     }
 
     /// <summary>
-    /// gRPC-JSON Bridge für WorkoutService.GetTrainingRecommendations
-    /// Placeholder - könnte erweitert werden wenn Service verfügbar
+    /// gRPC-JSON Bridge fÃ¼r WorkoutService.GetTrainingRecommendations
+    /// Placeholder - kÃ¶nnte erweitert werden wenn Service verfÃ¼gbar
     /// </summary>
     [HttpPost("WorkoutService/GetTrainingRecommendationsAsync")]
     public Task<ActionResult> GetTrainingRecommendationsAsync([FromBody] GrpcJsonTrainingRecommendationsRequestDto request, CancellationToken cancellationToken)
@@ -206,7 +206,7 @@ public class GrpcJsonController : ControllerBase
             "gRPC-JSON: Received training recommendations request for athlete: {AthleteId}",
             request.AthleteId);
 
-        // Da kein entsprechender Service verfügbar ist, geben wir einen Mock zurück
+        // Da kein entsprechender Service verfÃ¼gbar ist, geben wir einen Mock zurÃ¼ck
         var grpcJsonResponse = new
         {
             analysis = $"Training recommendations for athlete {request.AthleteId} based on current fitness profile " +
@@ -233,8 +233,8 @@ public class GrpcJsonController : ControllerBase
     }
 
     /// <summary>
-    /// gRPC-JSON Bridge für WorkoutService.AnalyzeHealthMetrics
-    /// Placeholder - könnte erweitert werden wenn Service verfügbar
+    /// gRPC-JSON Bridge fÃ¼r WorkoutService.AnalyzeHealthMetrics
+    /// Placeholder - kÃ¶nnte erweitert werden wenn Service verfÃ¼gbar
     /// </summary>
     [HttpPost("WorkoutService/AnalyzeHealthMetricsAsync")]
     public Task<ActionResult> AnalyzeHealthMetricsAsync([FromBody] GrpcJsonHealthMetricsRequestDto request, CancellationToken cancellationToken)
@@ -246,7 +246,7 @@ public class GrpcJsonController : ControllerBase
         int workoutCount = request.RecentWorkouts?.Length ?? 0;
         double avgCalories = request.RecentWorkouts?.Any() == true ? request.RecentWorkouts.Average(w => w.Calories) : 0;
 
-        // Da kein entsprechender Service verfügbar ist, geben wir einen Mock zurück
+        // Da kein entsprechender Service verfÃ¼gbar ist, geben wir einen Mock zurÃ¼ck
         var grpcJsonResponse = new
         {
             analysis = $"Health metrics analysis for athlete {request.AthleteId} based on {workoutCount} recent workouts " +
@@ -272,3 +272,4 @@ public class GrpcJsonController : ControllerBase
         return Task.FromResult<ActionResult>(this.Ok(grpcJsonResponse));
     }
 }
+

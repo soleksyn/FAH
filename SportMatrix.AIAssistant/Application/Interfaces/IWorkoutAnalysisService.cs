@@ -1,12 +1,9 @@
-namespace SportMatrix.AIAssistant.Application.Interfaces;
+﻿namespace SportMatrix.AIAssistant.Application.Interfaces;
 
 using SportMatrix.AIAssistant.Application.DTOs;
 
 public interface IWorkoutAnalysisService
 {
-    Task<WorkoutAnalysisResponseDto> AnalyzeHuggingFaceWorkoutsAsync(
-        WorkoutAnalysisRequestDto request, CancellationToken cancellationToken);
-
-    Task<WorkoutAnalysisResponseDto> AnalyzeGoogleGeminiWorkoutsAsync(
+    Task<WorkoutAnalysisResponseDto> AnalyzeWorkoutsAsync(
         WorkoutAnalysisRequestDto request, CancellationToken cancellationToken);
 }

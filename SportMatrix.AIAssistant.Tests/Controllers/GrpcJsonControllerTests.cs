@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.Tests.Controllers;
+﻿namespace SportMatrix.AIAssistant.Tests.Controllers;
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
@@ -81,7 +81,7 @@ public class GrpcJsonControllerTests : AIAssistantControllerTestBase<GrpcJsonCon
         };
 
         this.mockMotivationService
-            .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+            .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
             .ReturnsAsync(serviceResponse);
 
         // Act
@@ -92,7 +92,7 @@ public class GrpcJsonControllerTests : AIAssistantControllerTestBase<GrpcJsonCon
         Assert.NotNull(okResult.Value);
 
         // Verify service was called
-        this.mockMotivationService.Verify(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None), Times.Once);
+        this.mockMotivationService.Verify(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None), Times.Once);
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class GrpcJsonControllerTests : AIAssistantControllerTestBase<GrpcJsonCon
         };
 
         this.mockWorkoutAnalysisService
-            .Setup(s => s.AnalyzeGoogleGeminiWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+            .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
             .ReturnsAsync(serviceResponse);
 
         // Act
@@ -121,11 +121,11 @@ public class GrpcJsonControllerTests : AIAssistantControllerTestBase<GrpcJsonCon
         Assert.NotNull(okResult.Value);
 
         // Verify service was called
-        this.mockWorkoutAnalysisService.Verify(s => s.AnalyzeGoogleGeminiWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None), Times.Once);
+        this.mockWorkoutAnalysisService.Verify(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None), Times.Once);
     }
 
     [Fact]
-    public async Task AnalyzeGoogleGeminiWorkouts_WithValidRequest_ReturnsOkResult()
+    public async Task AnalyzeWorkouts_WithValidRequest_ReturnsOkResult()
     {
         // Arrange
         GrpcJsonWorkoutAnalysisRequestDto request = this.CreateWorkoutAnalysisRequest();
@@ -138,11 +138,11 @@ public class GrpcJsonControllerTests : AIAssistantControllerTestBase<GrpcJsonCon
         };
 
         this.mockWorkoutAnalysisService
-            .Setup(s => s.AnalyzeGoogleGeminiWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+            .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
             .ReturnsAsync(serviceResponse);
 
         // Act
-        ActionResult result = await this.controller.AnalyzeGoogleGeminiWorkoutsAsync(request, CancellationToken.None);
+        ActionResult result = await this.controller.AnalyzeWorkoutsAsync(request, CancellationToken.None);
 
         // Assert
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
@@ -252,7 +252,7 @@ public class GrpcJsonControllerTests : AIAssistantControllerTestBase<GrpcJsonCon
         };
 
         this.mockMotivationService
-            .Setup(s => s.GetHuggingFaceMotivationalMessageAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
+            .Setup(s => s.GenerateMotivationAsync(It.IsAny<MotivationRequestDto>(), CancellationToken.None))
             .ReturnsAsync(serviceResponse);
 
         // Act
@@ -280,7 +280,7 @@ public class GrpcJsonControllerTests : AIAssistantControllerTestBase<GrpcJsonCon
         };
 
         this.mockWorkoutAnalysisService
-            .Setup(s => s.AnalyzeGoogleGeminiWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
+            .Setup(s => s.AnalyzeWorkoutsAsync(It.IsAny<WorkoutAnalysisRequestDto>(), CancellationToken.None))
             .ReturnsAsync(serviceResponse);
 
         // Act

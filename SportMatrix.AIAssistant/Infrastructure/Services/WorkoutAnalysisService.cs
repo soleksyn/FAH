@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.Infrastructure.Services;
+ï»¿namespace SportMatrix.AIAssistant.Infrastructure.Services;
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
@@ -6,95 +6,52 @@ using SportMatrix.AIAssistant.Infrastructure.Services;
 
 public class WorkoutAnalysisService : IWorkoutAnalysisService
 {
-    private readonly HuggingFaceService huggingFaceService;
-    private readonly GoogleGeminiService googleGeminiService;
+    private readonly IAIPromptService aiPromptService;
     private readonly ILogger<WorkoutAnalysisService> logger;
-    private readonly IConfiguration configuration;
 
     public WorkoutAnalysisService(
-        HuggingFaceService huggingFaceService,
-        GoogleGeminiService googleGeminiService,
-        IConfiguration configuration,
+        IAIPromptService aiPromptService,
         ILogger<WorkoutAnalysisService> logger)
     {
-        this.huggingFaceService = huggingFaceService;
-        this.googleGeminiService = googleGeminiService;
-        this.configuration = configuration;
+        this.aiPromptService = aiPromptService;
         this.logger = logger;
     }
 
-    // Generic method
-    public Task<WorkoutAnalysisResponseDto> AnalyzeWorkoutsAsync(
+    public async Task<WorkoutAnalysisResponseDto> AnalyzeWorkoutsAsync(
         WorkoutAnalysisRequestDto request,
-        CancellationToken cancellationToken)
-    {
-        string defaultProvider = this.configuration["AI:DefaultProvider"] ?? "GoogleGemini";
-        return this.AnalyzeWorkoutsWithProviderAsync(request, defaultProvider, cancellationToken);
-    }
-
-    // HuggingFace specific method
-    public Task<WorkoutAnalysisResponseDto> AnalyzeHuggingFaceWorkoutsAsync(
-        WorkoutAnalysisRequestDto request, CancellationToken cancellationToken)
-    {
-        return this.AnalyzeWorkoutsWithProviderAsync(request, "HuggingFace", cancellationToken);
-    }
-
-    // Google Gemini specific method
-    public Task<WorkoutAnalysisResponseDto> AnalyzeGoogleGeminiWorkoutsAsync(
-        WorkoutAnalysisRequestDto request, CancellationToken cancellationToken)
-    {
-        return this.AnalyzeWorkoutsWithProviderAsync(request, "GoogleGemini", cancellationToken);
-    }
-
-    // Core analysis method with provider selection
-    private async Task<WorkoutAnalysisResponseDto> AnalyzeWorkoutsWithProviderAsync(
-        WorkoutAnalysisRequestDto request,
-        string provider,
         CancellationToken cancellationToken)
     {
         try
         {
             this.logger.LogInformation(
-                "Analyzing workouts with {Provider} for {WorkoutCount} recent workouts, analysis type: {AnalysisType}",
-                provider, request.RecentWorkouts?.Count ?? 0, request.AnalysisType ?? "General");
+                "Analyzing workouts for {WorkoutCount} recent workouts, analysis type: {AnalysisType}",
+                request.RecentWorkouts?.Count ?? 0, request.AnalysisType ?? "General");
 
             string prompt = this.BuildAnalysisPrompt(request);
 
-            // Select the appropriate AI service
-            IAIPromptService aiService = provider.ToLower() switch
-            {
-                "huggingface" => this.huggingFaceService,
-                "googlegemini" => this.googleGeminiService,
-                _ => this.huggingFaceService // Default fallback
-            };
-
-            // Call the appropriate AI method based on analysis type
             string aiResponse = request.AnalysisType?.ToLower() switch
             {
-                "health" => await aiService.GetHealthAnalysisAsync(prompt, cancellationToken),
-                "performance" => await aiService.GetFitnessAnalysisAsync(prompt, cancellationToken),
-                "trends" => await aiService.GetFitnessAnalysisAsync(prompt, cancellationToken),
-                _ => await aiService.GetFitnessAnalysisAsync(prompt, cancellationToken)
+                "health" => await this.aiPromptService.GetHealthAnalysisAsync(prompt, cancellationToken),
+                "performance" => await this.aiPromptService.GetFitnessAnalysisAsync(prompt, cancellationToken),
+                "trends" => await this.aiPromptService.GetFitnessAnalysisAsync(prompt, cancellationToken),
+                _ => await this.aiPromptService.GetFitnessAnalysisAsync(prompt, cancellationToken)
             };
 
             WorkoutAnalysisResponseDto result = this.ParseAnalysisResponse(aiResponse, request.AnalysisType);
-            result.Provider = provider; // Add provider info to response
+            result.Provider = "Gemini-AI";
 
             this.logger.LogInformation(
-                "Successfully generated workout analysis with {Provider}: {InsightCount} insights and {RecommendationCount} recommendations",
-                provider, result.KeyInsights?.Count ?? 0, result.Recommendations?.Count ?? 0);
+                "Successfully generated workout analysis: {InsightCount} insights and {RecommendationCount} recommendations",
+                result.KeyInsights?.Count ?? 0, result.Recommendations?.Count ?? 0);
 
             return result;
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Error analyzing workouts with {Provider}", provider);
-
-            // Provider-specific fallback
-            return this.GetFallbackAnalysis(request, provider);
+            this.logger.LogError(ex, "Error analyzing workouts");
+            return this.GetFallbackAnalysis(request, "Gemini-AI");
         }
     }
-
     private string BuildAnalysisPrompt(WorkoutAnalysisRequestDto request)
     {
         if (request.RecentWorkouts == null || !request.RecentWorkouts.Any())
@@ -483,7 +440,7 @@ Provide practical, actionable insights for fitness improvement.";
     private string CleanLineItem(string line)
     {
         return line.Trim()
-            .TrimStart('-', '*', '•', '1', '2', '3', '4', '5', '.', ' ')
+            .TrimStart('-', '*', 'â€¢', '1', '2', '3', '4', '5', '.', ' ')
             .Trim();
     }
 
@@ -498,7 +455,7 @@ Provide practical, actionable insights for fitness improvement.";
     {
         return new[]
         {
-        "ANALYSE:", "WICHTIGE ERKENNTNISSE:", "EMPFEHLUNGEN:", "RATSCHLÄGE:",
+        "ANALYSE:", "WICHTIGE ERKENNTNISSE:", "EMPFEHLUNGEN:", "RATSCHLÃ„GE:",
         "GESUNDHEITSANALYSE:", "LEISTUNGSANALYSE:", "TRENDANALYSE:",
         "ANALYSIS:", "KEY INSIGHTS:", "RECOMMENDATIONS:", "ADVICE:",
         "HEALTH ANALYSIS:", "PERFORMANCE ANALYSIS:", "TRENDS ANALYSIS:",
@@ -518,7 +475,7 @@ Provide practical, actionable insights for fitness improvement.";
         string analysis = analysisType.ToLower() switch
         {
             "health" => $"Basierend auf Ihren {workoutCount} letzten Trainingseinheiten scheint Ihre Trainingsbelastung gut ausgewogen zu sein. " +
-                       $"Die Gesamtdistanz von {totalDistance:F1}km über {TimeSpan.FromSeconds(totalDuration):h\\:mm} zeigt gutes Herz-Kreislauf-Engagement. " +
+                       $"Die Gesamtdistanz von {totalDistance:F1}km Ã¼ber {TimeSpan.FromSeconds(totalDuration):h\\:mm} zeigt gutes Herz-Kreislauf-Engagement. " +
                        $"No concerning overtraining patterns detected. Your average calorie consumption of {avgCalories:F0} per unit indicates appropriate training intensity.",
 
             "performance" => $"Ihre Leistungsdaten zeigen {workoutCount} absolvierte Trainingseinheiten mit {totalDistance:F1}km Gesamtdistanz. " +
@@ -526,14 +483,14 @@ Provide practical, actionable insights for fitness improvement.";
                            $"Die durchschnittliche Einheitsdauer von {TimeSpan.FromSeconds(workoutCount > 0 ? totalDuration / workoutCount : 0):h\\:mm} deutet auf guten Ausdaueraufbau hin. " +
                            $"Leistungsmetriken zeigen stetigen Fortschritt in Richtung Ihrer Ziele.",
 
-            "trends" => $"Die Trainingstrendanalyse zeigt {workoutCount} Trainingseinheiten über den letzten Zeitraum. " +
+            "trends" => $"Die Trainingstrendanalyse zeigt {workoutCount} Trainingseinheiten Ã¼ber den letzten Zeitraum. " +
                        $"Der Gesamtdistanzfortschritt auf {totalDistance:F1}km zeigt positive Trainingskonsistenz. " +
-                       $"Trainingshäufigkeits- und Dauermuster deuten auf nachhaltige Trainingsgewohnheiten hin. " +
+                       $"TrainingshÃ¤ufigkeits- und Dauermuster deuten auf nachhaltige Trainingsgewohnheiten hin. " +
                        $"Kalorienverbrauchstrends deuten auf effektives Energiemanagement hin.",
 
-            _ => $"Umfassende Analyse Ihrer {workoutCount} letzten Trainingseinheiten über {totalDistance:F1}km zeigt exzellente Trainingskonsistenz. " +
+            _ => $"Umfassende Analyse Ihrer {workoutCount} letzten Trainingseinheiten Ã¼ber {totalDistance:F1}km zeigt exzellente Trainingskonsistenz. " +
                 $"Ihre {analysisType.ToLower()}-Metriken deuten auf stetigen Fortschritt in Richtung Ihrer Fitnessziele hin. " +
-                $"Trainingsbelastung und Regenerationsbalance scheinen angemessen für kontinuierliche Verbesserung."
+                $"Trainingsbelastung und Regenerationsbalance scheinen angemessen fÃ¼r kontinuierliche Verbesserung."
         };
 
         List<string> insights = analysisType.ToLower() switch

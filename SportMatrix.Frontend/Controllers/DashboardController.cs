@@ -21,7 +21,7 @@ public class DashboardController : Controller
     }
 
     // GET: Dashboard
-    public async Task<IActionResult> Index(int id = 1, string? action = null)
+    public async Task<IActionResult> Index(int id = 1, string? analysisType = null)
     {
         var viewModel = new FitnessDashboardViewModel { Loading = true };
         try
@@ -30,9 +30,9 @@ public class DashboardController : Controller
             viewModel.Statistics = await LoadStatisticsAsync(id);
             viewModel.RecentActivities = await LoadActivitiesAsync(id);
 
-            if (action != null)
+            if (analysisType != null)
             {
-                viewModel.AIAnalysis = await HandleAIAnalysisAsync(id, action, viewModel.RecentActivities);
+                viewModel.AIAnalysis = await HandleAIAnalysisAsync(id, analysisType, viewModel.RecentActivities);
             }
         }
         catch (Exception ex)
@@ -68,9 +68,9 @@ public class DashboardController : Controller
         return activities.Count == 0 ? _demoDataService.GetActivities() : activities;
     }
 
-    private async Task<AIAnalysisDto?> HandleAIAnalysisAsync(int id, string action, List<ActivityDto> activities)
+    private async Task<AIAnalysisDto?> HandleAIAnalysisAsync(int id, string analysisType, List<ActivityDto> activities)
     {
-        return action switch
+        return analysisType switch
         {
             "analyze" => await GetAnalysisForFirstActivity(activities),
             "trends" => await _aiService.AnalyzePerformanceTrendsAsync(id),
@@ -96,7 +96,7 @@ public class DashboardController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AnalyzeWorkout(int id, int activityId)
     {
-        return RedirectToAction(nameof(Index), new { id, action = "analyze" });
+        return RedirectToAction(nameof(Index), new { id, analysisType = "analyze" });
     }
 
     // POST: Dashboard/GetPerformanceTrends
@@ -104,7 +104,7 @@ public class DashboardController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> GetPerformanceTrends(int id)
     {
-        return RedirectToAction(nameof(Index), new { id, action = "trends" });
+        return RedirectToAction(nameof(Index), new { id, analysisType = "trends" });
     }
 
     // POST: Dashboard/GetTrainingRecommendations
@@ -112,7 +112,7 @@ public class DashboardController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> GetTrainingRecommendations(int id)
     {
-        return RedirectToAction(nameof(Index), new { id, action = "recommendations" });
+        return RedirectToAction(nameof(Index), new { id, analysisType = "recommendations" });
     }
 
     // POST: Dashboard/AnalyzeHealthMetrics
@@ -120,7 +120,7 @@ public class DashboardController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AnalyzeHealthMetrics(int id)
     {
-        return RedirectToAction(nameof(Index), new { id, action = "health" });
+        return RedirectToAction(nameof(Index), new { id, analysisType = "health" });
     }
 
     private async Task<AIAnalysisDto?> GetAnalysisForFirstActivity(List<ActivityDto> activities)

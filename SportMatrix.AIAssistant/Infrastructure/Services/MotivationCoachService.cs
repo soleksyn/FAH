@@ -1,4 +1,4 @@
-namespace SportMatrix.AIAssistant.Infrastructure.Services;
+ï»¿namespace SportMatrix.AIAssistant.Infrastructure.Services;
 
 using System.Text.RegularExpressions;
 using SportMatrix.AIAssistant.Application.DTOs;
@@ -58,12 +58,7 @@ public class MotivationCoachService : IMotivationCoachService
         }
     }
 
-    // Legacy method für Backwards Compatibility
-    public Task<MotivationResponseDto> GetHuggingFaceMotivationalMessageAsync(
-        MotivationRequestDto request, CancellationToken cancellationToken)
-    {
-        return this.GenerateMotivationAsync(request, cancellationToken);
-    }
+
 
     private string BuildMotivationPrompt(MotivationRequestDto request)
     {
@@ -80,7 +75,7 @@ public class MotivationCoachService : IMotivationCoachService
             "The athlete is currently struggling with motivation and needs extra encouragement." :
             "The athlete is looking for additional motivation to stay on track.";
 
-        // Optimiert für moderne AI Models (HuggingFace, OpenAI, etc.)
+        // Optimiert fÃ¼r moderne AI Models (HuggingFace, OpenAI, etc.)
         return $@"Create a motivational fitness message for {athleteName}.
 
 Athlete Profile:
@@ -137,7 +132,7 @@ Response:";
                 break;
             }
 
-            // Ignoriere reine Quotes in Anführungszeichen am Anfang von Zeilen
+            // Ignoriere reine Quotes in AnfÃ¼hrungszeichen am Anfang von Zeilen
             if (cleanLine.StartsWith('"') && cleanLine.EndsWith('"') && cleanLine.Length > 20)
             {
                 continue;
@@ -152,7 +147,7 @@ Response:";
         string result = messageLines.Any() ? string.Join(" ", messageLines) :
                     "You're doing great! Keep up the excellent work with your fitness journey.";
 
-        // Begrenze die Länge
+        // Begrenze die LÃ¤nge
         if (result.Length > 300)
         {
             string[] sentences = result.Split('.', StringSplitOptions.RemoveEmptyEntries);
@@ -169,7 +164,7 @@ Response:";
             return null;
         }
 
-        // Suche nach Zitaten in Anführungszeichen
+        // Suche nach Zitaten in AnfÃ¼hrungszeichen
         MatchCollection quoteMatches = System.Text.RegularExpressions.Regex.Matches(
             aiResponse, @"""([^""]{10,})""", RegexOptions.None, TimeSpan.FromMilliseconds(100));
 
@@ -213,7 +208,7 @@ Response:";
 
         List<string> tips = new List<string>();
 
-        // Suche nach "Tips:" oder ähnlichen Labels
+        // Suche nach "Tips:" oder Ã¤hnlichen Labels
         string tipsSection = string.Empty;
         string lowerResponse = aiResponse.ToLower();
 
@@ -233,7 +228,7 @@ Response:";
             foreach (string line in lines)
             {
                 string cleanLine = line.Trim()
-                    .TrimStart('-', '*', '•', '1', '2', '3', '4', '5', '.', ' ')
+                    .TrimStart('-', '*', 'â€¢', '1', '2', '3', '4', '5', '.', ' ')
                     .Trim();
 
                 if (!string.IsNullOrWhiteSpace(cleanLine) &&
@@ -274,3 +269,4 @@ Response:";
         return motivations[randomIndex];
     }
 }
+

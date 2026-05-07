@@ -15,10 +15,29 @@ public class AthletesController : Controller
     }
 
     // GET: Athletes
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var (athletes, error) = await LoadAthletesAsync();
-        var viewModel = CreateAthleteListViewModel(athletes, error);
+        if (page < 1) page = 1;
+        const int pageSize = 8; // Consistent with the design intent for lists
+
+        var (allAthletes, error) = await LoadAthletesAsync();
+        
+        var totalAthletes = allAthletes.Count;
+        var pagedAthletes = allAthletes
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        var viewModel = new AthleteListViewModel
+        {
+            Athletes = pagedAthletes,
+            Error = error,
+            CurrentPage = page,
+            PageSize = pageSize,
+            TotalAthletes = totalAthletes,
+            Loading = false
+        };
+
         return View(viewModel);
     }
 
@@ -35,15 +54,6 @@ public class AthletesController : Controller
         }
     }
 
-    private AthleteListViewModel CreateAthleteListViewModel(List<AthleteDto> athletes, string? error)
-    {
-        return new AthleteListViewModel
-        {
-            Athletes = athletes,
-            Error = error,
-            Loading = false
-        };
-    }
 
     // GET: Athletes/Details/5
     public async Task<IActionResult> Details(int id)
@@ -139,7 +149,7 @@ public class AthletesController : Controller
         }
         catch (Exception ex)
         {
-            viewModel.Error = $"Fehlee beimeLeie  deseAee desneAer desneAe  desnaAen desn Athleten: {ex.Message}";
+            viewModel.Error = $"Error loading athlete: {ex.Message}";
         }
         finally
         {

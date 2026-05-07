@@ -13,10 +13,9 @@ public class GoogleAIOptions
 
 public class ModelsOptions
 {
-    public string Fitness { get; set; } = "gemini-3-flash-preview";
-    public string Health { get; set; } = "gemini-3-flash-preview";
-    public string Motivation { get; set; } = "gemini-3-flash-preview";
-    public string Analysis { get; set; } = "gemini-3-flash-preview";
+    public string Fitness { get; set; } = "gemini-3.1-flash-lite-preview";
+    public string Health { get; set; } = "gemini-3.1-flash-lite-preview";
+    public string Analysis { get; set; } = "gemini-3.1-flash-lite-preview";
 }
 
 public class GenerationConfigOptions

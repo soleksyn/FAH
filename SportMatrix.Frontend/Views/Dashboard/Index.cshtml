@@ -1,139 +1,69 @@
-@model SportMatrix.Frontend.Models.FitnessDashboardViewModel
+@model SportMatrix.Frontend.Models.DashboardPageViewModel
 @using System.Text.Json
 @{
     ViewData["Title"] = Model.Athlete != null ? $"{Model.Athlete.FirstName}'s Dashboard" : "Dashboard";
-
-    Func<string, string> sportIcon = sport => sport?.ToLower() switch {
-        "run"            => "bi-person-walking",
-        "ride"           => "bi-bicycle",
-        "swim"           => "bi-water",
-        "walk"           => "bi-person-walking",
-        "hike"           => "bi-tree",
-        "workout"        => "bi-lightning-charge",
-        "weighttraining" => "bi-lightning-charge",
-        "yoga"           => "bi-peace",
-        "crosstraining"  => "bi-stars",
-        _                => "bi-activity"
-    };
-
-    Func<string, string> sportCssClass = sport => sport?.ToLower() switch {
-        "run"            => "sport-run",
-        "ride"           => "sport-ride",
-        "swim"           => "sport-swim",
-        "walk"           => "sport-walk",
-        "hike"           => "sport-hike",
-        "workout"        => "sport-workout",
-        "weighttraining" => "sport-workout",
-        "yoga"           => "sport-yoga",
-        _                => "sport-other"
-    };
-
-    var weeklyData     = JsonSerializer.Serialize(Model.GetWeeklyProgress()
-                            .Select(w => new { distance = w.Distance, percentage = w.Percentage }));
-    var activityTypes  = JsonSerializer.Serialize(Model.GetActivityTypes()
-                            .Select(t => new { name = t.Name, count = t.Count, percentage = t.Percentage }));
-    var monthlyData    = JsonSerializer.Serialize(Model.GetMonthlyData()
-                            .Select(m => new { name = m.Name, count = m.Count, percentage = m.Percentage }));
+    var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    var chartData = JsonSerializer.Serialize(Model.Charts, options);
 }
 
-@* ── Error banner ─────────────────────────────────────────── *@
-@if (Model.Error != null)
+@foreach (var alert in Model.Alerts)
 {
-    <div class="alert alert-danger">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-        <span>@Model.Error</span>
+    <div class="alert alert-@alert.Type">
+        <i class="bi @alert.Icon"></i>
+        <span>@alert.Message</span>
     </div>
 }
 
-@* ── Loading ───────────────────────────────────────────────── *@
-@if (Model.Loading)
+@if (Model.IsDemoData)
 {
-    <div class="loading-state">
-        <div class="spinner spinner-lg"></div>
-        <span>Loading dashboard…</span>
+    <div class="alert alert-warning">
+        <i class="bi bi-database-exclamation"></i>
+        <span>Some dashboard sections are using demo data because live data could not be loaded.</span>
     </div>
 }
-else
+
+
+@if (Model.StatCards.Count > 0)
 {
-    @* ── Motivation banner ─────────────────────────────────── *@
-    <div class="motivation-banner">
-        <div class="motivation-banner-icon"><i class="bi bi-lightning-charge-fill"></i></div>
-        <div class="motivation-banner-body">
-            <h3>Today's Motivation</h3>
-            <p>
-                @if (Model.AIAnalysis != null)
-                {
-                    @Model.GetMotivationText()
-                }
-                else
-                {
-                    <text>Ready for today's challenge? Analyze your latest activities and unlock new insights.</text>
-                }
-            </p>
+    <div class="stats-grid">
+        @foreach (var stat in Model.StatCards)
+        {
+            <div class="stat-card">
+                <div class="stat-icon @stat.Accent"><i class="bi @stat.Icon"></i></div>
+                <div class="stat-info">
+                    <div class="stat-number">@stat.Value@if (!string.IsNullOrWhiteSpace(stat.Unit)){<span class="stat-unit"> @stat.Unit</span>}</div>
+                    <div class="stat-label">@stat.Label</div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<div class="dash-grid">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><i class="bi bi-list-ul"></i> All Activities</div>
         </div>
-    </div>
-
-    @* ── Stat cards ────────────────────────────────────────── *@
-    @if (Model.Statistics != null)
-    {
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon orange"><i class="bi bi-activity"></i></div>
-                <div class="stat-info">
-                    <div class="stat-number">@Model.Statistics.TotalActivities</div>
-                    <div class="stat-label">Total Activities</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon mint"><i class="bi bi-map"></i></div>
-                <div class="stat-info">
-                    <div class="stat-number">@Model.Statistics.TotalDistance.ToString("F1")<span style="font-size:1rem;font-weight:500;color:var(--color-text-2);"> km</span></div>
-                    <div class="stat-label">Total Distance</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon orange"><i class="bi bi-clock"></i></div>
-                <div class="stat-info">
-                    <div class="stat-number" style="font-size:1.35rem;">@Model.Statistics.TotalDuration</div>
-                    <div class="stat-label">Total Duration</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon mint"><i class="bi bi-fire"></i></div>
-                <div class="stat-info">
-                    <div class="stat-number">@Model.GetEstimatedCalories()</div>
-                    <div class="stat-label">Est. Calories</div>
-                </div>
-            </div>
-        </div>
-    }
-
-    @* ── Content grid: activities + AI ────────────────────── *@
-    <div class="dash-grid">
-
-        @* Recent activities *@
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title"><i class="bi bi-list-ul"></i> Recent Activities</div>
-            </div>
-            <div class="card-body" style="padding:12px 14px;">
-                @if (Model.RecentActivities.Count > 0)
-                {
-                    <div class="activity-list">
-                        @foreach (var activity in Model.RecentActivities)
-                        {
-                            <div class="activity-item">
-                                <div class="activity-sport-dot @sportCssClass(activity.SportType)">
-                                    <i class="bi @sportIcon(activity.SportType)"></i>
+        <div class="card-body card-body-compact">
+            @if (Model.RecentActivities.Count > 0)
+            {
+                <div class="activity-list">
+                    @foreach (var activity in Model.RecentActivities)
+                    {
+                        <div class="activity-item">
+                            <div class="activity-sport-dot @activity.SportCssClass">
+                                <i class="bi @activity.SportIcon"></i>
+                            </div>
+                            <div class="activity-info">
+                                <div class="activity-name">@activity.Name</div>
+                                <div class="activity-meta">
+                                    <span><i class="bi bi-map icon-orange"></i> @activity.Distance</span>
+                                    <span><i class="bi bi-clock"></i> @activity.MovingTime</span>
+                                    <span><i class="bi bi-calendar3"></i> @activity.StartDate</span>
                                 </div>
-                                <div class="activity-info">
-                                    <div class="activity-name">@activity.Name</div>
-                                    <div class="activity-meta">
-                                        <span><i class="bi bi-map" style="color:var(--color-orange);"></i> @activity.Distance.ToString("F1") km</span>
-                                        <span><i class="bi bi-clock" style="color:var(--color-text-3);"></i> @activity.MovingTime</span>
-                                        <span><i class="bi bi-calendar3" style="color:var(--color-text-3);"></i> @activity.StartDate.Substring(0, 10)</span>
-                                    </div>
-                                </div>
+                            </div>
+                            @if (Model.Athlete != null)
+                            {
                                 <div class="activity-actions">
                                     <form method="post" asp-action="AnalyzeWorkout" asp-route-id="@Model.Athlete.Id" asp-route-activityId="@activity.Id">
                                         <button type="submit" class="btn btn-orange btn-sm">
@@ -141,87 +71,153 @@ else
                                         </button>
                                     </form>
                                 </div>
-                            </div>
-                        }
-                    </div>
-                }
-                else
+                            }
+                        </div>
+                    }
+                </div>
+
+                @if (Model.TotalPages > 1)
                 {
-                    <div class="empty-state">
-                        <i class="bi bi-inbox"></i>
-                        <h3>No activities yet</h3>
-                        <p>Connect your account or add activities to get started.</p>
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            Showing page @Model.CurrentPage of @Model.TotalPages
+                        </div>
+                        <div class="pagination-actions">
+                            @if (Model.HasPreviousPage)
+                            {
+                                <a asp-action="Index" asp-route-id="@Model.Athlete?.Id" asp-route-page="@(Model.CurrentPage - 1)" class="page-btn">
+                                    <i class="bi bi-chevron-left"></i> Previous
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="page-btn" disabled>
+                                    <i class="bi bi-chevron-left"></i> Previous
+                                </button>
+                            }
+
+                            @if (Model.HasNextPage)
+                            {
+                                <a asp-action="Index" asp-route-id="@Model.Athlete?.Id" asp-route-page="@(Model.CurrentPage + 1)" class="page-btn">
+                                    Next <i class="bi bi-chevron-right"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="page-btn" disabled>
+                                    Next <i class="bi bi-chevron-right"></i>
+                                </button>
+                            }
+                        </div>
                     </div>
                 }
-            </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h3>No activities yet</h3>
+                    <p>Connect your account or add activities to get started.</p>
+                </div>
+            }
         </div>
+    </div>
 
-        @* AI Insights panel *@
-        <div class="ai-panel">
-            <div class="ai-panel-header">
-                <i class="bi bi-stars"></i>
-                AI Insights
-            </div>
-            <div class="ai-panel-body">
-                @if (Model.AIAnalysis != null)
-                {
-                    @if (!string.IsNullOrEmpty(Model.AIAnalysis.Analysis))
-                    {
-                        <div class="insight-block">
-                            <div class="insight-block-title"><i class="bi bi-graph-up-arrow"></i> Performance Analysis</div>
-                            <div class="formatted-analysis">@Html.Raw(Model.FormatMarkdown(Model.AIAnalysis.Analysis))</div>
-                        </div>
-                    }
-
-                    @if (Model.AIAnalysis.KeyInsights != null && Model.AIAnalysis.KeyInsights.Count > 0)
-                    {
-                        <div class="insight-block">
-                            <div class="insight-block-title"><i class="bi bi-lightbulb"></i> Key Insights</div>
-                            <ul class="insight-list">
-                                @foreach (var insight in Model.AIAnalysis.KeyInsights.Take(3))
-                                {
-                                    <li>@insight</li>
-                                }
-                            </ul>
-                        </div>
-                    }
-
-                    @if (Model.AIAnalysis.Recommendations != null && Model.AIAnalysis.Recommendations.Count > 0)
-                    {
-                        <div class="insight-block">
-                            <div class="insight-block-title"><i class="bi bi-check2-circle"></i> Recommendations</div>
-                            <ul class="insight-list">
-                                @foreach (var rec in Model.AIAnalysis.Recommendations.Take(3))
-                                {
-                                    <li>@rec</li>
-                                }
-                            </ul>
-                        </div>
-                    }
-
-                    @if (Model.AIAnalysis.PerformanceScore.HasValue)
-                    {
-                        <div class="insight-block">
-                            <div class="insight-block-title"><i class="bi bi-speedometer"></i> Performance Score</div>
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--color-mint-hover);margin-bottom:6px;">
-                                @Model.AIAnalysis.PerformanceScore<span style="font-size:0.9rem;color:var(--color-text-2)">/100</span>
-                            </div>
-                            <div class="score-bar">
-                                <div class="score-fill @Model.GetScoreClass(Model.AIAnalysis.PerformanceScore)"
-                                     style="width:@(Model.AIAnalysis.PerformanceScore)%"></div>
-                            </div>
-                        </div>
-                    }
-                }
-                else
+    <div class="ai-panel">
+        <div class="ai-panel-header">
+            <i class="bi bi-stars"></i>
+            AI Insights
+        </div>
+        <div class="ai-panel-body">
+            @if (Model.AIAnalysis != null)
+            {
+                @if (!string.IsNullOrEmpty(Model.AIAnalysis.Analysis))
                 {
                     <div class="insight-block">
-                        <div class="insight-block-title"><i class="bi bi-cpu"></i> Ready for Analysis</div>
-                        <p>Click <strong>Analyze</strong> on any activity to get AI-powered insights about your training.</p>
+                        <div class="insight-block-title"><i class="bi bi-graph-up-arrow"></i> Performance Analysis</div>
+                        <p class="analysis-paragraph">@Model.AIAnalysis.Analysis</p>
                     </div>
                 }
-            </div>
 
+                @if (Model.AIAnalysis.KeyInsights != null && Model.AIAnalysis.KeyInsights.Count > 0)
+                {
+                    <div class="insight-block">
+                        <div class="insight-block-title"><i class="bi bi-lightbulb"></i> Key Insights</div>
+                        <ul class="insight-list">
+                            @foreach (var insight in Model.AIAnalysis.KeyInsights)
+                            {
+                                <li>@insight</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                @if (Model.AIAnalysis.Recommendations != null && Model.AIAnalysis.Recommendations.Count > 0)
+                {
+                    <div class="insight-block">
+                        <div class="insight-block-title"><i class="bi bi-check2-circle"></i> Recommendations</div>
+                        <ul class="insight-list">
+                            @foreach (var rec in Model.AIAnalysis.Recommendations)
+                            {
+                                <li>@rec</li>
+                            }
+                        </ul>
+                    </div>
+                }
+            }
+            else if (Model.Athlete != null)
+            {
+                <div class="insight-block">
+                    <div class="insight-block-title"><i class="bi bi-cpu"></i> Ready for Analysis</div>
+                    <p class="analysis-paragraph">Choose an action to get AI-powered insights about your training.</p>
+
+                    <div class="ai-action-grid">
+                        <div class="ai-action-card">
+                            <form method="post" asp-action="GetPerformanceTrends" asp-route-id="@Model.Athlete.Id">
+                                <button type="submit">
+                                    <div class="ai-action-icon"><i class="bi bi-graph-up"></i></div>
+                                    <div class="ai-action-title">Performance Trends</div>
+                                    <div class="ai-action-copy">Analyze your training patterns</div>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="ai-action-card">
+                            <form method="post" asp-action="GetTrainingRecommendations" asp-route-id="@Model.Athlete.Id">
+                                <button type="submit">
+                                    <div class="ai-action-icon"><i class="bi bi-lightbulb"></i></div>
+                                    <div class="ai-action-title">Training Tips</div>
+                                    <div class="ai-action-copy">Get personalized recommendations</div>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="ai-action-card">
+                            <form method="post" asp-action="AnalyzeHealthMetrics" asp-route-id="@Model.Athlete.Id">
+                                <button type="submit">
+                                    <div class="ai-action-icon"><i class="bi bi-heart-pulse"></i></div>
+                                    <div class="ai-action-title">Health Analysis</div>
+                                    <div class="ai-action-copy">Review your health metrics</div>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="ai-action-card">
+                            <form method="post" asp-action="GetNextDayRecommendation" asp-route-id="@Model.Athlete.Id">
+                                <button type="submit">
+                                    <div class="ai-action-icon"><i class="bi bi-calendar-check"></i></div>
+                                    <div class="ai-action-title">Get Recommendation</div>
+                                    <div class="ai-action-copy">Plan your next workout</div>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.AIAnalysis != null && Model.Athlete != null)
+        {
             <div class="quick-actions">
                 <form method="post" asp-action="GetPerformanceTrends" asp-route-id="@Model.Athlete.Id">
                     <button type="submit" class="quick-action-btn">
@@ -238,31 +234,55 @@ else
                         <i class="bi bi-heart-pulse"></i> Health Analysis
                     </button>
                 </form>
+                <form method="post" asp-action="GetNextDayRecommendation" asp-route-id="@Model.Athlete.Id">
+                    <button type="submit" class="quick-action-btn">
+                        <i class="bi bi-calendar-check"></i> Get Recommendation
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="charts-grid">
+    <div class="chart-card">
+        <h3><i class="bi bi-bar-chart-fill"></i> Weekly Distance</h3>
+        <div class="chart-container">
+            <canvas id="weeklyChart" height="180"></canvas>
+            <div id="weeklyChartEmpty" class="chart-no-data">
+                <i class="bi bi-bar-chart"></i>
+                <p>No weekly data available</p>
+                <span>Complete some activities this week to see your progress</span>
             </div>
         </div>
     </div>
-
-    @* ── Charts ────────────────────────────────────────────── *@
-    @if (Model.Statistics != null)
-    {
-        <div class="charts-grid">
-            <div class="chart-card">
-                <h3><i class="bi bi-bar-chart-fill"></i> Weekly Distance</h3>
-                <canvas id="weeklyChart" height="180"></canvas>
-            </div>
-            <div class="chart-card">
-                <h3><i class="bi bi-pie-chart-fill mint"></i> Activity Split</h3>
-                <canvas id="doughnutChart" height="200"></canvas>
+    <div class="chart-card">
+        <h3><i class="bi bi-pie-chart-fill mint"></i> Activity Split</h3>
+        <div class="chart-container">
+            <canvas id="doughnutChart" height="200"></canvas>
+            <div id="doughnutChartEmpty" class="chart-no-data mint">
+                <i class="bi bi-pie-chart-fill"></i>
+                <p>No activity types recorded</p>
+                <span>Your diverse activities will appear here</span>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="chart-card-wide">
-            <h3><i class="bi bi-calendar3 mint"></i> Monthly Activity Volume</h3>
-            <canvas id="monthlyChart" height="120"></canvas>
+<div class="chart-card-wide">
+    <h3><i class="bi bi-calendar3 mint"></i> Monthly Activity Volume</h3>
+    <div class="chart-container">
+        <canvas id="monthlyChart" height="120"></canvas>
+        <div id="monthlyChartEmpty" class="chart-no-data mint">
+            <i class="bi bi-calendar3"></i>
+            <p>No monthly activity history</p>
+            <span>Track your journey over the months</span>
         </div>
-    }
+    </div>
+</div>
 
-    @* ── Bottom navigation ─────────────────────────────────── *@
+@if (Model.Athlete != null)
+{
     <div class="dash-nav-actions">
         <a asp-controller="Athletes" asp-action="Index" class="btn btn-ghost">
             <i class="bi bi-arrow-left"></i> All Athletes
@@ -274,17 +294,7 @@ else
 }
 
 @section Scripts {
-    <script>
-        window.chartData = {
-            weekly:   @Html.Raw(weeklyData),
-            types:    @Html.Raw(activityTypes),
-            monthly:  @Html.Raw(monthlyData),
-        };
-
-        document.addEventListener('DOMContentLoaded', function () {
-            initWeeklyChart('weeklyChart',   window.chartData.weekly);
-            initDoughnutChart('doughnutChart', window.chartData.types);
-            initMonthlyChart('monthlyChart', window.chartData.monthly);
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script type="application/json" id="dashboardChartData">@Html.Raw(chartData)</script>
+    <script src="~/js/charts.js" asp-append-version="true"></script>
 }

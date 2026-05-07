@@ -1,5 +1,6 @@
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Domain.Models;
+using SportMatrix.Domain.Enums;
 
 namespace SportMatrix.AIAssistant.Extensions;
 
@@ -64,7 +65,7 @@ public static class WorkoutDataExtensions
             AthleteProfile = grpcJsonRequest.AthleteProfile?.ToAthleteProfileDto(),
             RecentWorkouts = grpcJsonRequest.RecentWorkouts?.Select(w => w.ToWorkoutDataDto()).ToList()
                             ?? new List<WorkoutDataDto>(),
-            AnalysisType = grpcJsonRequest.AnalysisType ?? "Performance",
+            AnalysisType = Enum.TryParse<AnalysisType>(grpcJsonRequest.AnalysisType, ignoreCase: true, out var type) ? type : AnalysisType.Performance,
         };
     }
 }

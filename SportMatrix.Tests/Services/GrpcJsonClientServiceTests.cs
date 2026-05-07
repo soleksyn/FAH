@@ -38,102 +38,6 @@ public class GrpcJsonClientServiceTests
         this.httpClient?.Dispose();
     }
 
-    #region GetMotivationAsync Tests
-
-    [Fact]
-    public async Task GetMotivationAsync_WithValidRequest_ReturnsSuccessResponse()
-    {
-        // Arrange
-        AIMotivationRequestDto request = new AIMotivationRequestDto
-        {
-            AthleteProfile = new AIAthleteProfileDto
-            {
-                Name = "John Doe",
-                FitnessLevel = "Intermediate",
-                PrimaryGoal = "Weight Loss",
-            },
-        };
-
-        string responseJson = JsonSerializer.Serialize(new
-        {
-            motivationalMessage = "You're doing great!",
-            quote = "Success is earned",
-            actionableTips = new[] { "Stay consistent", "Track progress" },
-            generatedAt = DateTime.UtcNow.ToString("O"),
-        });
-
-        this.SetupHttpResponse(HttpStatusCode.OK, responseJson);
-
-        // Act
-        AIMotivationResponseDto result = await this.service.GetMotivationAsync(request, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal("You're doing great!", result.MotivationalMessage);
-        Assert.Equal("Success is earned", result.Quote);
-        Assert.NotNull(result.ActionableTips);
-        Assert.Equal(2, result.ActionableTips.Count);
-        Assert.Equal("gRPC-JSON", result.Source);
-
-        // Verify HTTP call
-        this.VerifyHttpCall(HttpMethod.Post, "/grpc-json/MotivationService/GetMotivation");
-    }
-
-    [Fact]
-    public async Task GetMotivationAsync_WithHttpError_ReturnsFallbackResponse()
-    {
-        // Arrange
-        AIMotivationRequestDto request = new AIMotivationRequestDto
-        {
-            AthleteProfile = new AIAthleteProfileDto { Name = "Jane Doe" },
-        };
-
-        this.SetupHttpResponse(HttpStatusCode.InternalServerError, "Server Error");
-
-        // Act
-        AIMotivationResponseDto result = await this.service.GetMotivationAsync(request, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Contains("Great work, Jane Doe!", result.MotivationalMessage);
-        Assert.Equal("gRPC-JSON-Fallback", result.Source);
-        Assert.NotNull(result.ActionableTips);
-        Assert.True(result.ActionableTips.Count > 0);
-
-        // Verify error logging
-        this.mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString() !.Contains("motivation request failed")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task GetMotivationAsync_WithNullAthleteProfile_HandlesGracefully()
-    {
-        // Arrange
-        AIMotivationRequestDto request = new AIMotivationRequestDto { AthleteProfile = null };
-
-        string responseJson = JsonSerializer.Serialize(new
-        {
-            motivationalMessage = "Keep going!",
-            generatedAt = DateTime.UtcNow.ToString("O"),
-        });
-
-        this.SetupHttpResponse(HttpStatusCode.OK, responseJson);
-
-        // Act
-        AIMotivationResponseDto result = await this.service.GetMotivationAsync(request, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal("Keep going!", result.MotivationalMessage);
-    }
-
-    #endregion
 
     #region GetWorkoutAnalysisAsync Tests
 
@@ -518,23 +422,6 @@ public class GrpcJsonClientServiceTests
         return Task.CompletedTask;
     }
 
-    [Fact]
-    public async Task GetMotivationAsync_WithCancellation_ThrowsCancellationException()
-    {
-        // Arrange
-        AIMotivationRequestDto request = new AIMotivationRequestDto();
-        CancellationTokenSource cts = new CancellationTokenSource();
-        cts.Cancel();
-
-        this.SetupHttpResponseWithDelay(HttpStatusCode.OK, "{}", TimeSpan.FromSeconds(1));
-
-        // Act & Assert
-        OperationCanceledException exception = await Assert.ThrowsAnyAsync<OperationCanceledException>(
-            () => this.service.GetMotivationAsync(request, cts.Token));
-
-        // TaskCanceledException is a subclass of OperationCanceledException
-        Assert.True(exception is TaskCanceledException || exception is OperationCanceledException);
-    }
 
     [Fact]
     public Task GetWorkoutAnalysisAsync_WithInvalidJson_ReturnsFallbackResponse()
@@ -548,52 +435,7 @@ public class GrpcJsonClientServiceTests
             () => this.service.GetWorkoutAnalysisAsync(request, CancellationToken.None));
     }
 
-    [Fact]
-    public async Task GetMotivationAsync_WithMinimalValidResponse_HandlesGracefully()
-    {
-        // Arrange
-        AIMotivationRequestDto request = new AIMotivationRequestDto();
-        string responseJson = JsonSerializer.Serialize(new
-        {
-            motivationalMessage = "Great work!",
-            generatedAt = DateTime.UtcNow.ToString("O"),
-        });
-        this.SetupHttpResponse(HttpStatusCode.OK, responseJson);
 
-        // Act
-        AIMotivationResponseDto result = await this.service.GetMotivationAsync(request, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal("Great work!", result.MotivationalMessage);
-        Assert.Null(result.Quote); // Optional field, should be null when missing
-        Assert.Null(result.ActionableTips); // Optional field, should be null when missing
-    }
-
-    [Fact]
-    public async Task GetMotivationAsync_WithPartialResponse_HandlesOptionalFields()
-    {
-        // Arrange
-        AIMotivationRequestDto request = new AIMotivationRequestDto();
-        string responseJson = JsonSerializer.Serialize(new
-        {
-            motivationalMessage = "Keep going!",
-            quote = "Success is a journey",
-
-            // actionableTips missing
-            generatedAt = DateTime.UtcNow.ToString("O"),
-        });
-        this.SetupHttpResponse(HttpStatusCode.OK, responseJson);
-
-        // Act
-        AIMotivationResponseDto result = await this.service.GetMotivationAsync(request, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal("Keep going!", result.MotivationalMessage);
-        Assert.Equal("Success is a journey", result.Quote);
-        Assert.Null(result.ActionableTips); // Should be null when missing
-    }
 
     #endregion
 
@@ -652,39 +494,7 @@ public class GrpcJsonClientServiceTests
 
     #region Parameterized Tests
 
-    [Theory]
-    [InlineData("Beginner", "Weight Loss")]
-    [InlineData("Intermediate", "Muscle Gain")]
-    [InlineData("Advanced", "Endurance")]
-    public async Task GetMotivationAsync_WithDifferentProfiles_ReturnsAppropriateResponse(
-        string fitnessLevel, string primaryGoal)
-    {
-        // Arrange
-        AIMotivationRequestDto request = new AIMotivationRequestDto
-        {
-            AthleteProfile = new AIAthleteProfileDto
-            {
-                Name = "Test User",
-                FitnessLevel = fitnessLevel,
-                PrimaryGoal = primaryGoal,
-            },
-        };
 
-        string responseJson = JsonSerializer.Serialize(new
-        {
-            motivationalMessage = $"Great work on your {primaryGoal} journey!",
-            generatedAt = DateTime.UtcNow.ToString("O"),
-        });
-
-        this.SetupHttpResponse(HttpStatusCode.OK, responseJson);
-
-        // Act
-        AIMotivationResponseDto result = await this.service.GetMotivationAsync(request, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Contains(primaryGoal, result.MotivationalMessage);
-    }
 
     [Theory]
     [InlineData("Performance")]

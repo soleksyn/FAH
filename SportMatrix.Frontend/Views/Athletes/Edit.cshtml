@@ -32,9 +32,9 @@
 }
 else
 {
-    <div class="form-card" style="max-width:640px;">
+    <div class="form-card form-card-narrow">
         <form method="post">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="margin:20px 20px 0; @(ViewData.ModelState.IsValid ? "display:none" : "")"></div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" style="@(ViewData.ModelState.IsValid ? "display:none" : "")"></div>
             <input type="hidden" asp-for="Id" />
 
             <div class="form-section">
@@ -42,41 +42,41 @@ else
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label asp-for="FirstName" class="form-label">First Name <span style="color:var(--color-danger)">*</span></label>
+                        <label asp-for="FirstName" class="form-label">First Name <span class="required">*</span></label>
                         <input asp-for="FirstName" class="form-control" placeholder="Anna" />
                         <div asp-validation-for="FirstName" class="form-error"></div>
                     </div>
                     <div class="form-group">
-                        <label asp-for="LastName" class="form-label">Last Name <span style="color:var(--color-danger)">*</span></label>
+                        <label asp-for="LastName" class="form-label">Last Name <span class="required">*</span></label>
                         <input asp-for="LastName" class="form-control" placeholder="Schmidt" />
                         <div asp-validation-for="LastName" class="form-error"></div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="Email" class="form-label">Email <span style="color:var(--color-danger)">*</span></label>
+                    <label asp-for="Email" class="form-label">Email <span class="required">*</span></label>
                     <input asp-for="Email" type="email" class="form-control" placeholder="anna@example.com" />
                     <div asp-validation-for="Email" class="form-error"></div>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="DateOfBirth" class="form-label">Date of Birth <span style="color:var(--color-danger)">*</span></label>
+                    <label asp-for="DateOfBirth" class="form-label">Date of Birth <span class="required">*</span></label>
                     <input asp-for="DateOfBirth" type="date" class="form-control" />
                     <div asp-validation-for="DateOfBirth" class="form-error"></div>
                 </div>
             </div>
 
-            <div class="form-section" style="padding-top:20px;padding-bottom:20px;">
+            <div class="form-section">
                 <div class="form-section-title">Body Metrics</div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label asp-for="Weight" class="form-label">Weight (kg) <span style="color:var(--color-danger)">*</span></label>
+                        <label asp-for="Weight" class="form-label">Weight (kg) <span class="required">*</span></label>
                         <input asp-for="Weight" type="number" step="0.1" min="20" max="300" class="form-control" />
                         <div asp-validation-for="Weight" class="form-error"></div>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Height" class="form-label">Height (cm) <span style="color:var(--color-danger)">*</span></label>
+                        <label asp-for="Height" class="form-label">Height (cm) <span class="required">*</span></label>
                         <input asp-for="Height" type="number" step="0.1" min="100" max="250" class="form-control" />
                         <div asp-validation-for="Height" class="form-error"></div>
                     </div>

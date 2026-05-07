@@ -45,6 +45,22 @@
     Chart.defaults.font = defaultFont;
     Chart.defaults.color = '#78716C';
 
+    function handleEmptyState(canvasId, isEmpty) {
+        const canvas = document.getElementById(canvasId);
+        const emptyState = document.getElementById(canvasId + 'Empty');
+        if (!canvas || !emptyState) return;
+
+        if (isEmpty) {
+            canvas.style.display = 'none';
+            emptyState.classList.add('active');
+            return true;
+        } else {
+            canvas.style.display = 'block';
+            emptyState.classList.remove('active');
+            return false;
+        }
+    }
+
     /* ── Weekly progress bar chart ─────────────────────────── */
     window.initWeeklyChart = function (canvasId, weeks) {
         const ctx = document.getElementById(canvasId);
@@ -143,20 +159,20 @@
     };
 
     /* ── Monthly heatmap bar chart ─────────────────────────── */
-    window.initMonthlyChart = function (canvasId, months) {
+    function initMonthlyChart(canvasId, data) {
         const ctx = document.getElementById(canvasId);
-        if (!ctx || !months || !months.length) return;
+        if (!ctx) return;
 
-        const maxCount = Math.max(...months.map(m => m.count), 1);
+        const maxCount = Math.max(...data.map(m => m.count), 1);
 
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: months.map(m => m.name),
+                labels: data.map(m => m.name),
                 datasets: [{
                     label: 'Activities',
-                    data: months.map(m => m.count),
-                    backgroundColor: months.map(m => {
+                    data: data.map(m => m.count),
+                    backgroundColor: data.map(m => {
                         if (m.count === 0) return 'rgba(16,185,129,0.08)';
                         const intensity = 0.25 + (m.count / maxCount) * 0.75;
                         return `rgba(16,185,129,${intensity.toFixed(2)})`;
@@ -186,22 +202,33 @@
         });
     };
 
-    /* ── Mobile sidebar toggle ─────────────────────────────── */
     document.addEventListener('DOMContentLoaded', function () {
-        const toggle  = document.getElementById('sidebarToggle');
-        const sidebar = document.getElementById('appSidebar');
-        const overlay = document.getElementById('sidebarOverlay');
+        const script = document.getElementById('dashboardChartData');
+        if (!script) return;
 
-        if (toggle && sidebar && overlay) {
-            toggle.addEventListener('click', () => {
-                sidebar.classList.toggle('is-open');
-                overlay.classList.toggle('is-open');
-            });
-            overlay.addEventListener('click', () => {
-                sidebar.classList.remove('is-open');
-                overlay.classList.remove('is-open');
-            });
+        let chartData;
+        try {
+            chartData = JSON.parse(script.textContent);
+        } catch {
+            return;
+        }
+
+        if (chartData.weekly && chartData.weekly.length > 0) {
+            initWeeklyChart('weeklyChart', chartData.weekly);
+        } else {
+            handleEmptyState('weeklyChart', true);
+        }
+
+        if (chartData.types && chartData.types.length > 0) {
+            initDoughnutChart('doughnutChart', chartData.types);
+        } else {
+            handleEmptyState('doughnutChart', true);
+        }
+
+        if (chartData.monthly && chartData.monthly.length > 0) {
+            initMonthlyChart('monthlyChart', chartData.monthly);
+        } else {
+            handleEmptyState('monthlyChart', true);
         }
     });
-
 })();

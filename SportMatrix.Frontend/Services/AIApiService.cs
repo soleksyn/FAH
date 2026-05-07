@@ -1,4 +1,5 @@
 using SportMatrix.Frontend.Models.ApiClient;
+using SportMatrix.Domain.Enums;
 using System.Net.Http.Json;
 
 namespace SportMatrix.Frontend.Services;
@@ -14,7 +15,7 @@ public class AIApiService
         _demoDataService = demoDataService;
     }
 
-    public async Task<AIAnalysisDto?> AnalyzeWorkoutAsync(int athleteId, List<WorkoutDataDto> recentWorkouts, string analysisType = "Performance")
+    public async Task<AIAnalysisDto?> AnalyzeWorkoutAsync(int athleteId, List<WorkoutDataDto> recentWorkouts, AnalysisType analysisType = AnalysisType.Performance)
     {
         var request = new WorkoutAnalysisRequestDto
         {
@@ -63,6 +64,25 @@ public class AIApiService
         return MapToAnalysis(aiResponse);
     }
 
+    public async Task<AIAnalysisDto?> GetNextDayRecommendationAsync(int athleteId, List<ActivityDto> activities)
+    {
+        if (activities.Count == 0)
+            return null;
+
+        var lastActivity = activities.First();
+        var workout = new WorkoutDataDto
+        {
+            Date = lastActivity.StartDate,
+            ActivityType = lastActivity.SportType,
+            Distance = lastActivity.Distance,
+            MovingTime = lastActivity.MovingTime,
+            HeartRate = lastActivity.AverageHeartRate,
+            Calories = lastActivity.Calories
+        };
+
+        return await AnalyzeWorkoutAsync(athleteId, new List<WorkoutDataDto> { workout }, AnalysisType.NextDay);
+    }
+
     public async Task<AIAnalysisDto?> AnalyzeHealthMetricsAsync(int athleteId, List<WorkoutDataDto> workouts)
     {
         var request = new HealthAnalysisRequestDto
@@ -97,49 +117,14 @@ public class AIApiService
         if (response == null) return null;
         return new AIAnalysisDto
         {
-            Analysis = response.Analysis ?? "AI analysis completed successfully.",
-            KeyInsights = response.KeyInsights ??
-            [
-                "Your training shows consistent progress",
-                "Performance metrics are improving",
-                "Keep up the great work!"
-            ],
-            Recommendations = response.Recommendations ??
-            [
-                "Continue with current training schedule",
-                "Focus on gradual progression",
-                "Ensure adequate recovery time"
-            ],
-            PerformanceScore = new Random().Next(70, 91),
-            Trends = new TrendDto
-            {
-                Direction = "up",
-                Description = "Positive trend detected"
-            }
+            Analysis = response.Analysis,
+            KeyInsights = response.KeyInsights,
+            Recommendations = response.Recommendations,
+            PerformanceScore = null,
+            Trends = null
         };
     }
 
-    private static AIAnalysisDto? MapToMotivationAnalysis(WorkoutAnalysisResponseDto? response)
-    {
-        if (response == null) return null;
-        return new AIAnalysisDto
-        {
-            Analysis = response.Analysis ?? "Stay motivated and keep pushing your limits!",
-            KeyInsights = response.KeyInsights ??
-            [
-                "Consistency is key to success",
-                "Small improvements compound over time",
-                "Your dedication is paying off"
-            ],
-            Recommendations = response.Recommendations ??
-            [
-                "Set small, achievable daily goals",
-                "Track your progress regularly",
-                "Celebrate every milestone"
-            ],
-            PerformanceScore = new Random().Next(80, 96)
-        };
-    }
 
     private int ParseMovingTime(string movingTime)
     {
@@ -156,7 +141,7 @@ public class AIApiService
 public class WorkoutAnalysisRequestDto
 {
     public List<WorkoutDataDtoBackend> RecentWorkouts { get; set; } = [];
-    public string AnalysisType { get; set; } = string.Empty;
+    public AnalysisType AnalysisType { get; set; } = AnalysisType.Performance;
     public AthleteProfileDto? AthleteProfile { get; set; }
     public Dictionary<string, object>? AdditionalContext { get; set; }
 }

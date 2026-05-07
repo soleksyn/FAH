@@ -55,39 +55,38 @@ else if (Model.Athletes.Count == 0)
 }
 else
 {
-    <div class="athlete-grid">
+    <div class="athlete-list">
         @foreach (var athlete in Model.Athletes)
         {
-            var initials  = $"{athlete.FirstName?[..1]}{athlete.LastName?[..1]}".ToUpper();
-            var colorIdx  = avatarVariant(athlete.LastName ?? athlete.FirstName ?? "A");
+            var initials = $"{athlete.FirstName?[..1]}{athlete.LastName?[..1]}".ToUpper();
+            var colorIdx = avatarVariant(athlete.LastName ?? athlete.FirstName ?? "A");
 
-            <div class="athlete-card">
-                <div class="athlete-card-avatar">
-                    <div class="avatar avatar-lg av-@colorIdx">@initials</div>
+            <div class="athlete-list-item">
+                <div class="athlete-list-avatar">
+                    <div class="avatar avatar-md av-@colorIdx">@initials</div>
                 </div>
 
-                <div class="athlete-card-name">@athlete.FirstName @athlete.LastName</div>
-                <div class="athlete-card-email">@athlete.Email</div>
+                <div class="athlete-list-info">
+                    <div class="athlete-list-name">@athlete.FirstName @athlete.LastName</div>
+                    <div class="athlete-list-email">@athlete.Email</div>
+                </div>
 
-                <div class="athlete-card-stats">
-                    <div class="athlete-stat-chip">
-                        <span>@athlete.Weight</span>
-                        <span>kg</span>
+                <div class="athlete-list-stats">
+                    <div class="athlete-stat-mini">
+                        <span class="val">@athlete.Weight</span><span class="unit">kg</span>
                     </div>
-                    <div class="athlete-stat-chip">
-                        <span>@athlete.Height</span>
-                        <span>cm</span>
+                    <div class="athlete-stat-mini">
+                        <span class="val">@athlete.Height</span><span class="unit">cm</span>
                     </div>
-                    <div class="athlete-stat-chip">
-                        <span>@athlete.DateOfBirth.ToString("yyyy")</span>
-                        <span>born</span>
+                    <div class="athlete-stat-mini">
+                        <span class="val">@athlete.DateOfBirth.ToString("yyyy")</span><span class="unit">born</span>
                     </div>
                 </div>
 
-                <div class="athlete-card-actions">
+                <div class="athlete-list-actions">
                     <a asp-action="Details" asp-route-id="@athlete.Id"
                        class="btn btn-ghost btn-sm" title="View Details">
-                        <i class="bi bi-eye"></i> View
+                        <i class="bi bi-eye"></i> <span class="d-none d-md-inline">View</span>
                     </a>
                     <a asp-controller="Dashboard" asp-action="Index" asp-route-id="@athlete.Id"
                        class="btn btn-mint btn-sm" title="Open Dashboard">
@@ -108,4 +107,25 @@ else
             </div>
         }
     </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Showing @(((Model.CurrentPage - 1) * Model.PageSize) + 1) to @Math.Min(Model.CurrentPage * Model.PageSize, Model.TotalAthletes) of @Model.TotalAthletes athletes
+            </div>
+            <div class="pagination-actions">
+                <a asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)"
+                   class="page-btn @(!Model.HasPreviousPage ? "disabled" : "")"
+                   onclick="@(!Model.HasPreviousPage ? "return false;" : null)">
+                    <i class="bi bi-chevron-left"></i> Previous
+                </a>
+                <a asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)"
+                   class="page-btn @(!Model.HasNextPage ? "disabled" : "")"
+                   onclick="@(!Model.HasNextPage ? "return false;" : null)">
+                    Next <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    }
 }

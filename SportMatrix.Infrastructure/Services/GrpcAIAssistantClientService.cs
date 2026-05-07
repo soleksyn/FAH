@@ -1,4 +1,4 @@
-﻿namespace SportMatrix.Infrastructure.Services;
+namespace SportMatrix.Infrastructure.Services;
 
 using SportMatrix;
 using SportMatrix.Application.DTOs;
@@ -12,7 +12,6 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
 {
     private readonly GrpcChannel channel;
     private readonly ILogger<GrpcAIAssistantClientService> logger;
-    private readonly Sportmatrix.MotivationService.MotivationServiceClient motivationClient;
     private readonly Sportmatrix.WorkoutService.WorkoutServiceClient workoutServiceClient;
 
     public GrpcAIAssistantClientService(
@@ -26,55 +25,12 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
         this.channel = GrpcChannel.ForAddress(grpcUrl);
 
         // Create gRPC clients
-        this.motivationClient = new Sportmatrix.MotivationService.MotivationServiceClient(this.channel);
         this.workoutServiceClient = new Sportmatrix.WorkoutService.WorkoutServiceClient(this.channel);
 
         this.logger.LogInformation("gRPC Channel created for: {GrpcUrl}", grpcUrl);
     }
 
-    public async Task<AIMotivationResponseDto> GetMotivationAsync(AIMotivationRequestDto request, CancellationToken cancellationToken)
-    {
-        this.logger.LogInformation(
-            "gRPC: Requesting motivation for athlete: {AthleteName}",
-            request.AthleteProfile?.Name ?? "Unknown");
 
-        try
-        {
-            MotivationRequest grpcRequest = new MotivationRequest
-            {
-                AthleteProfile = new AthleteProfile
-                {
-                    Name = request.AthleteProfile?.Name ?? string.Empty,
-                    FitnessLevel = request.AthleteProfile?.FitnessLevel ?? string.Empty,
-                    PrimaryGoal = request.AthleteProfile?.PrimaryGoal ?? string.Empty,
-                },
-                PreferredTone = request.PreferredTone ?? string.Empty,
-                ContextualInfo = request.ContextualInfo ?? string.Empty,
-            };
-
-            // gRPC call
-            MotivationResponse grpcResponse = await this.motivationClient.GetMotivationAsync(grpcRequest, cancellationToken: cancellationToken);
-
-            // Convert gRPC response to DTO
-            AIMotivationResponseDto response = new AIMotivationResponseDto
-            {
-                MotivationalMessage = grpcResponse.MotivationalMessage,
-                Quote = grpcResponse.Quote,
-                ActionableTips = grpcResponse.ActionableTips.ToList(),
-                GeneratedAt = DateTime.TryParse(grpcResponse.GeneratedAt, out DateTime parsedDate)
-                ? parsedDate : DateTime.UtcNow,
-                Source = grpcResponse.Source,
-            };
-
-            this.logger.LogInformation("gRPC: Motivation response received successfully");
-            return response;
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex, "gRPC: Error getting motivation");
-            throw;
-        }
-    }
 
     public async Task<AIWorkoutAnalysisResponseDto> GetWorkoutAnalysisAsync(AIWorkoutAnalysisRequestDto request, CancellationToken cancellationToken)
     {

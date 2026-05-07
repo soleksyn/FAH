@@ -1,5 +1,6 @@
-﻿using SportMatrix.AIAssistant.Application.Interfaces;
+using SportMatrix.AIAssistant.Application.Interfaces;
 using SportMatrix.AIAssistant.Infrastructure.Configuration;
+using SportMatrix.AIAssistant.Infrastructure.Providers;
 using SportMatrix.AIAssistant.Infrastructure.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -7,11 +8,20 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // Configure Google AI options
 builder.Services.Configure<GoogleAIOptions>(
     builder.Configuration.GetSection("GoogleAI"));
+builder.Services.Configure<SportMatrixApiOptions>(
+    builder.Configuration.GetSection(SportMatrixApiOptions.SectionName));
 
 // Register AI services
 builder.Services.AddScoped<IAIPromptService, GoogleGeminiService>();
-builder.Services.AddScoped<IMotivationCoachService, MotivationCoachService>();
+
 builder.Services.AddScoped<IWorkoutAnalysisService, WorkoutAnalysisService>();
+builder.Services.AddHttpClient<IWorkoutDataProvider, SportMatrixWorkoutDataProvider>(
+    (serviceProvider, httpClient) =>
+    {
+        IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>();
+        string baseUrl = configuration[$"{SportMatrixApiOptions.SectionName}:BaseUrl"] ?? "https://localhost:44333";
+        httpClient.BaseAddress = new Uri(baseUrl);
+    });
 
 // Add gRPC services
 builder.Services.AddGrpc();
@@ -23,12 +33,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure CORS for Angular frontend
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularApp",
+    string[] allowedOrigins = builder.Configuration
+        .GetSection("Cors:AllowedOrigins")
+        .Get<string[]>()
+        ?? ["http://localhost:5000", "https://localhost:5001"];
+
+    options.AddPolicy("AllowSportMatrixFrontend",
         policy => policy
-            .WithOrigins("http://localhost:4200")
+            .WithOrigins(allowedOrigins)
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
@@ -46,14 +60,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAngularApp");
+app.UseCors("AllowSportMatrixFrontend");
 app.UseAuthorization();
 
 // Map controllers
 app.MapControllers();
 
 // Map gRPC services
-app.MapGrpcService<SportMatrix.AIAssistant.UI.API.Services.MotivationGrpcService>();
+
 app.MapGrpcService<SportMatrix.AIAssistant.UI.API.Services.WorkoutAnalysisGrpcService>();
 
 // Map health check endpoint

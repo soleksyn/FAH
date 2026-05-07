@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<DemoDataService>();
+builder.Services.AddSingleton<DashboardViewModelFactory>();
 
 builder.Services.AddHttpClient<AthleteApiService>(client =>
 {

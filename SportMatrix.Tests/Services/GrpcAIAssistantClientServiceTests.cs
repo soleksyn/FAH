@@ -76,50 +76,7 @@ public class GrpcAIAssistantClientServiceTests : IDisposable
 
     #region Input Validation and Logging Tests
 
-    [Fact]
-    public async Task GetMotivationAsync_WithNullAthleteProfile_LogsUnknownAthlete()
-    {
-        // Arrange
-        this.service = new GrpcAIAssistantClientService(this.mockLogger.Object, this.mockConfiguration.Object);
 
-        AIMotivationRequestDto request = new AIMotivationRequestDto
-        {
-            AthleteProfile = null,
-            PreferredTone = "Motivational",
-        };
-
-        // Act & Assert - We expect this to throw since there's no actual gRPC server
-        Exception exception = await Assert.ThrowsAnyAsync<Exception>(
-            () => this.service.GetMotivationAsync(request, CancellationToken.None));
-
-        // Verify logging occurred before the exception
-        this.VerifyLogCalled(LogLevel.Information, "Requesting motivation for athlete: Unknown");
-    }
-
-    [Fact]
-    public async Task GetMotivationAsync_WithValidAthleteProfile_LogsAthleteName()
-    {
-        // Arrange
-        this.service = new GrpcAIAssistantClientService(this.mockLogger.Object, this.mockConfiguration.Object);
-
-        AIMotivationRequestDto request = new AIMotivationRequestDto
-        {
-            AthleteProfile = new AIAthleteProfileDto
-            {
-                Name = "John Doe",
-                FitnessLevel = "Intermediate",
-                PrimaryGoal = "Weight Loss",
-            },
-            PreferredTone = "Encouraging",
-        };
-
-        // Act & Assert - We expect this to throw since there's no actual gRPC server
-        Exception exception = await Assert.ThrowsAnyAsync<Exception>(
-            () => this.service.GetMotivationAsync(request, CancellationToken.None));
-
-        // Verify logging occurred before the exception
-        this.VerifyLogCalled(LogLevel.Information, "Requesting motivation for athlete: John Doe");
-    }
 
     [Fact]
     public async Task GetWorkoutAnalysisAsync_WithMultipleWorkouts_LogsWorkoutCount()
@@ -279,24 +236,6 @@ public class GrpcAIAssistantClientServiceTests : IDisposable
         this.VerifyLogCalled(LogLevel.Warning, "Health check failed");
     }
 
-    [Fact]
-    public async Task GetMotivationAsync_WithGrpcConnectionError_LogsErrorAndThrows()
-    {
-        // Arrange
-        this.service = new GrpcAIAssistantClientService(this.mockLogger.Object, this.mockConfiguration.Object);
-
-        AIMotivationRequestDto request = new AIMotivationRequestDto
-        {
-            AthleteProfile = new AIAthleteProfileDto { Name = "Test User" },
-        };
-
-        // Act & Assert
-        Exception exception = await Assert.ThrowsAnyAsync<Exception>(
-            () => this.service.GetMotivationAsync(request, CancellationToken.None));
-
-        // Verify error logging occurred
-        this.VerifyLogCalled(LogLevel.Error, "Error getting motivation");
-    }
 
     [Fact]
     public async Task GetWorkoutAnalysisAsync_WithGrpcConnectionError_LogsErrorAndThrows()
@@ -495,30 +434,6 @@ public class GrpcAIAssistantClientServiceTests : IDisposable
 
     #region Edge Cases and Data Validation
 
-    [Fact]
-    public async Task GetMotivationAsync_WithEmptyStrings_HandlesGracefully()
-    {
-        // Arrange
-        this.service = new GrpcAIAssistantClientService(this.mockLogger.Object, this.mockConfiguration.Object);
-
-        AIMotivationRequestDto request = new AIMotivationRequestDto
-        {
-            AthleteProfile = new AIAthleteProfileDto
-            {
-                Name = string.Empty,
-                FitnessLevel = string.Empty,
-                PrimaryGoal = string.Empty,
-            },
-            PreferredTone = string.Empty,
-            ContextualInfo = string.Empty,
-        };
-
-        // Act & Assert
-        Exception exception = await Assert.ThrowsAnyAsync<Exception>(
-            () => this.service.GetMotivationAsync(request, CancellationToken.None));
-
-        this.VerifyLogCalled(LogLevel.Information, "Requesting motivation for athlete:");
-    }
 
     [Fact]
     public async Task GetWorkoutAnalysisAsync_WithNullWorkouts_HandlesGracefully()
@@ -719,28 +634,6 @@ public class GrpcAIAssistantClientServiceTests : IDisposable
 
     #region Success Path Coverage Tests
 
-    [Fact]
-    public async Task GetMotivationAsync_WithSuccessfulResponse_LogsSuccessMessage()
-    {
-        // Diese Tests decken die Success-Logs ab, die bisher nicht getestet wurden
-        // Wir testen die Logik bis zum gRPC-Call und den Error-Catch
-
-        // Arrange
-        this.service = new GrpcAIAssistantClientService(this.mockLogger.Object, this.mockConfiguration.Object);
-
-        AIMotivationRequestDto request = new AIMotivationRequestDto
-        {
-            AthleteProfile = new AIAthleteProfileDto { Name = "Test User" },
-        };
-
-        // Act & Assert - This will fail at gRPC call but should log success message attempt
-        Exception exception = await Assert.ThrowsAnyAsync<Exception>(
-            () => this.service.GetMotivationAsync(request, CancellationToken.None));
-
-        // Verify that both info and error logs are called
-        this.VerifyLogCalled(LogLevel.Information, "Requesting motivation for athlete: Test User");
-        this.VerifyLogCalled(LogLevel.Error, "Error getting motivation");
-    }
 
     [Fact]
     public async Task GetWorkoutAnalysisAsync_WithSuccessfulResponse_LogsSuccessMessage()
@@ -770,35 +663,6 @@ public class GrpcAIAssistantClientServiceTests : IDisposable
 
     #region DateTime Parsing Coverage
 
-    [Fact]
-    public async Task GetMotivationAsync_WithInvalidDateFormat_UsesCurrentDateTime()
-    {
-        // This tests the DateTime.TryParse fallback logic
-        // We can't directly test this without mocking the gRPC response,
-        // but we can test that the method handles the parsing logic correctly
-
-        // Arrange
-        this.service = new GrpcAIAssistantClientService(this.mockLogger.Object, this.mockConfiguration.Object);
-
-        AIMotivationRequestDto request = new AIMotivationRequestDto
-        {
-            AthleteProfile = new AIAthleteProfileDto
-            {
-                Name = "Test User",
-                FitnessLevel = "Beginner",
-                PrimaryGoal = "Health",
-            },
-            PreferredTone = "Encouraging",
-            ContextualInfo = "First time user",
-        };
-
-        // Act & Assert
-        Exception exception = await Assert.ThrowsAnyAsync<Exception>(
-            () => this.service.GetMotivationAsync(request, CancellationToken.None));
-
-        // The method should have attempted to process the request
-        this.VerifyLogCalled(LogLevel.Information, "Requesting motivation for athlete: Test User");
-    }
 
     #endregion
 
@@ -957,30 +821,6 @@ public class GrpcAIAssistantClientServiceTests : IDisposable
 
     #region Edge Case String Handling
 
-    [Fact]
-    public async Task GetMotivationAsync_WithWhitespaceStrings_HandlesCorrectly()
-    {
-        // Arrange
-        this.service = new GrpcAIAssistantClientService(this.mockLogger.Object, this.mockConfiguration.Object);
-
-        AIMotivationRequestDto request = new AIMotivationRequestDto
-        {
-            AthleteProfile = new AIAthleteProfileDto
-            {
-                Name = "   ", // Whitespace
-                FitnessLevel = "\t",
-                PrimaryGoal = "\n",
-            },
-            PreferredTone = "  Motivational  ",
-            ContextualInfo = "\r\n",
-        };
-
-        // Act & Assert
-        Exception exception = await Assert.ThrowsAnyAsync<Exception>(
-            () => this.service.GetMotivationAsync(request, CancellationToken.None));
-
-        this.VerifyLogCalled(LogLevel.Information, "Requesting motivation for athlete:");
-    }
 
     [Fact]
     public async Task GetWorkoutAnalysisAsync_WithWhitespaceAnalysisType_HandlesCorrectly()

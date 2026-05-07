@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <UserSecretsId>1d01d35d-186b-4e05-be37-768500706931</UserSecretsId>
@@ -6,6 +6,10 @@
     <AssemblyName>SportMatrix.AIAssistant</AssemblyName>
     <RootNamespace>SportMatrix.AIAssistant</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SportMatrix.Domain\SportMatrix.Domain.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Google.GenAI" />
@@ -18,12 +22,14 @@
 
   <ItemGroup>
     <Protobuf Include="Protos\common.proto" GrpcServices="None" ProtoRoot="Protos" />
-    <Protobuf Include="Protos\motivation.proto" GrpcServices="Both" ProtoRoot="Protos">
-      <Access>Public</Access>
-    </Protobuf>
+
     <Protobuf Include="Protos\workout.proto" GrpcServices="Both" ProtoRoot="Protos">
       <Access>Public</Access>
     </Protobuf>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Infrastructure\Providers\DemoDataProvider.cs" />
   </ItemGroup>
 
 </Project>

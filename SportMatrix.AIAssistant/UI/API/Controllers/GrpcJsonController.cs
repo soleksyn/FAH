@@ -1,4 +1,4 @@
-﻿namespace SportMatrix.AIAssistant.UI.API.Controllers;
+namespace SportMatrix.AIAssistant.UI.API.Controllers;
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
@@ -9,61 +9,17 @@ using Microsoft.AspNetCore.Mvc;
 [Route("grpc-json")]
 public class GrpcJsonController : ControllerBase
 {
-    private readonly IMotivationCoachService motivationCoachService;
     private readonly IWorkoutAnalysisService workoutAnalysisService;
     private readonly ILogger<GrpcJsonController> logger;
 
     public GrpcJsonController(
-        IMotivationCoachService motivationCoachService,
         IWorkoutAnalysisService workoutAnalysisService,
         ILogger<GrpcJsonController> logger)
     {
-        this.motivationCoachService = motivationCoachService;
         this.workoutAnalysisService = workoutAnalysisService;
         this.logger = logger;
     }
 
-    /// <summary>
-    /// gRPC-JSON Bridge for MotivationService.GetMotivationAsync
-    /// </summary>
-    [HttpPost("MotivationService/GetMotivationAsync")]
-    public async Task<ActionResult> GetMotivationAsync([FromBody] GrpcJsonMotivationRequestDto request, CancellationToken cancellationToken)
-    {
-        this.logger.LogInformation(
-            "gRPC-JSON: Received motivation request for athlete: {Name}",
-            request.AthleteProfile?.Name ?? "Unknown");
-
-        // Convert JSON to Application DTO (same as REST Controller)
-        MotivationRequestDto motivationRequest = new MotivationRequestDto
-        {
-            AthleteProfile = new AthleteProfileDto
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = request.AthleteProfile?.Name ?? string.Empty,
-                FitnessLevel = request.AthleteProfile?.FitnessLevel ?? string.Empty,
-                PrimaryGoal = request.AthleteProfile?.PrimaryGoal ?? string.Empty,
-            },
-            IsStruggling = false,
-            UpcomingWorkoutType = null,
-            LastWorkout = null,
-        };
-
-        // Call the same service as the gRPC service
-        MotivationResponseDto response = await this.motivationCoachService.GenerateMotivationAsync(motivationRequest, cancellationToken);
-
-        // Convert Response to gRPC-JSON format
-        var grpcJsonResponse = new
-        {
-            motivationalMessage = response.MotivationalMessage ?? string.Empty,
-            quote = response.Quote ?? string.Empty,
-            actionableTips = response.ActionableTips ?? new List<string>(),
-            generatedAt = response.GeneratedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-            source = "gRPC-JSON",
-        };
-
-        this.logger.LogInformation("gRPC-JSON: Successfully generated motivation response");
-        return this.Ok(grpcJsonResponse);
-    }
 
     /// <summary>
     /// Health check for gRPC-JSON Bridge
@@ -78,7 +34,6 @@ public class GrpcJsonController : ControllerBase
             timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),
             availableEndpoints = new[]
             {
-                "POST /grpc-json/MotivationService/GetMotivationAsync",
                 "POST /grpc-json/WorkoutService/GetWorkoutAnalysisAsync",
                 "POST /grpc-json/WorkoutService/AnalyzeWorkoutsAsync",
                 "POST /grpc-json/WorkoutService/GetPerformanceTrendsAsync",

@@ -4,7 +4,6 @@ namespace SportMatrix.Application.Interfaces
 
     public interface IAIAssistantClientService
     {
-        Task<AIMotivationResponseDto> GetMotivationAsync(AIMotivationRequestDto request, CancellationToken cancellationToken);
 
         Task<AIWorkoutAnalysisResponseDto> GetWorkoutAnalysisAsync(AIWorkoutAnalysisRequestDto request, CancellationToken cancellationToken);
 

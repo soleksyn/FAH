@@ -4,18 +4,21 @@ using Grpc.Core;
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
 using SportMatrix.AIAssistant.Extensions;
-using SportMatrix.AIAssistant.Infrastructure.Providers;
+using SportMatrix.Domain.Enums;
 
 public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServiceBase
 {
     private readonly IWorkoutAnalysisService workoutAnalysisService;
+    private readonly IWorkoutDataProvider workoutDataProvider;
     private readonly ILogger<WorkoutAnalysisGrpcService> logger;
 
     public WorkoutAnalysisGrpcService(
         IWorkoutAnalysisService workoutAnalysisService,
+        IWorkoutDataProvider workoutDataProvider,
         ILogger<WorkoutAnalysisGrpcService> logger)
     {
         this.workoutAnalysisService = workoutAnalysisService;
+        this.workoutDataProvider = workoutDataProvider;
         this.logger = logger;
     }
 
@@ -58,11 +61,16 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 "gRPC: Received performance trends request for athlete: {AthleteId}",
                 request.AthleteId);
 
+            List<WorkoutDataDto> recentWorkouts = await this.workoutDataProvider.GetRecentWorkoutsAsync(
+                request.AthleteId,
+                TimeSpan.FromDays(14),
+                context.CancellationToken);
+
             WorkoutAnalysisRequestDto analysisRequest = new WorkoutAnalysisRequestDto
             {
-                AnalysisType = "Trends",
-                RecentWorkouts = this.GetDemoWorkouts(request.AthleteId, request.TimeFrame),
-                AthleteProfile = this.GetDemoAthleteProfile(request.AthleteId),
+                AnalysisType = AnalysisType.Trends,
+                RecentWorkouts = recentWorkouts,
+                AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(request.AthleteId, recentWorkouts),
                 AdditionalContext = new Dictionary<string, object>
                 {
                     { "timeFrame", request.TimeFrame },
@@ -95,11 +103,16 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 "gRPC: Received training recommendations request for athlete: {AthleteId}",
                 request.AthleteId);
 
+            List<WorkoutDataDto> recentWorkouts = await this.workoutDataProvider.GetRecentWorkoutsAsync(
+                request.AthleteId,
+                TimeSpan.FromDays(14),
+                context.CancellationToken);
+
             WorkoutAnalysisRequestDto analysisRequest = new WorkoutAnalysisRequestDto
             {
-                AnalysisType = "Recommendations",
-                RecentWorkouts = this.GetDemoWorkouts(request.AthleteId, "week"),
-                AthleteProfile = this.GetDemoAthleteProfile(request.AthleteId),
+                AnalysisType = AnalysisType.Recommendations,
+                RecentWorkouts = recentWorkouts,
+                AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(request.AthleteId, recentWorkouts),
                 AdditionalContext = new Dictionary<string, object>
                 {
                     { "focus", "training_optimization" },
@@ -132,18 +145,28 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 "gRPC: Received health metrics analysis request for athlete: {AthleteId}",
                 request.AthleteId);
 
+            List<WorkoutDataDto> recentWorkouts = request.RecentWorkouts.Select(w => new WorkoutDataDto
+            {
+                Date = DateTime.Parse(w.Date),
+                ActivityType = w.ActivityType,
+                Distance = w.Distance,
+                Duration = w.Duration,
+                Calories = w.Calories,
+            }).ToList();
+
+            if (recentWorkouts.Count == 0)
+            {
+                recentWorkouts = await this.workoutDataProvider.GetRecentWorkoutsAsync(
+                    request.AthleteId,
+                    TimeSpan.FromDays(14),
+                    context.CancellationToken);
+            }
+
             WorkoutAnalysisRequestDto analysisRequest = new WorkoutAnalysisRequestDto
             {
-                AnalysisType = "Health",
-                RecentWorkouts = request.RecentWorkouts.Select(w => new WorkoutDataDto
-                {
-                    Date = DateTime.Parse(w.Date),
-                    ActivityType = w.ActivityType,
-                    Distance = w.Distance,
-                    Duration = w.Duration,
-                    Calories = w.Calories,
-                }).ToList(),
-                AthleteProfile = this.GetDemoAthleteProfile(request.AthleteId),
+                AnalysisType = AnalysisType.Health,
+                RecentWorkouts = recentWorkouts,
+                AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(request.AthleteId, recentWorkouts),
                 AdditionalContext = new Dictionary<string, object>
                 {
                     { "focus", "injury_prevention" },
@@ -206,9 +229,4 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
         return grpcResponse;
     }
 
-    private List<WorkoutDataDto> GetDemoWorkouts(int athleteId, string timeFrame)
-        => DemoDataProvider.GetDemoWorkouts();
-
-    private AthleteProfileDto GetDemoAthleteProfile(int athleteId)
-        => DemoDataProvider.GetDemoAthleteProfile(athleteId);
 }

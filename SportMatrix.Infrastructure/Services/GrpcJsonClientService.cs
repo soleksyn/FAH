@@ -1,4 +1,4 @@
-﻿namespace SportMatrix.Infrastructure.Services;
+namespace SportMatrix.Infrastructure.Services;
 
 using System.Text;
 using System.Text.Json;
@@ -30,61 +30,7 @@ public class GrpcJsonClientService : IAIAssistantClientService
         this.logger.LogInformation("GrpcJsonClientService initialized with base URL: {BaseUrl}", aiAssistantUrl);
     }
 
-    public async Task<AIMotivationResponseDto> GetMotivationAsync(AIMotivationRequestDto request, CancellationToken cancellationToken)
-    {
-        this.logger.LogInformation(
-            "gRPC-JSON: Requesting motivation for athlete: {AthleteName}",
-            request.AthleteProfile?.Name ?? "Unknown");
 
-        // Create JSON in gRPC format (not REST format)
-        var grpcJsonRequest = new
-        {
-            athleteProfile = new
-            {
-                name = request.AthleteProfile?.Name ?? string.Empty,
-                fitnessLevel = request.AthleteProfile?.FitnessLevel ?? string.Empty,
-                primaryGoal = request.AthleteProfile?.PrimaryGoal ?? string.Empty,
-            },
-            isStruggling = false,
-            upcomingWorkoutType = (string?)null,
-        };
-
-        string json = JsonSerializer.Serialize(grpcJsonRequest);
-        StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        // HTTP POST zu gRPC-JSON Endpunkt
-        HttpResponseMessage response = await this.httpClient.PostAsync("/grpc-json/MotivationService/GetMotivation", content, cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            string errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            this.logger.LogError(
-                "gRPC-JSON motivation request failed: {StatusCode} - {Error}",
-                response.StatusCode, errorContent);
-
-            return this.GetFallbackMotivation(request);
-        }
-
-        string responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
-        JsonElement grpcJsonResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
-
-        // Convert gRPC-JSON response back to DTO
-        return new AIMotivationResponseDto
-        {
-            MotivationalMessage = grpcJsonResponse.TryGetProperty("motivationalMessage", out JsonElement msgProp)
-                     ? msgProp.GetString() ?? "Keep pushing forward! You're doing great!"
-                     : "Keep pushing forward! You're doing great!",
-            Quote = grpcJsonResponse.TryGetProperty("quote", out JsonElement quote) ? quote.GetString() : null,
-            ActionableTips = grpcJsonResponse.TryGetProperty("actionableTips", out JsonElement tips) &&
-                           tips.ValueKind == JsonValueKind.Array ?
-                           tips.EnumerateArray().Select(t => t.GetString()).Where(s => s != null).Cast<string>().ToList() :
-                           null,
-            GeneratedAt = grpcJsonResponse.TryGetProperty("generatedAt", out JsonElement dateProp) &&
-              DateTime.TryParse(dateProp.GetString(), out DateTime parsedDate)
-              ? parsedDate : DateTime.UtcNow,
-            Source = "gRPC-JSON",
-        };
-    }
 
     public async Task<AIWorkoutAnalysisResponseDto> GetWorkoutAnalysisAsync(AIWorkoutAnalysisRequestDto request, CancellationToken cancellationToken)
     {
@@ -396,24 +342,7 @@ public class GrpcJsonClientService : IAIAssistantClientService
 
     #region Fallback Methods
 
-    private AIMotivationResponseDto GetFallbackMotivation(AIMotivationRequestDto request)
-    {
-        string athleteName = request.AthleteProfile?.Name ?? "Champion";
-        return new AIMotivationResponseDto
-        {
-            MotivationalMessage = $"Great work, {athleteName}! Your dedication to fitness is inspiring. " +
-                                "Every workout brings you closer to your goals. Keep pushing forward!",
-            Quote = "Success is the sum of small efforts repeated day in and day out.",
-            ActionableTips = new List<string>
-            {
-                "Set small, achievable goals for today",
-                "Focus on consistency over perfection",
-                "Celebrate every workout completed",
-            },
-            GeneratedAt = DateTime.UtcNow,
-            Source = "gRPC-JSON-Fallback",
-        };
-    }
+
 
     private AIWorkoutAnalysisResponseDto GetFallbackAnalysis(AIWorkoutAnalysisRequestDto request)
     {

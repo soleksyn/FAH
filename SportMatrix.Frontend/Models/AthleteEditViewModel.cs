@@ -7,28 +7,28 @@ public class AthleteEditViewModel
     [Required]
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Vorname ist erforderlich.")]
-    [MaxLength(50, ErrorMessage = "Vorname darf maximal 50 Zeichen lang sein.")]
+    [Required(ErrorMessage = "First name is required.")]
+    [MaxLength(50, ErrorMessage = "First name must be at most 50 characters.")]
     public string FirstName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Nachname ist erforderlich.")]
-    [MaxLength(50, ErrorMessage = "Nachname darf maximal 50 Zeichen lang sein.")]
+    [Required(ErrorMessage = "Last name is required.")]
+    [MaxLength(50, ErrorMessage = "Last name must be at most 50 characters.")]
     public string LastName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "E-Mail ist erforderlich.")]
-    [EmailAddress(ErrorMessage = "Bitte gib eine gültige E-Mail-Adresse ein.")]
+    [Required(ErrorMessage = "Email is required.")]
+    [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Geburtsdatum ist erforderlich.")]
+    [Required(ErrorMessage = "Date of birth is required.")]
     [DataType(DataType.Date)]
     public DateTime DateOfBirth { get; set; }
 
-    [Required(ErrorMessage = "Gewicht ist erforderlich.")]
-    [Range(0.1, double.MaxValue, ErrorMessage = "Gewicht muss größer als 0 sein.")]
+    [Required(ErrorMessage = "Weight is required.")]
+    [Range(20, 300, ErrorMessage = "Weight must be between 20 and 300 kg.")]
     public double Weight { get; set; }
 
-    [Required(ErrorMessage = "Größe ist erforderlich.")]
-    [Range(0.1, double.MaxValue, ErrorMessage = "Größe muss größer als 0 sein.")]
+    [Required(ErrorMessage = "Height is required.")]
+    [Range(100, 250, ErrorMessage = "Height must be between 100 and 250 cm.")]
     public double Height { get; set; }
 
     public string? Error { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace SportMatrix.AIAssistant.UI.API.Controllers;
+namespace SportMatrix.AIAssistant.UI.API.Controllers;
 
 using SportMatrix.AIAssistant.Application.Interfaces;
 using SportMatrix.AIAssistant.Application.DTOs;
@@ -15,38 +15,6 @@ public class DebugController : ControllerBase
         this.logger = logger;
     }
 
-    [HttpGet("test-gemini-service")]
-    public async Task<ActionResult> TestGeminiService(CancellationToken cancellationToken)
-    {
-        try
-        {
-            IMotivationCoachService motivationService = this.HttpContext.RequestServices.GetRequiredService<IMotivationCoachService>();
-
-            MotivationRequestDto testRequest = new MotivationRequestDto
-            {
-                AthleteProfile = new AthleteProfileDto
-                {
-                    Name = "TestUser",
-                    FitnessLevel = "Intermediate",
-                    PrimaryGoal = "General Fitness",
-                }
-            };
-
-            var result = await motivationService.GenerateMotivationAsync(testRequest, cancellationToken);
-
-            return this.Ok(new
-            {
-                message = "Gemini Service Test",
-                hasMotivation = !string.IsNullOrEmpty(result.MotivationalMessage),
-                generatedAt = result.GeneratedAt,
-            });
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex, "Gemini Service test failed");
-            return this.StatusCode(500, new { error = ex.Message });
-        }
-    }
 
     [HttpGet("health")]
     public ActionResult HealthCheck()

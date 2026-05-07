@@ -1,4 +1,4 @@
-﻿namespace SportMatrix.Infrastructure.Services;
+namespace SportMatrix.Infrastructure.Services;
 
 using System.Globalization;
 using System.Text;
@@ -31,64 +31,7 @@ public class AIAssistantClientService : IAIAssistantClientService
         this.logger.LogInformation("AIAssistantClientService initialized with base URL: {BaseUrl}", aiAssistantUrl);
     }
 
-    public async Task<AIMotivationResponseDto> GetMotivationAsync(AIMotivationRequestDto request, CancellationToken cancellationToken)
-    {
-        this.logger.LogInformation(
-            "Requesting motivation for athlete: {AthleteName}",
-            request.AthleteProfile?.Name ?? "Unknown");
 
-        // Convert to AIAssistant DTO format
-        AIAssistantMotivationRequest aiRequest = new AIAssistantMotivationRequest
-        {
-            AthleteProfile = new AIAssistantAthleteProfile
-            {
-                Name = request.AthleteProfile?.Name ?? "Champion",
-                FitnessLevel = request.AthleteProfile?.FitnessLevel ?? "Intermediate",
-                PrimaryGoal = request.AthleteProfile?.PrimaryGoal ?? "General Fitness",
-            },
-            RecentWorkouts = request.RecentWorkouts?.Select(w => new AIAssistantWorkout
-            {
-                Date = w.Date,
-                ActivityType = w.ActivityType,
-                Distance = w.Distance,
-                Duration = w.Duration,
-                Calories = w.Calories,
-            }).ToList() ?? new List<AIAssistantWorkout>(),
-            PreferredTone = request.PreferredTone ?? "Encouraging",
-            ContextualInfo = request.ContextualInfo ?? string.Empty,
-        };
-
-        string json = JsonSerializer.Serialize(aiRequest);
-        StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        HttpResponseMessage response = await this.httpClient.PostAsync("/api/MotivationCoach/motivate", content, cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            string errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            this.logger.LogError(
-                "AIAssistant motivation request failed: {StatusCode} - {Error}",
-                response.StatusCode, errorContent);
-
-            return this.GetFallbackMotivation(request);
-        }
-
-        string responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
-        JsonElement aiResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
-
-        return new AIMotivationResponseDto
-        {
-            MotivationalMessage = aiResponse.TryGetProperty("motivationalMessage", out JsonElement msgElement)
-            ? msgElement.GetString() : "Keep pushing forward! You're doing great!",
-            Quote = aiResponse.TryGetProperty("quote", out JsonElement quote) ? quote.GetString() : null,
-            ActionableTips = aiResponse.TryGetProperty("actionableTips", out JsonElement tips) &&
-                           tips.ValueKind == JsonValueKind.Array ?
-                           tips.EnumerateArray().Select(t => t.GetString()).Where(s => s != null).Cast<string>().ToList() :
-                           null,
-            GeneratedAt = DateTime.UtcNow,
-            Source = "AIAssistant-Gemini",
-        };
-    }
 
     public async Task<AIWorkoutAnalysisResponseDto> GetWorkoutAnalysisAsync(AIWorkoutAnalysisRequestDto request, CancellationToken cancellationToken)
     {
@@ -167,24 +110,7 @@ public class AIAssistantClientService : IAIAssistantClientService
         }
     }
 
-    private AIMotivationResponseDto GetFallbackMotivation(AIMotivationRequestDto request)
-    {
-        string athleteName = request.AthleteProfile?.Name ?? "Champion";
-        return new AIMotivationResponseDto
-        {
-            MotivationalMessage = $"Great work, {athleteName}! Your dedication to fitness is inspiring. " +
-                                "Every workout brings you closer to your goals. Keep pushing forward!",
-            Quote = "Success is the sum of small efforts repeated day in and day out.",
-            ActionableTips = new List<string>
-            {
-                "Set small, achievable goals for today",
-                "Focus on consistency over perfection",
-                "Celebrate every workout completed",
-            },
-            GeneratedAt = DateTime.UtcNow,
-            Source = "Fallback",
-        };
-    }
+
 
     private AIWorkoutAnalysisResponseDto GetFallbackAnalysis(AIWorkoutAnalysisRequestDto request)
     {

@@ -1,10 +1,8 @@
 namespace SportMatrix.AIAssistant.Application.Interfaces;
 
+using Google.GenAI.Types;
+
 public interface IAIPromptService
 {
-    Task<string> GetFitnessAnalysisAsync(string prompt, CancellationToken cancellationToken);
-
-    Task<string> GetHealthAnalysisAsync(string prompt, CancellationToken cancellationToken);
-
-    Task<string> GetMotivationAsync(string prompt, CancellationToken cancellationToken);
+    Task<string> GetStructuredAnalysisAsync(string prompt, string systemInstruction, Schema responseSchema, CancellationToken cancellationToken);
 }

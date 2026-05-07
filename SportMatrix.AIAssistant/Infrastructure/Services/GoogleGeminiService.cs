@@ -1,4 +1,4 @@
-﻿namespace SportMatrix.AIAssistant.Infrastructure.Services;
+namespace SportMatrix.AIAssistant.Infrastructure.Services;
 
 using global::Google.GenAI;
 using global::Google.GenAI.Types;
@@ -21,26 +21,26 @@ public class GoogleGeminiService : IAIPromptService
         this.client = new Client(apiKey: this.options.ApiKey);
     }
 
-    public Task<string> GetFitnessAnalysisAsync(string prompt, CancellationToken cancellationToken)
+    public Task<string> GetStructuredAnalysisAsync(
+        string prompt,
+        string systemInstruction,
+        Schema responseSchema,
+        CancellationToken cancellationToken)
     {
-        return this.GetGeminiCompletionAsync(prompt, this.options.Models.Fitness, "You are a fitness expert who analyzes training data. Respond in Markdown format.", cancellationToken);
+        return this.GetGeminiJsonCompletionAsync(prompt, this.options.Models.Fitness, systemInstruction, responseSchema, cancellationToken);
     }
 
-    public Task<string> GetHealthAnalysisAsync(string prompt, CancellationToken cancellationToken)
-    {
-        return this.GetGeminiCompletionAsync(prompt, this.options.Models.Health, "You are a health expert who analyzes fitness data for wellness insights. Respond in Markdown format.", cancellationToken);
-    }
 
-    public Task<string> GetMotivationAsync(string prompt, CancellationToken cancellationToken)
-    {
-        return this.GetGeminiCompletionAsync(prompt, this.options.Models.Motivation, "You are an enthusiastic fitness trainer. Provide motivational and encouraging responses in Markdown.", cancellationToken);
-    }
-
-    private async Task<string> GetGeminiCompletionAsync(string prompt, string model, string systemInstruction, CancellationToken cancellationToken)
+    private async Task<string> GetGeminiJsonCompletionAsync(
+        string prompt,
+        string model,
+        string systemInstruction,
+        Schema responseSchema,
+        CancellationToken cancellationToken)
     {
         try
         {
-            this.logger.LogInformation("Calling Google Gemini API with model: {Model}", model);
+            this.logger.LogInformation("Calling Google Gemini API (JSON mode) with model: {Model}", model);
 
             var config = new GenerateContentConfig
             {
@@ -51,6 +51,8 @@ public class GoogleGeminiService : IAIPromptService
                 Temperature = this.options.GenerationConfig.Temperature,
                 MaxOutputTokens = this.options.GenerationConfig.MaxOutputTokens,
                 TopP = this.options.GenerationConfig.TopP,
+                ResponseMimeType = "application/json",
+                ResponseSchema = responseSchema,
             };
 
             var response = await this.client.Models.GenerateContentAsync(
@@ -63,28 +65,25 @@ public class GoogleGeminiService : IAIPromptService
 
             if (!string.IsNullOrEmpty(resultText))
             {
-                this.logger.LogInformation("Successfully received response from Google Gemini API");
+                this.logger.LogInformation("Successfully received JSON response from Google Gemini API");
                 return resultText.Trim();
             }
 
-            this.logger.LogWarning("Unexpected empty response from Google Gemini API");
-            return this.GetFallbackResponse(model, "empty_response");
+            this.logger.LogWarning("Empty JSON response from Google Gemini API for model: {Model}", model);
+            return string.Empty;
         }
         catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
         {
             this.logger.LogWarning("Google Gemini request timeout for model: {Model}", model);
-            return this.GetFallbackResponse(model, "timeout");
+            return string.Empty;
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Error calling Google Gemini API for model: {Model}", model);
-            return this.GetFallbackResponse(model, ex.Message);
+            this.logger.LogError(ex, "Error calling Google Gemini API (JSON mode) for model: {Model}", model);
+            return string.Empty;
         }
     }
 
-    private string GetFallbackResponse(string model, string errorType)
-    {
-        this.logger.LogInformation("Generating fallback response for {Model} due to: {Error}", model, errorType);
-        return $"System currently unavailable. Please try again later. (Error: {errorType})";
-    }
+
 }
+

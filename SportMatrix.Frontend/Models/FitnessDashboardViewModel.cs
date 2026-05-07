@@ -219,23 +219,7 @@ public class FitnessDashboardViewModel
         return "#196127";
     }
 
-    public string FormatMarkdown(string? text)
-    {
-        if (string.IsNullOrEmpty(text)) return "";
-        return text
-            .Replace("## ", "<h4 class=\"analysis-header\">", StringComparison.Ordinal)
-            .Replace("**", "<strong class=\"analysis-bold\">", StringComparison.Ordinal)
-            .Replace("\n\n", "</p><p class=\"analysis-paragraph\">");
-    }
 
-    public string GetMotivationText()
-    {
-        if (AIAnalysis?.PerformanceScore > 70)
-            return $"\"Fantastic! Your performance score is {AIAnalysis.PerformanceScore}/100. You're crushing your goals!\"";
-        if (AIAnalysis?.PerformanceScore <= 70)
-            return "\"Keep going! Every workout counts. Your dedication will pay off!\"";
-        return "\"Ready for today's challenge? Let's analyze your latest activities and unlock new insights!\"";
-    }
 }
 
 public class ActivityTypeInfo

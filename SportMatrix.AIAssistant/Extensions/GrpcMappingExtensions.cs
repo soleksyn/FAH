@@ -1,5 +1,6 @@
-﻿using SportMatrix.AIAssistant.Application.DTOs;
+using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Domain.Models;
+using SportMatrix.Domain.Enums;
 
 namespace SportMatrix.AIAssistant.Extensions;
 
@@ -18,24 +19,13 @@ public static class GrpcMappingExtensions
         };
     }
 
-    public static MotivationRequestDto ToMotivationRequestDto(
-        this global::Sportmatrix.MotivationRequest grpcRequest)
-    {
-        return new MotivationRequestDto
-        {
-            AthleteProfile = grpcRequest.AthleteProfile.ToAthleteProfileDto(),
-            LastWorkout = null,
-            UpcomingWorkoutType = null,
-            IsStruggling = false,
-        };
-    }
 
     public static WorkoutAnalysisRequestDto ToWorkoutAnalysisRequestDto(
     this global::Sportmatrix.WorkoutAnalysisRequest grpcRequest)
     {
         return new WorkoutAnalysisRequestDto
         {
-            AnalysisType = grpcRequest.AnalysisType ?? "General",
+            AnalysisType = Enum.TryParse<AnalysisType>(grpcRequest.AnalysisType, ignoreCase: true, out var type) ? type : AnalysisType.Performance,
             RecentWorkouts = grpcRequest.RecentWorkouts
                 .Select(w => w.ToWorkoutDataDto())
                 .ToList(),

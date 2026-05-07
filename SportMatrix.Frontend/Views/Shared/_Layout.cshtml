@@ -87,17 +87,14 @@
         </header>
 
         <!-- Main content -->
-        <main class="main-content">
+        <main class="main-content @(currentController == "Dashboard" ? "dashboard-content" : "")">
             @RenderBody()
         </main>
 
     </div>
 </div>
 
-<!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<!-- SportMatrix JS -->
-<script src="~/js/charts.js" asp-append-version="true"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
 
 @await RenderSectionAsync("Scripts", required: false)
 </body>

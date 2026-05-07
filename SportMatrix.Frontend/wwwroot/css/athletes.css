@@ -2,7 +2,109 @@
    Athletes pages — card grid, profile hero, details layout
    ============================================================ */
 
-/* ── Athlete card grid ────────────────────────────────────── */
+/* ── Athlete horizontal list ──────────────────────────────── */
+.athlete-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.athlete-list-item {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.2s ease;
+    animation: listIn 0.3s ease-out both;
+}
+
+.athlete-list-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: var(--color-orange-muted);
+    transform: translateX(4px);
+}
+
+.athlete-list-avatar { flex-shrink: 0; }
+
+.athlete-list-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.athlete-list-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 2px;
+}
+
+.athlete-list-email {
+    font-size: 0.85rem;
+    color: var(--color-text-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.athlete-list-stats {
+    display: flex;
+    gap: 24px;
+    margin: 0 24px;
+}
+
+.athlete-stat-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50px;
+}
+
+.athlete-stat-mini .val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.athlete-stat-mini .unit {
+    font-size: 0.7rem;
+    color: var(--color-text-3);
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.athlete-list-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+@keyframes listIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Responsive list */
+@media (max-width: 992px) {
+    .athlete-list-stats { display: none; }
+}
+
+@media (max-width: 640px) {
+    .athlete-list-item {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .athlete-list-actions {
+        width: 100%;
+        justify-content: flex-end;
+        padding-top: 10px;
+        border-top: 1px solid var(--color-border);
+    }
+}
+
+/* ── Athlete card grid (Legacy/Alt) ────────────────────────── */
 .athlete-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));

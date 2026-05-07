@@ -19,21 +19,6 @@ public class AIController : ControllerBase
         this.logger = logger;
     }
 
-    [HttpPost("motivation")]
-    public async Task<ActionResult<AIMotivationResponseDto>> GetMotivation(
-        AIMotivationRequestDto request,
-        CancellationToken cancellationToken)
-    {
-        this.logger.LogInformation(
-            "AI motivation request for athlete: {AthleteName}",
-            request.AthleteProfile?.Name ?? "Unknown");
-
-        AIMotivationResponseDto result = await this.aiAssistant.GetMotivationAsync(request, cancellationToken);
-
-        this.logger.LogInformation("AI motivation response generated from source: {Source}", result.Source);
-
-        return this.Ok(result);
-    }
 
     [HttpPost("analysis")]
     public async Task<ActionResult<AIWorkoutAnalysisResponseDto>> GetWorkoutAnalysis(

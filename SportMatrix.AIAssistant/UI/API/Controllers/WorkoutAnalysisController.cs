@@ -1,4 +1,4 @@
-﻿namespace SportMatrix.AIAssistant.UI.API.Controllers;
+namespace SportMatrix.AIAssistant.UI.API.Controllers;
 
 using SportMatrix.AIAssistant.Application.DTOs;
 using SportMatrix.AIAssistant.Application.Interfaces;
@@ -61,7 +61,7 @@ public class WorkoutAnalysisController : ControllerBase
 
             WorkoutAnalysisRequestDto request = new WorkoutAnalysisRequestDto
             {
-                AnalysisType = AnalysisType.Trends,
+                AnalysisType = AnalysisType.PerformanceTrends,
                 RecentWorkouts = recentWorkouts,
                 AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(athleteId, recentWorkouts),
                 AdditionalContext = new Dictionary<string, object>
@@ -97,7 +97,7 @@ public class WorkoutAnalysisController : ControllerBase
 
             WorkoutAnalysisRequestDto request = new WorkoutAnalysisRequestDto
             {
-                AnalysisType = AnalysisType.Recommendations,
+                AnalysisType = AnalysisType.TrainingRecommendations,
                 RecentWorkouts = recentWorkouts,
                 AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(athleteId, recentWorkouts),
                 AdditionalContext = new Dictionary<string, object>
@@ -126,19 +126,19 @@ public class WorkoutAnalysisController : ControllerBase
         {
             this.logger.LogInformation("Getting next-day recommendation for athlete: {AthleteId}", athleteId);
 
-            List<WorkoutDataDto> latestWorkout = await this.workoutDataProvider.GetLatestWorkoutsAsync(
+            List<WorkoutDataDto> recentWorkouts = await this.workoutDataProvider.GetRecentWorkoutsAsync(
                 athleteId,
-                1,
+                TimeSpan.FromDays(14),
                 cancellationToken);
 
             WorkoutAnalysisRequestDto request = new WorkoutAnalysisRequestDto
             {
-                AnalysisType = AnalysisType.NextDay,
-                RecentWorkouts = latestWorkout,
-                AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(athleteId, latestWorkout),
+                AnalysisType = AnalysisType.NextDayRecommendation,
+                RecentWorkouts = recentWorkouts,
+                AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(athleteId, recentWorkouts),
                 AdditionalContext = new Dictionary<string, object>
                 {
-                    { "focus", "recovery_planning" },
+                    { "focus", "next_workout_planning" },
                     { "athleteId", athleteId },
                 },
             };
@@ -154,31 +154,29 @@ public class WorkoutAnalysisController : ControllerBase
     }
 
     // Health Metrics Analysis Endpoint
-    [HttpPost("health-analysis")]
+    [HttpGet("health-analysis/{athleteId}")]
     public async Task<ActionResult<WorkoutAnalysisResponseDto>> AnalyzeHealthMetrics(
-        [FromBody] HealthAnalysisRequestDto request, CancellationToken cancellationToken)
+        int athleteId, CancellationToken cancellationToken)
     {
         try
         {
-            this.logger.LogInformation("Analyzing health metrics for athlete: {AthleteId}", request.AthleteId);
+            this.logger.LogInformation("Analyzing health metrics for athlete: {AthleteId}", athleteId);
 
-            List<WorkoutDataDto> recentWorkouts = request.RecentWorkouts.Count > 0
-                ? request.RecentWorkouts
-                : await this.workoutDataProvider.GetRecentWorkoutsAsync(
-                    request.AthleteId,
-                    TimeSpan.FromDays(14),
-                    cancellationToken);
+            List<WorkoutDataDto> recentWorkouts = await this.workoutDataProvider.GetRecentWorkoutsAsync(
+                athleteId,
+                TimeSpan.FromDays(14),
+                cancellationToken);
 
             WorkoutAnalysisRequestDto analysisRequest = new WorkoutAnalysisRequestDto
             {
-                AnalysisType = AnalysisType.Health,
+                AnalysisType = AnalysisType.HealthMetrics,
                 RecentWorkouts = recentWorkouts,
-                AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(request.AthleteId, recentWorkouts),
+                AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(athleteId, recentWorkouts),
                 AdditionalContext = new Dictionary<string, object>
                 {
                     { "focus", "injury_prevention" },
                     { "health_analysis", true },
-                    { "athleteId", request.AthleteId },
+                    { "athleteId", athleteId },
                 },
             };
 
@@ -187,7 +185,7 @@ public class WorkoutAnalysisController : ControllerBase
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Error analyzing health metrics for athlete {AthleteId}", request.AthleteId);
+            this.logger.LogError(ex, "Error analyzing health metrics for athlete {AthleteId}", athleteId);
             return this.StatusCode(500, "An error occurred while analyzing health metrics");
         }
     }
@@ -201,7 +199,7 @@ public class WorkoutAnalysisController : ControllerBase
             // Simple test request
             WorkoutAnalysisRequestDto testRequest = new WorkoutAnalysisRequestDto
             {
-                AnalysisType = AnalysisType.Performance,
+                AnalysisType = AnalysisType.PerformanceTrends,
                 RecentWorkouts = new List<WorkoutDataDto>
                 {
                     new WorkoutDataDto

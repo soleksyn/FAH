@@ -17,9 +17,8 @@ public class ActivityConfiguration : IEntityTypeConfiguration<Activity>
         builder.Property(e => e.Description)
             .HasMaxLength(1000);
 
-        builder.Property(e => e.SportType)
-            .IsRequired()
-            .HasMaxLength(50);
+        builder.Property(e => e.ActivityType)
+            .IsRequired();
 
         builder.Property(e => e.Timezone)
             .HasMaxLength(50);

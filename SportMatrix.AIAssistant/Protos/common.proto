@@ -14,4 +14,5 @@ message Workout {
   double distance = 3;          // Kilometers
   int32 duration = 4;           // Minutes
   int32 calories = 5;           // Calories burned
+  int32 average_heart_rate = 6;
 }

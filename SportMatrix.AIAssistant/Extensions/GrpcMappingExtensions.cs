@@ -25,7 +25,7 @@ public static class GrpcMappingExtensions
     {
         return new WorkoutAnalysisRequestDto
         {
-            AnalysisType = Enum.TryParse<AnalysisType>(grpcRequest.AnalysisType, ignoreCase: true, out var type) ? type : AnalysisType.Performance,
+            AnalysisType = Enum.TryParse<AnalysisType>(grpcRequest.AnalysisType, ignoreCase: true, out var type) ? type : AnalysisType.PerformanceTrends,
             RecentWorkouts = grpcRequest.RecentWorkouts
                 .Select(w => w.ToWorkoutDataDto())
                 .ToList(),
@@ -44,6 +44,7 @@ public static class GrpcMappingExtensions
             Distance = grpcWorkout.Distance,
             Duration = (int)grpcWorkout.Duration,
             Calories = (int)grpcWorkout.Calories,
+            AverageHeartRate = grpcWorkout.AverageHeartRate > 0 ? grpcWorkout.AverageHeartRate : null,
         };
     }
 }

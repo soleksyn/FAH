@@ -6,6 +6,14 @@ public class HomeController : Controller
 {
     public IActionResult Index()
     {
-        return RedirectToAction("Index", "Athletes");
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            if (User.IsInRole("Admin"))
+                return RedirectToAction("Index", "Athletes");
+
+            return View();
+        }
+
+        return View();
     }
 }

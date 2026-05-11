@@ -8,9 +8,18 @@
         ? $"{Model.Athlete.FirstName?[..1]}{Model.Athlete.LastName?[..1]}".ToUpper()
         : "?";
     var colorIdx   = Model.Athlete?.LastName is { Length: > 0 } ln ? (int)ln[0] % 6 : 0;
-    var age        = Model.Athlete != null
-        ? (DateTime.Today.Year - Model.Athlete.DateOfBirth.Year).ToString()
+    var age = Model.Athlete != null
+        ? (DateTime.Today.Year - Model.Athlete.DateOfBirth.Year
+           - (DateTime.Today < Model.Athlete.DateOfBirth.AddYears(DateTime.Today.Year - Model.Athlete.DateOfBirth.Year) ? 1 : 0)).ToString()
         : "—";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle-fill"></i>
+        <span>@TempData["Success"]</span>
+    </div>
 }
 
 @if (Model.Error != null)

@@ -2,6 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using SportMatrix.Domain.Enums;
 using SportMatrix.Domain.ValueObjects;
 
 public class Activity
@@ -27,7 +28,7 @@ public class Activity
 
     public double TotalElevationGain { get; set; }
 
-    public string SportType { get; set; } = string.Empty;
+    public ActivityType ActivityType { get; set; }
 
     public DateTime StartDate { get; set; }
 

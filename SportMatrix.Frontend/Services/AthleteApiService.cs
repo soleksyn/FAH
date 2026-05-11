@@ -28,6 +28,14 @@ public class AthleteApiService
         return await response.Content.ReadFromJsonAsync<AthleteDto>();
     }
 
+    public async Task<AthleteDto?> GetAthleteByEmailAsync(string email)
+    {
+        var response = await _httpClient.GetAsync($"/api/athlete/email/{email}");
+        if (!response.IsSuccessStatusCode)
+            return null;
+        return await response.Content.ReadFromJsonAsync<AthleteDto>();
+    }
+
     public async Task<AthleteDto?> CreateAthleteAsync(CreateAthleteRequest athlete)
     {
         var response = await _httpClient.PostAsJsonAsync("/api/athlete", athlete);

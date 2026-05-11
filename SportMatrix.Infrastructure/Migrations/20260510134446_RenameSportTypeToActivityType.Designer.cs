@@ -11,19 +11,214 @@ using SportMatrix.Infrastructure.Persistence;
 namespace SportMatrix.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260505195305_AddAthleteBodyMetrics")]
-    partial class AddAthleteBodyMetrics
+    [Migration("20260510134446_RenameSportTypeToActivityType")]
+    partial class RenameSportTypeToActivityType
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
 
             modelBuilder.Entity("SportMatrix.Domain.Entities.Activity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ActivityType")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("AthleteId")
@@ -71,11 +266,6 @@ namespace SportMatrix.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("SportType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("TEXT");
 
@@ -102,6 +292,7 @@ namespace SportMatrix.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
+                            ActivityType = 1,
                             AthleteId = 1,
                             AverageCadence = 180.0,
                             AverageHeartRate = 145,
@@ -114,7 +305,6 @@ namespace SportMatrix.Infrastructure.Migrations
                             MaxSpeed = 3.5,
                             MovingTime = 1800,
                             Name = "Morning Run",
-                            SportType = "Run",
                             StartDate = new DateTime(2026, 5, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             StartDateLocal = new DateTime(2026, 5, 3, 3, 0, 0, 0, DateTimeKind.Utc),
                             Timezone = "Europe/Kiev",
@@ -124,6 +314,7 @@ namespace SportMatrix.Infrastructure.Migrations
                         new
                         {
                             Id = 2,
+                            ActivityType = 2,
                             AthleteId = 1,
                             AverageCadence = 90.0,
                             AverageHeartRate = 130,
@@ -136,7 +327,6 @@ namespace SportMatrix.Infrastructure.Migrations
                             MaxSpeed = 8.0,
                             MovingTime = 3600,
                             Name = "Cycling Training",
-                            SportType = "Ride",
                             StartDate = new DateTime(2026, 5, 2, 0, 0, 0, 0, DateTimeKind.Utc),
                             StartDateLocal = new DateTime(2026, 5, 2, 3, 0, 0, 0, DateTimeKind.Utc),
                             Timezone = "Europe/Kiev",
@@ -146,6 +336,7 @@ namespace SportMatrix.Infrastructure.Migrations
                         new
                         {
                             Id = 3,
+                            ActivityType = 3,
                             AthleteId = 2,
                             AverageHeartRate = 140,
                             AverageSpeed = 0.63,
@@ -157,7 +348,6 @@ namespace SportMatrix.Infrastructure.Migrations
                             MaxSpeed = 0.80000000000000004,
                             MovingTime = 2400,
                             Name = "Swimming Session",
-                            SportType = "Swim",
                             StartDate = new DateTime(2026, 5, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             StartDateLocal = new DateTime(2026, 5, 3, 3, 0, 0, 0, DateTimeKind.Utc),
                             Timezone = "Europe/Kiev",
@@ -262,6 +452,9 @@ namespace SportMatrix.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("ActivityType")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("CompletedActivityId")
                         .HasColumnType("INTEGER");
 
@@ -276,10 +469,6 @@ namespace SportMatrix.Infrastructure.Migrations
 
                     b.Property<int?>("PlannedDuration")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("SportType")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -300,33 +489,33 @@ namespace SportMatrix.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
+                            ActivityType = 1,
                             Description = "15km long run",
                             PlannedDate = new DateTime(2026, 5, 7, 0, 0, 0, 0, DateTimeKind.Utc),
                             PlannedDistance = 15000.0,
                             PlannedDuration = 5400,
-                            SportType = "Run",
                             Title = "Long Run",
                             TrainingPlanId = 1
                         },
                         new
                         {
                             Id = 2,
+                            ActivityType = 1,
                             Description = "5x1km intervals",
                             PlannedDate = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Utc),
                             PlannedDistance = 8000.0,
                             PlannedDuration = 2400,
-                            SportType = "Run",
                             Title = "Interval Training",
                             TrainingPlanId = 1
                         },
                         new
                         {
                             Id = 3,
+                            ActivityType = 7,
                             Description = "Bike to run transition",
                             PlannedDate = new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Utc),
                             PlannedDistance = 50000.0,
                             PlannedDuration = 7200,
-                            SportType = "Brick",
                             Title = "Brick Workout",
                             TrainingPlanId = 2
                         });
@@ -397,6 +586,57 @@ namespace SportMatrix.Infrastructure.Migrations
                             StartDate = new DateTime(2026, 5, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             UpdatedAt = new DateTime(2026, 5, 4, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SportMatrix.Domain.Entities.Activity", b =>

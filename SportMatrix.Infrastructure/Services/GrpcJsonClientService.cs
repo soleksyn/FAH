@@ -56,8 +56,9 @@ public class GrpcJsonClientService : IAIAssistantClientService
                 distance = w.Distance,
                 duration = w.Duration,
                 calories = w.Calories,
+                averageHeartRate = w.AverageHeartRate,
             }).ToArray() ?? Array.Empty<object>(),
-            analysisType = request.AnalysisType ?? "Performance",
+            analysisType = request.AnalysisType ?? "PerformanceTrends",
             focusAreas = request.FocusAreas ?? new List<string>(),
             preferredAiProvider = "googlegemini",
         };
@@ -122,8 +123,9 @@ public class GrpcJsonClientService : IAIAssistantClientService
                 distance = w.Distance,
                 duration = w.Duration,
                 calories = w.Calories,
+                averageHeartRate = w.AverageHeartRate,
             }).ToArray() ?? Array.Empty<object>(),
-            analysisType = request.AnalysisType ?? "Performance",
+            analysisType = request.AnalysisType ?? "PerformanceTrends",
             focusAreas = request.FocusAreas ?? new List<string>(),
             preferredAiProvider = "googlegemini",
         };
@@ -278,6 +280,7 @@ public class GrpcJsonClientService : IAIAssistantClientService
                 distance = w.Distance,
                 duration = w.Duration,
                 calories = w.Calories,
+                averageHeartRate = w.AverageHeartRate,
             }).ToArray() ?? Array.Empty<object>(),
         };
 

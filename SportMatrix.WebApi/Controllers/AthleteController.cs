@@ -29,6 +29,17 @@ public class AthleteController : ControllerBase
         return this.Ok(athlete);
     }
 
+    [HttpGet("email/{email}")]
+    public async Task<ActionResult<AthleteDto>> GetByEmail(string email, CancellationToken cancellationToken)
+    {
+        AthleteDto? athlete = await this.athleteService.GetAthleteByEmailAsync(email, cancellationToken);
+        if (athlete == null)
+        {
+            return this.NotFound();
+        }
+        return this.Ok(athlete);
+    }
+
     [HttpPost]
     public async Task<ActionResult<AthleteDto>> Create(CreateAthleteDto createAthleteDto, CancellationToken cancellationToken)
     {

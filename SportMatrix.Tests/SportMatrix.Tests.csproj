@@ -11,9 +11,9 @@
     <PackageReference Include="TngTech.ArchUnitNET.xUnit" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
-	<PackageReference Include="Moq"  />
-	<PackageReference Include="FluentAssertions"  />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory"  />
+	<PackageReference Include="Moq" />
+	<PackageReference Include="FluentAssertions" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +21,7 @@
     <ProjectReference Include="..\SportMatrix.Domain\SportMatrix.Domain.csproj" />
     <ProjectReference Include="..\SportMatrix.Infrastructure\SportMatrix.Infrastructure.csproj" />
     <ProjectReference Include="..\SportMatrix.WebApi\SportMatrix.WebApi.csproj" />
+    <ProjectReference Include="..\SportMatrix.Frontend\SportMatrix.Frontend.csproj" />
   </ItemGroup>
 
   <ItemGroup>

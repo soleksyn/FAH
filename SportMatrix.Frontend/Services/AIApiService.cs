@@ -15,7 +15,7 @@ public class AIApiService
         _demoDataService = demoDataService;
     }
 
-    public async Task<AIAnalysisDto?> AnalyzeWorkoutAsync(int athleteId, List<WorkoutDataDto> recentWorkouts, AnalysisType analysisType = AnalysisType.Performance)
+    public async Task<AIAnalysisDto?> AnalyzeWorkoutAsync(int athleteId, List<WorkoutDataDto> recentWorkouts, AnalysisType analysisType = AnalysisType.PerformanceTrends)
     {
         var request = new WorkoutAnalysisRequestDto
         {
@@ -31,7 +31,8 @@ public class AIApiService
                 ActivityType = w.ActivityType,
                 Distance = w.Distance,
                 Duration = ParseMovingTime(w.MovingTime),
-                Calories = w.Calories
+                Calories = w.Calories,
+                AverageHeartRate = w.HeartRate
             }).ToList(),
             AnalysisType = analysisType
         };
@@ -44,7 +45,7 @@ public class AIApiService
         return MapToAnalysis(aiResponse);
     }
 
-    public async Task<AIAnalysisDto?> AnalyzePerformanceTrendsAsync(int athleteId, string timeFrame = "month")
+    public async Task<AIAnalysisDto?> GetPerformanceTrendsAsync(int athleteId, string timeFrame = "month")
     {
         var response = await _httpClient.GetAsync($"/api/WorkoutAnalysis/performance-trends/{athleteId}?timeFrame={Uri.EscapeDataString(timeFrame)}");
         if (!response.IsSuccessStatusCode)
@@ -64,41 +65,19 @@ public class AIApiService
         return MapToAnalysis(aiResponse);
     }
 
-    public async Task<AIAnalysisDto?> GetNextDayRecommendationAsync(int athleteId, List<ActivityDto> activities)
+    public async Task<AIAnalysisDto?> GetNextDayRecommendationAsync(int athleteId)
     {
-        if (activities.Count == 0)
+        var response = await _httpClient.GetAsync($"/api/WorkoutAnalysis/next-day-recommendation/{athleteId}");
+        if (!response.IsSuccessStatusCode)
             return null;
 
-        var lastActivity = activities.First();
-        var workout = new WorkoutDataDto
-        {
-            Date = lastActivity.StartDate,
-            ActivityType = lastActivity.SportType,
-            Distance = lastActivity.Distance,
-            MovingTime = lastActivity.MovingTime,
-            HeartRate = lastActivity.AverageHeartRate,
-            Calories = lastActivity.Calories
-        };
-
-        return await AnalyzeWorkoutAsync(athleteId, new List<WorkoutDataDto> { workout }, AnalysisType.NextDay);
+        var aiResponse = await response.Content.ReadFromJsonAsync<WorkoutAnalysisResponseDto>();
+        return MapToAnalysis(aiResponse);
     }
 
-    public async Task<AIAnalysisDto?> AnalyzeHealthMetricsAsync(int athleteId, List<WorkoutDataDto> workouts)
+    public async Task<AIAnalysisDto?> GetHealthMetricsAsync(int athleteId)
     {
-        var request = new HealthAnalysisRequestDto
-        {
-            AthleteId = athleteId,
-            RecentWorkouts = workouts.Select(w => new WorkoutDataDtoBackend
-            {
-                Date = DateTime.TryParse(w.Date, out var date) ? date : DateTime.UtcNow,
-                ActivityType = w.ActivityType,
-                Distance = w.Distance,
-                Duration = ParseMovingTime(w.MovingTime),
-                Calories = w.Calories
-            }).ToList()
-        };
-
-        var response = await _httpClient.PostAsJsonAsync("/api/WorkoutAnalysis/health-analysis", request);
+        var response = await _httpClient.GetAsync($"/api/WorkoutAnalysis/health-analysis/{athleteId}");
         if (!response.IsSuccessStatusCode)
             return null;
 
@@ -141,7 +120,7 @@ public class AIApiService
 public class WorkoutAnalysisRequestDto
 {
     public List<WorkoutDataDtoBackend> RecentWorkouts { get; set; } = [];
-    public AnalysisType AnalysisType { get; set; } = AnalysisType.Performance;
+    public AnalysisType AnalysisType { get; set; } = AnalysisType.PerformanceTrends;
     public AthleteProfileDto? AthleteProfile { get; set; }
     public Dictionary<string, object>? AdditionalContext { get; set; }
 }
@@ -171,6 +150,7 @@ public class WorkoutDataDtoBackend
     public double Distance { get; set; }
     public int Duration { get; set; }
     public int? Calories { get; set; }
+    public int? AverageHeartRate { get; set; }
     public Dictionary<string, double>? MetricsData { get; set; }
 }
 

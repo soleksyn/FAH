@@ -56,8 +56,9 @@ public class AIAssistantClientService : IAIAssistantClientService
                 Distance = w.Distance,
                 Duration = w.Duration,
                 Calories = w.Calories,
+                AverageHeartRate = w.AverageHeartRate,
             }).ToList() ?? new List<AIAssistantWorkout>(),
-            AnalysisType = request.AnalysisType ?? "Performance",
+            AnalysisType = request.AnalysisType ?? "PerformanceTrends",
             FocusAreas = request.FocusAreas ?? new List<string>(),
         };
 

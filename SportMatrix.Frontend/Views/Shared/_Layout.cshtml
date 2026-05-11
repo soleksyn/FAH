@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/dashboard.css"  asp-append-version="true" />
     <link rel="stylesheet" href="~/css/athletes.css"   asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css"       asp-append-version="true" />
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -40,7 +41,7 @@
 
         <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
             <div class="sidebar-brand-icon">
-                <i class="bi bi-activity"></i>
+                <img src="~/images/logo.png" alt="SportMatrix Logo" />
             </div>
             <div class="sidebar-brand-label">
                 <span class="sidebar-brand-name">SportMatrix</span>
@@ -57,15 +58,33 @@
                 Dashboard
             </a>
 
-            <a class="nav-link-item @(currentController == "Athletes" ? "active" : "")"
-               asp-controller="Athletes" asp-action="Index">
-                <i class="bi bi-people"></i>
-                Athletes
-            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a class="nav-link-item @(currentController == "Athletes" ? "active" : "")"
+                   asp-controller="Athletes" asp-action="Index">
+                    <i class="bi bi-people"></i>
+                    Athletes
+                </a>
+            }
         </nav>
 
         <div class="sidebar-footer">
-            &copy; 2025 SportMatrix
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div style="font-size:.75rem; color:var(--color-text-2); margin-bottom:.5rem; truncate: ellipsis; overflow:hidden; white-space:nowrap;">
+                    <i class="bi bi-person-circle" style="margin-right:.35rem;"></i>@User.Identity.Name
+                </div>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" style="width:100%; padding:.5rem; background:transparent; border:1px solid var(--color-border); border-radius:var(--radius-md); color:var(--color-text-2); font-family:inherit; font-size:.8rem; cursor:pointer; transition:border-color .18s, color .18s;" onmouseover="this.style.borderColor='var(--color-mint)';this.style.color='var(--color-mint)';" onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-2)';">
+                        <i class="bi bi-box-arrow-right" style="margin-right:.3rem;"></i>Sign Out
+                    </button>
+                </form>
+            }
+            else
+            {
+                <span style="font-size:.75rem; color:var(--color-text-2);">&copy; 2025 SportMatrix</span>
+            }
         </div>
     </aside>
 

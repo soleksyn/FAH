@@ -1,9 +1,10 @@
-﻿namespace SportMatrix.Application.Services;
+namespace SportMatrix.Application.Services;
 
 using AutoMapper;
 using SportMatrix.Application.DTOs;
 using SportMatrix.Application.Interfaces;
 using SportMatrix.Domain.Entities;
+using SportMatrix.Domain.Enums;
 using SportMatrix.Domain.Exceptions.Activities;
 using SportMatrix.Domain.Exceptions.Athletes;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@ public class ActivityService : IActivityService
         List<Activity> activities = await this.context.Activities
             .Include(a => a.Athlete)
             .Where(a => a.AthleteId == athleteId)
+            .OrderByDescending(a => a.StartDate)
             .ToListAsync(cancellationToken);
 
         IEnumerable<ActivityDto> activityDtos = this.mapper.Map<IEnumerable<ActivityDto>>(activities);
@@ -50,17 +52,16 @@ public class ActivityService : IActivityService
 
     public async Task<ActivityDto> CreateActivityAsync(CreateActivityDto activityDto, CancellationToken cancellationToken)
     {
-        Activity activity = this.mapper.Map<Activity>(activityDto);
+        Activity activity = mapper.Map<Activity>(activityDto);
 
-        await this.context.Activities.AddAsync(activity, cancellationToken);
-        await this.context.SaveChangesAsync(cancellationToken);
+        await context.Activities.AddAsync(activity, cancellationToken);В
+        await context.SaveChangesAsync(cancellationToken);
 
-        // Load activity with Athlete for mapping
-        Activity activityWithAthlete = await this.context.Activities
+        Activity activityWithAthlete = await context.Activities
             .Include(a => a.Athlete)
             .FirstAsync(a => a.Id == activity.Id, cancellationToken);
 
-        ActivityDto resultDto = this.mapper.Map<ActivityDto>(activityWithAthlete);
+        ActivityDto resultDto = mapper.Map<ActivityDto>(activityWithAthlete);
         return resultDto;
     }
 
@@ -119,15 +120,15 @@ public class ActivityService : IActivityService
             TotalDuration = TimeSpan.FromSeconds(activities.Sum(a => a.MovingTime)),
             TotalElevationGain = activities.Sum(a => a.TotalElevationGain),
             ActivitiesByType = activities
-            .GroupBy(a => a.SportType)
+            .GroupBy(a => a.ActivityType)
             .ToDictionary(g => g.Key, g => g.Count()),
             ActivitiesByMonth = activities
             .GroupBy(a => a.StartDateLocal.Month)
             .ToDictionary(g => g.Key, g => g.Count()),
             AverageDistance = activities.Any() ? activities.Average(a => a.Distance) / 1000.0 : (double?)null, // Convert meters to kilometers
             LongestDistance = activities.Any() ? activities.Max(a => a.Distance) / 1000.0 : (double?)null, // Convert meters to kilometers
-            MostCommonSport = activities
-                .GroupBy(a => a.SportType)
+            MostCommonActivityType = activities
+                .GroupBy(a => a.ActivityType)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefault()
@@ -142,7 +143,7 @@ public class ActivityService : IActivityService
             TotalDistance = 0,
             TotalDuration = TimeSpan.Zero,
             TotalElevationGain = 0,
-            ActivitiesByType = new Dictionary<string, int>(),
+            ActivitiesByType = new Dictionary<ActivityType, int>(),
             ActivitiesByMonth = new Dictionary<int, int>(),
         };
     }

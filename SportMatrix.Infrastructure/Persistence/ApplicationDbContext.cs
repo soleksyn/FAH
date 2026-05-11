@@ -1,10 +1,13 @@
-using SportMatrix.Application.Interfaces;
+﻿using SportMatrix.Application.Interfaces;
 using SportMatrix.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SportMatrix.Domain.Enums;
 
 namespace SportMatrix.Infrastructure.Persistence;
 
-public class ApplicationDbContext : DbContext, IApplicationDbContext
+public class ApplicationDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>, IApplicationDbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
     : base(options)
@@ -64,7 +67,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                 MovingTime = 1800,
                 ElapsedTime = 1800,
                 TotalElevationGain = 50,
-                SportType = "Run",
+                ActivityType = ActivityType.Run,
                 StartDate = new DateTime(2026, 5, 3, 0, 0, 0, DateTimeKind.Utc),
                 StartDateLocal = new DateTime(2026, 5, 3, 3, 0, 0, DateTimeKind.Utc),
                 Timezone = "Europe/Kiev",
@@ -86,7 +89,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                 MovingTime = 3600,
                 ElapsedTime = 3600,
                 TotalElevationGain = 200,
-                SportType = "Ride",
+                ActivityType = ActivityType.Ride,
                 StartDate = new DateTime(2026, 5, 2, 0, 0, 0, DateTimeKind.Utc),
                 StartDateLocal = new DateTime(2026, 5, 2, 3, 0, 0, DateTimeKind.Utc),
                 Timezone = "Europe/Kiev",
@@ -108,7 +111,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                 MovingTime = 2400,
                 ElapsedTime = 2400,
                 TotalElevationGain = 0,
-                SportType = "Swim",
+                ActivityType = ActivityType.Swim,
                 StartDate = new DateTime(2026, 5, 3, 0, 0, 0, DateTimeKind.Utc),
                 StartDateLocal = new DateTime(2026, 5, 3, 3, 0, 0, DateTimeKind.Utc),
                 Timezone = "Europe/Kiev",
@@ -156,7 +159,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                 PlannedDate = new DateTime(2026, 5, 7, 0, 0, 0, DateTimeKind.Utc),
                 PlannedDistance = 15000,
                 PlannedDuration = 5400,
-                SportType = "Run"
+                ActivityType = ActivityType.Run
             },
             new PlannedActivity
             {
@@ -167,7 +170,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                 PlannedDate = new DateTime(2026, 5, 9, 0, 0, 0, DateTimeKind.Utc),
                 PlannedDistance = 8000,
                 PlannedDuration = 2400,
-                SportType = "Run"
+                ActivityType = ActivityType.Run
             },
             new PlannedActivity
             {
@@ -178,8 +181,9 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                 PlannedDate = new DateTime(2026, 5, 8, 0, 0, 0, DateTimeKind.Utc),
                 PlannedDistance = 50000,
                 PlannedDuration = 7200,
-                SportType = "Brick"
+                ActivityType = ActivityType.Brick
             }
         );
     }
 }
+

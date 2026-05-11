@@ -101,11 +101,39 @@ public class SportMatrixWorkoutDataProvider : IWorkoutDataProvider
         return new WorkoutDataDto
         {
             Date = activity.StartDate,
-            ActivityType = activity.SportType,
+            ActivityType = activity.ActivityType.ToString(),
             Distance = activity.Distance,
             Duration = Math.Max(1, (int)activity.MovingTime.TotalSeconds),
-            Calories = null,
+            Calories = EstimateCalories(activity),
+            AverageHeartRate = activity.AverageHeartRate,
             MetricsData = metricsData.Count > 0 ? metricsData : null,
+        };
+    }
+
+    private static int EstimateCalories(ActivityDto activity)
+    {
+        double durationHours = Math.Max(1, activity.MovingTime.TotalSeconds) / 3600.0;
+        double weightKg = activity.AthleteWeight.GetValueOrDefault(75);
+        double met = GetMetValue(activity.ActivityType, activity.Distance, activity.MovingTime);
+
+        return Math.Max(1, (int)Math.Round(met * weightKg * durationHours));
+    }
+
+    private static double GetMetValue(SportMatrix.Domain.Enums.ActivityType activityType, double distance, TimeSpan movingTime)
+    {
+        string normalizedSportType = activityType.ToString().ToLowerInvariant();
+        double speedKmh = movingTime.TotalHours > 0 ? (distance / 1000.0) / movingTime.TotalHours : 0;
+
+        return normalizedSportType switch
+        {
+            "run" or "running" => speedKmh >= 12 ? 12.5 : speedKmh >= 9.5 ? 10.0 : 8.3,
+            "ride" or "cycling" or "bike" or "biking" => speedKmh >= 25 ? 10.0 : speedKmh >= 16 ? 8.0 : 6.8,
+            "swim" or "swimming" => 8.0,
+            "walk" or "walking" => 3.8,
+            "hike" or "hiking" => 6.0,
+            "workout" or "weighttraining" or "crosstraining" => 6.0,
+            "yoga" => 2.5,
+            _ => 5.0,
         };
     }
 
@@ -125,7 +153,7 @@ public class SportMatrixWorkoutDataProvider : IWorkoutDataProvider
 
         public double TotalElevationGain { get; set; }
 
-        public string SportType { get; set; } = string.Empty;
+        public SportMatrix.Domain.Enums.ActivityType ActivityType { get; set; }
 
         public DateTime StartDate { get; set; }
 
@@ -142,5 +170,7 @@ public class SportMatrixWorkoutDataProvider : IWorkoutDataProvider
         public double? MaxPower { get; set; }
 
         public double? AverageCadence { get; set; }
+
+        public double? AthleteWeight { get; set; }
     }
 }

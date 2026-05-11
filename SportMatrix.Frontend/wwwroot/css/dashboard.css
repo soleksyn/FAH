@@ -133,8 +133,12 @@
 
 .page-btn:hover:not(:disabled) {
     background: var(--color-orange);
-    color: white;
+    color: white !important;
     border-color: var(--color-orange);
+}
+
+.page-btn:hover i {
+    color: white !important;
 }
 
 .page-btn:disabled {
@@ -220,7 +224,7 @@
     transition: 0.2s;
 }
 
-.quick-action-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+.quick-action-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white !important; }
 
 /* ── AI Action Grid (Large Square Cards) ─────────────────── */
 .ai-action-grid {
@@ -448,4 +452,54 @@
 .chart-no-data.active {
     display: flex;
     animation: chartFadeIn 0.4s ease-out forwards;
+}
+
+/* ── AI Panel Spinner Loader ─────────────────────────────── */
+.ai-panel-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(6, 78, 59, 0.85);
+    backdrop-filter: blur(4px);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: var(--radius-lg);
+}
+
+.ai-panel-loader.loading {
+    display: flex;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(52, 211, 153, 0.2);
+    border-top-color: #34D399;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.spinner-text {
+    color: #ECFDF5;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 16px;
+    letter-spacing: 0.5px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Disable AI buttons during loading ───────────────────── */
+.ai-panel.loading .ai-action-card,
+.ai-panel.loading .quick-action-btn,
+.ai-panel.loading .btn-orange {
+    pointer-events: none;
+    opacity: 0.6;
 }

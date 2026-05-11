@@ -9,4 +9,6 @@ public class AIAssistantWorkout
     public int Duration { get; set; }
     
     public int Calories { get; set; }
+
+    public int? AverageHeartRate { get; set; }
 }

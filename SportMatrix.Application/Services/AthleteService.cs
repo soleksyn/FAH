@@ -22,7 +22,8 @@ public class AthleteService : IAthleteService
 
     public async Task<AthleteDto> GetAthleteByIdAsync(int id, CancellationToken cancellationToken)
     {
-        Athlete? athlete = await this.context.Athletes.FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+        Athlete? athlete = await this.context.Athletes
+            .FirstOrDefaultAsync(a => a.Id == id && a.Id != 0 && a.Email != "admin@sportmatrix.com", cancellationToken);
 
         if (athlete == null)
         {
@@ -34,7 +35,9 @@ public class AthleteService : IAthleteService
 
     public async Task<IEnumerable<AthleteDto>> GetAllAthletesAsync(CancellationToken cancellationToken)
     {
-        List<Athlete> athletes = await this.context.Athletes.ToListAsync(cancellationToken);
+        List<Athlete> athletes = await this.context.Athletes
+            .Where(a => a.Email != "admin@sportmatrix.com" && a.Id != 0)
+            .ToListAsync(cancellationToken);
         return this.mapper.Map<IEnumerable<AthleteDto>>(athletes);
     }
 
@@ -59,6 +62,13 @@ public class AthleteService : IAthleteService
         athlete.UpdatedAt = DateTime.Now;
 
         await this.context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<AthleteDto?> GetAthleteByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        Athlete? athlete = await this.context.Athletes
+            .FirstOrDefaultAsync(a => a.Email == email && a.Email != "admin@sportmatrix.com" && a.Id != 0, cancellationToken);
+        return this.mapper.Map<AthleteDto>(athlete);
     }
 
     public async Task DeleteAthleteAsync(int id, CancellationToken cancellationToken)

@@ -1,10 +1,12 @@
 using SportMatrix.Frontend.Models.ApiClient;
 using SportMatrix.Frontend.Services;
 using SportMatrix.Frontend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SportMatrix.Frontend.Controllers;
 
+[Authorize(Roles = "Admin")]
 public class AthletesController : Controller
 {
     private readonly AthleteApiService _athleteService;
@@ -18,11 +20,15 @@ public class AthletesController : Controller
     public async Task<IActionResult> Index(int page = 1)
     {
         if (page < 1) page = 1;
-        const int pageSize = 8; // Consistent with the design intent for lists
+        const int pageSize = 8;
 
         var (allAthletes, error) = await LoadAthletesAsync();
-        
+
+        // Clamp the current page so a stale bookmark after deletion never shows an empty page
         var totalAthletes = allAthletes.Count;
+        var totalPages = (int)Math.Ceiling((double)totalAthletes / pageSize);
+        if (page > 1 && page > totalPages) page = Math.Max(1, totalPages);
+
         var pagedAthletes = allAthletes
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
@@ -30,12 +36,12 @@ public class AthletesController : Controller
 
         var viewModel = new AthleteListViewModel
         {
-            Athletes = pagedAthletes,
-            Error = error,
-            CurrentPage = page,
-            PageSize = pageSize,
+            Athletes  = pagedAthletes,
+            Error     = error,
+            CurrentPage   = page,
+            PageSize      = pageSize,
             TotalAthletes = totalAthletes,
-            Loading = false
+            Loading   = false
         };
 
         return View(viewModel);
@@ -46,7 +52,7 @@ public class AthletesController : Controller
         try
         {
             var athletes = await _athleteService.GetAllAthletesAsync();
-            return (athletes, null);
+            return (athletes ?? new List<AthleteDto>(), null);
         }
         catch (Exception ex)
         {
@@ -54,26 +60,19 @@ public class AthletesController : Controller
         }
     }
 
-
     // GET: Athletes/Details/5
     public async Task<IActionResult> Details(int id)
     {
-        var viewModel = new AthleteDetailViewModel { Loading = true };
+        var viewModel = new AthleteDetailViewModel();
         try
         {
             viewModel.Athlete = await _athleteService.GetAthleteByIdAsync(id);
             if (viewModel.Athlete == null)
-            {
                 viewModel.Error = "Athlete not found.";
-            }
         }
         catch (Exception ex)
         {
             viewModel.Error = $"Error loading athlete: {ex.Message}";
-        }
-        finally
-        {
-            viewModel.Loading = false;
         }
         return View(viewModel);
     }
@@ -90,29 +89,28 @@ public class AthletesController : Controller
     public async Task<IActionResult> Create(AthleteCreateViewModel model)
     {
         if (!ModelState.IsValid)
-        {
             return View(model);
-        }
 
-        model.Submitting = true;
         try
         {
             var request = new CreateAthleteRequest
             {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                DateOfBirth = model.DateOfBirth,
-                Weight = model.Weight,
-                Height = model.Height
+                FirstName   = model.FirstName.Trim(),
+                LastName    = model.LastName.Trim(),
+                Email       = model.Email.Trim(),
+                DateOfBirth = model.DateOfBirth!.Value,
+                Weight      = model.Weight,
+                Height      = model.Height
             };
 
             var created = await _athleteService.CreateAthleteAsync(request);
             if (created == null)
             {
-                model.Error = "Error creating athlete.";
+                model.Error = "The server did not return the created athlete. Please try again.";
                 return View(model);
             }
+
+            TempData["Success"] = $"{created.FirstName} {created.LastName} was added successfully.";
             return RedirectToAction(nameof(Details), new { id = created.Id });
         }
         catch (Exception ex)
@@ -120,40 +118,35 @@ public class AthletesController : Controller
             model.Error = $"Error creating athlete: {ex.Message}";
             return View(model);
         }
-        finally
-        {
-            model.Submitting = false;
-        }
     }
 
     // GET: Athletes/Edit/5
     public async Task<IActionResult> Edit(int id)
     {
-        var viewModel = new AthleteEditViewModel { Loading = true };
+        AthleteEditViewModel viewModel;
         try
         {
             var athlete = await _athleteService.GetAthleteByIdAsync(id);
             if (athlete == null)
-            {
-                viewModel.Error = "Athlete not found.";
-                return View(viewModel);
-            }
+                return RedirectToAction(nameof(Index));
 
-            viewModel.Id = athlete.Id;
-            viewModel.FirstName = athlete.FirstName;
-            viewModel.LastName = athlete.LastName;
-            viewModel.Email = athlete.Email;
-            viewModel.DateOfBirth = athlete.DateOfBirth;
-            viewModel.Weight = athlete.Weight;
-            viewModel.Height = athlete.Height;
+            viewModel = new AthleteEditViewModel
+            {
+                Id          = athlete.Id,
+                FirstName   = athlete.FirstName,
+                LastName    = athlete.LastName,
+                Email       = athlete.Email,
+                DateOfBirth = athlete.DateOfBirth,
+                Weight      = athlete.Weight,
+                Height      = athlete.Height
+            };
         }
         catch (Exception ex)
         {
-            viewModel.Error = $"Error loading athlete: {ex.Message}";
-        }
-        finally
-        {
-            viewModel.Loading = false;
+            viewModel = new AthleteEditViewModel
+            {
+                Error = $"Error loading athlete: {ex.Message}"
+            };
         }
         return View(viewModel);
     }
@@ -164,35 +157,29 @@ public class AthletesController : Controller
     public async Task<IActionResult> Edit(AthleteEditViewModel model)
     {
         if (!ModelState.IsValid)
-        {
             return View(model);
-        }
 
-        model.Submitting = true;
         try
         {
             var request = new UpdateAthleteRequest
             {
-                Id = model.Id,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                DateOfBirth = model.DateOfBirth,
-                Weight = model.Weight,
-                Height = model.Height
+                Id          = model.Id,
+                FirstName   = model.FirstName.Trim(),
+                LastName    = model.LastName.Trim(),
+                Email       = model.Email.Trim(),
+                DateOfBirth = model.DateOfBirth!.Value,
+                Weight      = model.Weight,
+                Height      = model.Height
             };
 
             await _athleteService.UpdateAthleteAsync(request);
+            TempData["Success"] = $"{model.FirstName} {model.LastName} was updated successfully.";
             return RedirectToAction(nameof(Details), new { id = model.Id });
         }
         catch (Exception ex)
         {
             model.Error = $"Error updating athlete: {ex.Message}";
             return View(model);
-        }
-        finally
-        {
-            model.Submitting = false;
         }
     }
 
@@ -204,14 +191,12 @@ public class AthletesController : Controller
         try
         {
             await _athleteService.DeleteAthleteAsync(id);
-            return RedirectToAction(nameof(Index));
+            TempData["Success"] = "Athlete deleted successfully.";
         }
         catch (Exception ex)
         {
-            // For delete from Index page, we need to handle error differently
-            // We'll redirect back with error message via TempData
-            TempData["Error"] = $"Error deleting: {ex.Message}";
-            return RedirectToAction(nameof(Index));
+            TempData["Error"] = $"Could not delete athlete: {ex.Message}";
         }
+        return RedirectToAction(nameof(Index));
     }
 }

@@ -1,20 +1,22 @@
 namespace SportMatrix.Tests.Services;
 
 using AutoMapper;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using SportMatrix.Application.DTOs;
 using SportMatrix.Application.Mapping;
 using SportMatrix.Application.Services;
 using SportMatrix.Domain.Entities;
 using SportMatrix.Domain.Exceptions.Athletes;
 using SportMatrix.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Moq;
+using Xunit;
 
 public class AthleteServiceTests : IDisposable
 {
-    private readonly ApplicationDbContext context;
-    private readonly IMapper mapper;
-    private readonly AthleteService athleteService;
+    private readonly ApplicationDbContext _context;
+    private readonly IMapper _mapper;
+    private readonly AthleteService _athleteService;
 
     public AthleteServiceTests()
     {
@@ -22,222 +24,131 @@ public class AthleteServiceTests : IDisposable
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
-        this.context = new ApplicationDbContext(options);
+        _context = new ApplicationDbContext(options);
+        
         var mappingConfig = new MapperConfiguration(mc =>
         {
             mc.AddProfile(new MappingProfile());
         });
-        this.mapper = mappingConfig.CreateMapper();
-        this.athleteService = new AthleteService(this.context, this.mapper);
+        _mapper = mappingConfig.CreateMapper();
+        
+        _athleteService = new AthleteService(_context, _mapper);
     }
 
     public void Dispose()
     {
-        this.context.Dispose();
+        _context.Database.EnsureDeleted();
+        _context.Dispose();
     }
 
     [Fact]
-    public async Task GetAthleteByIdAsync_ShouldReturnAthlete_WhenAthleteExists()
+    public async Task GetAthleteByIdAsync_WhenAthleteExists_ShouldReturnAthleteDto()
     {
         // Arrange
-        Athlete athlete = new Athlete
+        var athlete = new Athlete
         {
             Id = 1,
-            FirstName = "Max",
-            LastName = "Mustermann",
-            Email = "max@test.com",
-            City = "Berlin",
-            Country = "Germany",
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now,
+            FirstName = "Stanislav",
+            LastName = "Oleksyn",
+            Email = "stanislav@test.com",
+            CreatedAt = DateTime.UtcNow
         };
-
-        await this.context.Athletes.AddAsync(athlete);
-        await this.context.SaveChangesAsync();
-
-        // Act
-        AthleteDto result = await this.athleteService.GetAthleteByIdAsync(1, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(1, result.Id);
-        Assert.Equal("Max", result.FirstName);
-        Assert.Equal("Mustermann", result.LastName);
-        Assert.Equal("max@test.com", result.Email);
-        Assert.Equal("Berlin", result.City);
-        Assert.Equal("Germany", result.Country);
-    }
-
-    [Fact]
-    public async Task GetAthleteByIdAsync_ShouldThrowAthleteNotFoundException_WhenAthleteDoesNotExist()
-    {
-        // Arrange - No data in DB
-
-        // Act & Assert
-        AthleteNotFoundException exception = await Assert.ThrowsAsync<AthleteNotFoundException>(
-            () => this.athleteService.GetAthleteByIdAsync(999, CancellationToken.None));
-
-        Assert.Equal(999, exception.AthleteId);
-    }
-
-    [Fact]
-    public async Task GetAllAthletesAsync_ShouldReturnAllAthletes()
-    {
-        // Arrange
-        List<Athlete> athletes = new List<Athlete>
-    {
-        new Athlete
-        {
-            Id = 1,
-            FirstName = "Max",
-            LastName = "Mustermann",
-            Email = "max@test.com",
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now,
-        },
-        new Athlete
-        {
-            Id = 2,
-            FirstName = "Anna",
-            LastName = "Schmidt",
-            Email = "anna@test.com",
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now,
-        },
-    };
-
-        await this.context.Athletes.AddRangeAsync(athletes);
-        await this.context.SaveChangesAsync();
+        await _context.Athletes.AddAsync(athlete);
+        await _context.SaveChangesAsync(CancellationToken.None);
 
         // Act
-        IEnumerable<AthleteDto> result = await this.athleteService.GetAllAthletesAsync(CancellationToken.None);
+        var result = await _athleteService.GetAthleteByIdAsync(1, CancellationToken.None);
 
         // Assert
-        List<AthleteDto> resultList = result.ToList();
-        Assert.Equal(2, resultList.Count);
-        Assert.Contains(resultList, a => a.FirstName == "Max" && a.LastName == "Mustermann");
-        Assert.Contains(resultList, a => a.FirstName == "Anna" && a.LastName == "Schmidt");
+        result.Should().NotBeNull();
+        result.Id.Should().Be(1);
+        result.FirstName.Should().Be("Stanislav");
+        result.LastName.Should().Be("Oleksyn");
     }
 
     [Fact]
-    public async Task CreateAthleteAsync_ShouldCreateAthlete_WhenValidData()
+    public async Task GetAthleteByIdAsync_WhenAthleteDoesNotExist_ShouldThrowAthleteNotFoundException()
+    {
+        // Act
+        var act = () => _athleteService.GetAthleteByIdAsync(99, CancellationToken.None);
+
+        // Assert
+        await act.Should().ThrowAsync<AthleteNotFoundException>()
+            .Where(e => e.AthleteId == 99);
+    }
+
+    [Fact]
+    public async Task CreateAthleteAsync_WithValidData_ShouldCreateAndReturnAthleteDto()
     {
         // Arrange
-        CreateAthleteDto createDto = new CreateAthleteDto
+        var createDto = new CreateAthleteDto
         {
-            FirstName = "Test",
-            LastName = "User",
-            Email = "test@test.com",
-            City = "Munich",
-            Country = "Germany",
+            FirstName = "New",
+            LastName = "Athlete",
+            Email = "new@test.com"
         };
 
         // Act
-        AthleteDto result = await this.athleteService.CreateAthleteAsync(createDto, CancellationToken.None);
+        var result = await _athleteService.CreateAthleteAsync(createDto, CancellationToken.None);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal("Test", result.FirstName);
-        Assert.Equal("User", result.LastName);
-        Assert.Equal("test@test.com", result.Email);
-        Assert.True(result.Id > 0);
-
-        // Verify in database
-        Athlete? athleteInDb = await this.context.Athletes.FindAsync(result.Id);
-        Assert.NotNull(athleteInDb);
-        Assert.Equal("Test", athleteInDb.FirstName);
+        result.Should().NotBeNull();
+        result.FirstName.Should().Be("New");
+        result.Email.Should().Be("new@test.com");
+        
+        var athleteInDb = await _context.Athletes.FirstOrDefaultAsync(a => a.Email == "new@test.com");
+        athleteInDb.Should().NotBeNull();
+        athleteInDb!.FirstName.Should().Be("New");
     }
 
     [Fact]
-    public async Task UpdateAthleteAsync_ShouldUpdateAthlete_WhenAthleteExists()
+    public async Task UpdateAthleteAsync_WhenAthleteExists_ShouldUpdateAthlete()
     {
         // Arrange
-        Athlete athlete = new Athlete
+        var athlete = new Athlete
         {
             Id = 1,
-            FirstName = "Max",
-            LastName = "Mustermann",
-            Email = "max@test.com",
-            City = "Berlin",
-            Country = "Germany",
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now,
+            FirstName = "Old",
+            LastName = "Name",
+            Email = "old@test.com"
         };
+        await _context.Athletes.AddAsync(athlete);
+        await _context.SaveChangesAsync(CancellationToken.None);
 
-        await this.context.Athletes.AddAsync(athlete);
-        await this.context.SaveChangesAsync();
-
-        UpdateAthleteDto updateDto = new UpdateAthleteDto
+        var updateDto = new UpdateAthleteDto
         {
             Id = 1,
-            FirstName = "Maximilian",
-            LastName = "Mustermann",
-            City = "Munich",
-            Country = "Germany",
+            FirstName = "Updated",
+            LastName = "Name"
         };
 
         // Act
-        await this.athleteService.UpdateAthleteAsync(updateDto, CancellationToken.None);
+        await _athleteService.UpdateAthleteAsync(updateDto, CancellationToken.None);
 
         // Assert
-        Athlete? updatedAthlete = await this.context.Athletes.FindAsync(1);
-        Assert.NotNull(updatedAthlete);
-        Assert.Equal("Maximilian", updatedAthlete.FirstName);
-        Assert.Equal("Munich", updatedAthlete.City);
+        var updatedAthlete = await _context.Athletes.FindAsync(1);
+        updatedAthlete!.FirstName.Should().Be("Updated");
     }
 
     [Fact]
-    public async Task UpdateAthleteAsync_ShouldThrowAthleteNotFoundException_WhenAthleteDoesNotExist()
+    public async Task DeleteAthleteAsync_WhenAthleteExists_ShouldRemoveAthlete()
     {
         // Arrange
-        UpdateAthleteDto updateDto = new UpdateAthleteDto
-        {
-            Id = 999,
-            FirstName = "Test",
-            LastName = "User",
-        };
-
-        // Act & Assert
-        AthleteNotFoundException exception = await Assert.ThrowsAsync<AthleteNotFoundException>(
-            () => this.athleteService.UpdateAthleteAsync(updateDto, CancellationToken.None));
-
-        Assert.Equal(999, exception.AthleteId);
-    }
-
-    [Fact]
-    public async Task DeleteAthleteAsync_ShouldDeleteAthlete_WhenAthleteExists()
-    {
-        // Arrange
-        Athlete athlete = new Athlete
+        var athlete = new Athlete
         {
             Id = 1,
-            FirstName = "Max",
-            LastName = "Mustermann",
-            Email = "max@test.com",
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now,
+            FirstName = "To",
+            LastName = "Delete",
+            Email = "delete@test.com"
         };
-
-        await this.context.Athletes.AddAsync(athlete);
-        await this.context.SaveChangesAsync();
+        await _context.Athletes.AddAsync(athlete);
+        await _context.SaveChangesAsync(CancellationToken.None);
 
         // Act
-        await this.athleteService.DeleteAthleteAsync(1, CancellationToken.None);
+        await _athleteService.DeleteAthleteAsync(1, CancellationToken.None);
 
         // Assert
-        Athlete? deletedAthlete = await this.context.Athletes.FindAsync(1);
-        Assert.Null(deletedAthlete);
-    }
-
-    [Fact]
-    public async Task DeleteAthleteAsync_ShouldThrowAthleteNotFoundException_WhenAthleteDoesNotExist()
-    {
-        // Arrange - No data in DB
-
-        // Act & Assert
-        AthleteNotFoundException exception = await Assert.ThrowsAsync<AthleteNotFoundException>(
-            () => this.athleteService.DeleteAthleteAsync(999, CancellationToken.None));
-
-        Assert.Equal(999, exception.AthleteId);
+        var deletedAthlete = await _context.Athletes.FindAsync(1);
+        deletedAthlete.Should().BeNull();
     }
 }

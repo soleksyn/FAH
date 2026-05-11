@@ -2,6 +2,7 @@ namespace SportMatrix.Domain.Entities;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using SportMatrix.Domain.Enums;
 
 public class PlannedActivity
 {
@@ -18,7 +19,7 @@ public class PlannedActivity
 
     public string? Description { get; set; }
 
-    public string SportType { get; set; } = string.Empty;
+    public ActivityType ActivityType { get; set; }
 
     public DateTime PlannedDate { get; set; }
 

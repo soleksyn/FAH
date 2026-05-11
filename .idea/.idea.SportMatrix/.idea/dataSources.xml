@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:sqlite:C:\DYPLOM\FitnessAnalyticsHubV1_0\SportMatrix.WebApi\FitnessAnalytics.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="FitnessAnalytics.db [2]" uuid="65ce1591-2313-4573-9679-740414e6394f">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\DYPLOM\SportMatrix\SportMatrix.WebApi\FitnessAnalytics.db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

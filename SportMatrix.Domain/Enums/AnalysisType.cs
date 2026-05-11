@@ -1,10 +1,9 @@
-﻿namespace SportMatrix.Domain.Enums;
+namespace SportMatrix.Domain.Enums;
 
 public enum AnalysisType
 {
-    Performance,
-    Trends,
-    Recommendations,
-    NextDay,
-    Health,
+    PerformanceTrends,
+    TrainingRecommendations,
+    NextDayRecommendation,
+    HealthMetrics,
 }

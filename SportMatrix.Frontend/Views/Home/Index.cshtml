@@ -1,0 +1,211 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="landing-container">
+    <div class="landing-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to <span class="text-gradient">SportMatrix</span></h1>
+            <p class="hero-subtitle">Your personalized hub for fitness analytics and AI-powered performance insights.</p>
+            
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="user-status-card">
+                    <div class="status-icon">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+                    <div class="status-info">
+                        <h3>Signed in as @User.Identity.Name</h3>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <p class="status-badge admin">Administrator Access</p>
+                            <div class="cta-actions">
+                                <a asp-controller="Athletes" asp-action="Index" class="btn-primary">Go to Dashboard</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="status-badge user">Regular Member</p>
+                            <p class="status-note">Your account is active. Currently, dashboard features are restricted to Administrators. Stay tuned for member-specific features!</p>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="guest-cta">
+                    <p>Unlock your full potential with data-driven training.</p>
+                    <div class="cta-actions">
+                        <a asp-controller="Account" asp-action="Login" class="btn-primary">Sign In</a>
+                        <a asp-controller="Account" asp-action="Register" class="btn-outline">Create Account</a>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <div class="hero-visual">
+            <div class="visual-card">
+                <i class="bi bi-graph-up-arrow"></i>
+                <span>Real-time Analytics</span>
+            </div>
+            <div class="visual-card">
+                <i class="bi bi-cpu"></i>
+                <span>AI Insights</span>
+            </div>
+            <div class="visual-card">
+                <i class="bi bi-shield-check"></i>
+                <span>Secure Data</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.landing-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.landing-hero {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 4rem;
+    align-items: center;
+    padding: 4rem 0;
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--color-mint) 0%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-2);
+    margin-bottom: 3rem;
+    line-height: 1.6;
+}
+
+.user-status-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.status-icon {
+    width: 60px;
+    height: 60px;
+    background: color-mix(in srgb, var(--color-mint) 15%, transparent);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--color-mint);
+}
+
+.status-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.status-badge.admin { background: color-mix(in srgb, var(--color-mint) 20%, transparent); color: var(--color-mint); }
+.status-badge.user { background: color-mix(in srgb, #60a5fa 20%, transparent); color: #60a5fa; }
+
+.status-note {
+    font-size: 0.9rem;
+    color: var(--color-text-2);
+    margin: 0;
+}
+
+.cta-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-primary {
+    padding: 0.8rem 2rem;
+    background: var(--color-mint);
+    color: #0a0f1a;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.2s;
+}
+
+.btn-outline {
+    padding: 0.8rem 2rem;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover { transform: translateY(-2px); }
+.btn-outline:hover { border-color: var(--color-mint); color: var(--color-mint); }
+
+.hero-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.visual-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    transform: perspective(1000px) rotateY(-5deg);
+    transition: transform 0.3s;
+}
+
+.visual-card:nth-child(2) { transform: perspective(1000px) rotateY(-5deg) translateX(20px); }
+.visual-card:hover { transform: perspective(1000px) rotateY(0deg) translateX(0); }
+
+.visual-card i {
+    font-size: 1.5rem;
+    color: var(--color-mint);
+}
+
+@@media (max-width: 992px) {
+    .landing-hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 3rem;
+    }
+    .user-status-card { flex-direction: column; align-items: center; text-align: center; }
+    .cta-actions { justify-content: center; }
+    .hero-visual { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+    .visual-card, .visual-card:nth-child(2) { transform: none; }
+}
+</style>

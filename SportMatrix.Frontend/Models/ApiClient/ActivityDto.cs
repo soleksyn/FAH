@@ -10,8 +10,8 @@ public class ActivityDto
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 
-    [JsonPropertyName("sportType")]
-    public string SportType { get; set; } = string.Empty;
+    [JsonPropertyName("activityType")]
+    public string ActivityType { get; set; } = string.Empty;
 
     [JsonPropertyName("distance")]
     public double Distance { get; set; }

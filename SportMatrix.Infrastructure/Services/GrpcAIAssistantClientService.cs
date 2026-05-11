@@ -70,6 +70,7 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
                         Distance = workout.Distance,
                         Duration = workout.Duration,
                         Calories = workout.Calories,
+                        AverageHeartRate = workout.AverageHeartRate ?? 0,
                     };
 
                     grpcRequest.RecentWorkouts.Add(grpcWorkout);
@@ -164,6 +165,7 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
                         Distance = workout.Distance,
                         Duration = workout.Duration,
                         Calories = workout.Calories,
+                        AverageHeartRate = workout.AverageHeartRate ?? 0,
                     };
 
                     grpcRequest.RecentWorkouts.Add(grpcWorkout);
@@ -223,6 +225,7 @@ public class GrpcAIAssistantClientService : IAIAssistantClientService, IDisposab
                         Distance = workout.Distance,
                         Duration = workout.Duration,
                         Calories = workout.Calories,
+                        AverageHeartRate = workout.AverageHeartRate ?? 0,
                     };
 
                     grpcRequest.RecentWorkouts.Add(grpcWorkout);

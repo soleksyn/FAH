@@ -22,5 +22,8 @@ public class WorkoutDataDto
     [Range(0, int.MaxValue)]
     public int? Calories { get; set; }
 
+    [Range(0, int.MaxValue)]
+    public int? AverageHeartRate { get; set; }
+
     public Dictionary<string, double>? MetricsData { get; set; }
 }

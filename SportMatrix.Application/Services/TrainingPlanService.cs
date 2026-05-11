@@ -51,17 +51,16 @@ public class TrainingPlanService : ITrainingPlanService
 
     public async Task<TrainingPlanDto> CreateTrainingPlanAsync(CreateTrainingPlanDto trainingPlanDto, CancellationToken cancellationToken)
     {
-        TrainingPlan trainingPlan = this.mapper.Map<TrainingPlan>(trainingPlanDto);
+        TrainingPlan trainingPlan = mapper.Map<TrainingPlan>(trainingPlanDto);
 
-        await this.context.TrainingPlans.AddAsync(trainingPlan, cancellationToken);
-        await this.context.SaveChangesAsync(cancellationToken);
+        await context.TrainingPlans.AddAsync(trainingPlan, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
 
-        // Load TrainingPlan with Athlete for mapping
-        TrainingPlan trainingPlanWithAthlete = await this.context.TrainingPlans
+        TrainingPlan trainingPlanWithAthlete = await context.TrainingPlans
             .Include(tp => tp.Athlete)
             .FirstAsync(tp => tp.Id == trainingPlan.Id, cancellationToken);
 
-        return this.mapper.Map<TrainingPlanDto>(trainingPlanWithAthlete);
+        return mapper.Map<TrainingPlanDto>(trainingPlanWithAthlete);
     }
 
     public async Task UpdateTrainingPlanAsync(UpdateTrainingPlanDto trainingPlanDto, CancellationToken cancellationToken)

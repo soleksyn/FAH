@@ -54,6 +54,8 @@ public class DashboardActivityViewModel
     public string Distance { get; set; } = string.Empty;
     public string MovingTime { get; set; } = string.Empty;
     public string StartDate { get; set; } = string.Empty;
+    public int? AverageHeartRate { get; set; }
+    public int? Calories { get; set; }
 }
 
 public class DashboardChartDataViewModel

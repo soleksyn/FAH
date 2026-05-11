@@ -1,3 +1,5 @@
+using SportMatrix.Domain.Enums;
+
 namespace SportMatrix.Application;
 
 public class CreatePlannedActivityDto
@@ -8,7 +10,7 @@ public class CreatePlannedActivityDto
 
     public string? Description { get; set; }
 
-    public string SportType { get; set; } = string.Empty;
+    public ActivityType ActivityType { get; set; }
 
     public DateTime PlannedDate { get; set; }
 

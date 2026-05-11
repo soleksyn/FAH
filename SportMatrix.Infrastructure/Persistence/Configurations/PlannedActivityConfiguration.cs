@@ -13,7 +13,7 @@ public class PlannedActivityConfiguration : IEntityTypeConfiguration<PlannedActi
         builder.Property(e => e.Title)
             .IsRequired();
 
-        builder.Property(e => e.SportType)
+        builder.Property(e => e.ActivityType)
             .IsRequired();
 
         // Relationships

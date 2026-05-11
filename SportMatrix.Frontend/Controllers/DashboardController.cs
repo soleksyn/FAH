@@ -2,10 +2,12 @@ using SportMatrix.Frontend.Models.ApiClient;
 using SportMatrix.Frontend.Services;
 using SportMatrix.Frontend.Models;
 using SportMatrix.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SportMatrix.Frontend.Controllers;
 
+[Authorize]
 public class DashboardController : Controller
 {
     private readonly AthleteApiService _athleteService;
@@ -29,10 +31,42 @@ public class DashboardController : Controller
     }
 
     // GET: Dashboard
-    public async Task<IActionResult> Index(int id = 1, AnalysisType? analysisType = null, int? activityId = null, int page = 1)
+    public async Task<IActionResult> Index(int? id = null, AnalysisType? analysisType = null, int? activityId = null, int page = 1)
     {
         var alerts = new List<DashboardAlertViewModel>();
         AthleteDto? athlete = null;
+
+        // If user is not an admin, they can ONLY see their own data
+        if (!User.IsInRole("Admin"))
+        {
+            var userEmail = User.Identity!.Name!;
+            athlete = await _athleteService.GetAthleteByEmailAsync(userEmail);
+            
+            if (athlete == null)
+            {
+                // Self-healing: Create a profile if it's missing (e.g. registered before this feature)
+                athlete = await _athleteService.CreateAthleteAsync(new CreateAthleteRequest
+                {
+                    FirstName = "New",
+                    LastName = "Member",
+                    Email = userEmail,
+                    DateOfBirth = DateTime.Now.AddYears(-25),
+                    Weight = 75,
+                    Height = 180
+                });
+                
+                alerts.Add(_viewModelFactory.CreateAlert("A new athlete profile has been created for your account.", "info"));
+            }
+        }
+        else
+        {
+            // Admin can see anyone, default to id 1 if not specified
+            int targetId = id ?? 1;
+            athlete = await _athleteService.GetAthleteByIdAsync(targetId);
+        }
+
+        int athleteId = athlete?.Id ?? (id ?? 1);
+        
         ActivityStatisticsDto? statistics = null;
         var activities = new List<ActivityDto>();
         var allActivitiesForCharts = new List<ActivityDto>();
@@ -45,10 +79,10 @@ public class DashboardController : Controller
 
         try
         {
-            athlete = await _athleteService.GetAthleteByIdAsync(id);
-            statistics = await _fitnessService.GetAthleteStatisticsAsync(id);
+            // athlete is already fetched above
+            statistics = await _fitnessService.GetAthleteStatisticsAsync(athleteId);
 
-            var allActivities = await _fitnessService.GetAthleteActivitiesAsync(id);
+            var allActivities = await _fitnessService.GetAthleteActivitiesAsync(athleteId);
             allActivitiesForCharts = allActivities;
             totalActivities = allActivities.Count;
             totalPages = (int)Math.Ceiling(totalActivities / (double)pageSize);
@@ -59,7 +93,7 @@ public class DashboardController : Controller
 
             if (analysisType.HasValue)
             {
-                analysis = await HandleAIAnalysisAsync(id, analysisType.Value, activities, activityId);
+                analysis = await HandleAIAnalysisAsync(athleteId, analysisType.Value);
                 if (analysis == null)
                 {
                     alerts.Add(_viewModelFactory.CreateAlert("AI analysis is currently unavailable for this request.", "warning"));
@@ -104,33 +138,47 @@ public class DashboardController : Controller
         return View(viewModel);
     }
 
-    private async Task<AIAnalysisDto?> HandleAIAnalysisAsync(int id, AnalysisType analysisType, List<ActivityDto> activities, int? activityId)
+    private async Task<AIAnalysisDto?> HandleAIAnalysisAsync(int id, AnalysisType analysisType)
     {
         return analysisType switch
         {
-            AnalysisType.Performance => await GetAnalysisForActivity(id, activities, activityId),
-            AnalysisType.Trends => await _aiService.AnalyzePerformanceTrendsAsync(id),
-            AnalysisType.Recommendations => await _aiService.GetTrainingRecommendationsAsync(id),
-            AnalysisType.Health => await _aiService.AnalyzeHealthMetricsAsync(id, activities.Select(MapWorkout).ToList()),
-            AnalysisType.NextDay => await _aiService.GetNextDayRecommendationAsync(id, activities),
+            AnalysisType.PerformanceTrends => await _aiService.GetPerformanceTrendsAsync(id),
+            AnalysisType.TrainingRecommendations => await _aiService.GetTrainingRecommendationsAsync(id),
+            AnalysisType.HealthMetrics => await _aiService.GetHealthMetricsAsync(id),
+            AnalysisType.NextDayRecommendation => await _aiService.GetNextDayRecommendationAsync(id),
             _ => null
         };
     }
 
-    // POST: Dashboard/AnalyzeWorkout
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AnalyzeWorkout(int id, int activityId)
-    {
-        return RedirectToAction(nameof(Index), new { id, analysisType = AnalysisType.Performance, activityId });
-    }
+
 
     // POST: Dashboard/GetPerformanceTrends
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> GetPerformanceTrends(int id)
     {
-        return RedirectToAction(nameof(Index), new { id, analysisType = AnalysisType.Trends });
+        return RedirectToAction(nameof(Index), new { id, analysisType = AnalysisType.PerformanceTrends });
+    }
+
+    // POST: Dashboard/GetPerformanceTrendsJson
+    [HttpPost]
+    public async Task<IActionResult> GetPerformanceTrendsJson(int id)
+    {
+        try
+        {
+            var analysis = await _aiService.GetPerformanceTrendsAsync(id);
+
+            if (analysis == null)
+            {
+                return Json(new { success = false, error = "AI analysis failed" });
+            }
+
+            return Json(new { success = true, data = analysis });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, error = ex.Message });
+        }
     }
 
     // POST: Dashboard/GetTrainingRecommendations
@@ -138,15 +186,56 @@ public class DashboardController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> GetTrainingRecommendations(int id)
     {
-        return RedirectToAction(nameof(Index), new { id, analysisType = AnalysisType.Recommendations });
+        return RedirectToAction(nameof(Index), new { id, analysisType = AnalysisType.TrainingRecommendations });
     }
 
-    // POST: Dashboard/AnalyzeHealthMetrics
+    // POST: Dashboard/GetTrainingRecommendationsJson
+    [HttpPost]
+    public async Task<IActionResult> GetTrainingRecommendationsJson(int id)
+    {
+        try
+        {
+            var analysis = await _aiService.GetTrainingRecommendationsAsync(id);
+
+            if (analysis == null)
+            {
+                return Json(new { success = false, error = "AI analysis failed" });
+            }
+
+            return Json(new { success = true, data = analysis });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, error = ex.Message });
+        }
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AnalyzeHealthMetrics(int id)
+    public async Task<IActionResult> GetHealthMetrics(int id)
     {
-        return RedirectToAction(nameof(Index), new { id, analysisType = AnalysisType.Health });
+        return RedirectToAction(nameof(Index), new { id, analysisType = AnalysisType.HealthMetrics });
+    }
+
+    // POST: Dashboard/GetHealthMetricsJson
+    [HttpPost]
+    public async Task<IActionResult> GetHealthMetricsJson(int id)
+    {
+        try
+        {
+            var analysis = await _aiService.GetHealthMetricsAsync(id);
+
+            if (analysis == null)
+            {
+                return Json(new { success = false, error = "AI analysis failed" });
+            }
+
+            return Json(new { success = true, data = analysis });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, error = ex.Message });
+        }
     }
 
     // POST: Dashboard/GetNextDayRecommendation
@@ -154,32 +243,38 @@ public class DashboardController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> GetNextDayRecommendation(int id)
     {
-        return RedirectToAction(nameof(Index), new { id, analysisType = AnalysisType.NextDay });
+        return RedirectToAction(nameof(Index), new { id, analysisType = AnalysisType.NextDayRecommendation });
     }
 
-    private async Task<AIAnalysisDto?> GetAnalysisForActivity(int athleteId, List<ActivityDto> activities, int? activityId)
+    // POST: Dashboard/GetNextDayRecommendationJson
+    [HttpPost]
+    public async Task<IActionResult> GetNextDayRecommendationJson(int id)
     {
-        if (activities.Count == 0)
-            return null;
+        try
+        {
+            var analysis = await _aiService.GetNextDayRecommendationAsync(id);
 
-        var activity = activityId.HasValue
-            ? activities.FirstOrDefault(item => item.Id == activityId.Value)
-            : activities.FirstOrDefault();
+            if (analysis == null)
+            {
+                return Json(new { success = false, error = "AI analysis failed" });
+            }
 
-        if (activity == null)
-            return null;
-
-        var workout = MapWorkout(activity);
-
-        return await _aiService.AnalyzeWorkoutAsync(athleteId, new List<WorkoutDataDto> { workout }, AnalysisType.Performance);
+            return Json(new { success = true, data = analysis });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, error = ex.Message });
+        }
     }
+
+
 
     private static WorkoutDataDto MapWorkout(ActivityDto activity)
     {
         return new WorkoutDataDto
         {
             Date = activity.StartDate,
-            ActivityType = activity.SportType,
+            ActivityType = activity.ActivityType,
             Distance = activity.Distance,
             MovingTime = activity.MovingTime,
             HeartRate = activity.AverageHeartRate,

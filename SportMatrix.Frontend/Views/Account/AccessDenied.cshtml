@@ -1,0 +1,60 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Access Denied";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Denied — SportMatrix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/tokens.css"     asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css"       asp-append-version="true" />
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-card denied-card">
+
+        <div class="denied-icon">
+            <i class="bi bi-shield-lock"></i>
+        </div>
+
+        <h1 class="denied-title">Access Restricted</h1>
+        <p class="denied-text">
+            Your account does not have permission to access this area.<br />
+            Only <strong>Admins</strong> can view the Dashboard and Athlete profiles.<br />
+            Contact your administrator if you believe this is an error.
+        </p>
+
+        <div class="denied-actions">
+            <a asp-controller="Home" asp-action="Index" class="denied-btn-outline" style="margin-right: 1rem;">
+                <i class="bi bi-house" style="margin-right:.4rem;"></i>
+                Return Home
+            </a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="auth-btn" style="width:auto; padding:.65rem 1.4rem;">
+                        <i class="bi bi-box-arrow-right" style="margin-right:.4rem;"></i>
+                        Sign Out
+                    </button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="auth-btn" style="display:inline-block; width:auto; padding:.65rem 1.4rem; text-decoration:none; text-align:center;">
+                    <i class="bi bi-box-arrow-in-right" style="margin-right:.4rem;"></i>
+                    Sign In
+                </a>
+            }
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

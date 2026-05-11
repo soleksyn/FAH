@@ -12,5 +12,7 @@ public interface IAthleteService
 
     Task UpdateAthleteAsync(UpdateAthleteDto athleteDto, CancellationToken cancellationToken);
 
+    Task<AthleteDto?> GetAthleteByEmailAsync(string email, CancellationToken cancellationToken);
+
     Task DeleteAthleteAsync(int id, CancellationToken cancellationToken);
 }

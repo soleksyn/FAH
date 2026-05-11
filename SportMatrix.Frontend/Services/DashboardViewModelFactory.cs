@@ -76,12 +76,14 @@ public class DashboardViewModelFactory
         {
             Id = activity.Id,
             Name = string.IsNullOrWhiteSpace(activity.Name) ? "Untitled activity" : activity.Name,
-            SportType = activity.SportType,
-            SportIcon = SportVisuals.GetIcon(activity.SportType),
-            SportCssClass = SportVisuals.GetCssClass(activity.SportType),
+            SportType = activity.ActivityType,
+            SportIcon = SportVisuals.GetIcon(activity.ActivityType),
+            SportCssClass = SportVisuals.GetCssClass(activity.ActivityType),
             Distance = $"{activity.Distance:F1} km",
             MovingTime = string.IsNullOrWhiteSpace(activity.MovingTime) ? "N/A" : activity.MovingTime,
-            StartDate = FormatDate(activity.StartDate)
+            StartDate = FormatDate(activity.StartDate),
+            AverageHeartRate = activity.AverageHeartRate,
+            Calories = activity.Calories
         };
     }
 

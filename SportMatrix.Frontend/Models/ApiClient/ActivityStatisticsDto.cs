@@ -25,6 +25,6 @@ public class ActivityStatisticsDto
     [JsonPropertyName("longestDistance")]
     public double? LongestDistance { get; set; }
 
-    [JsonPropertyName("mostCommonSport")]
-    public string? MostCommonSport { get; set; }
+    [JsonPropertyName("mostCommonActivityType")]
+    public string? MostCommonActivityType { get; set; }
 }

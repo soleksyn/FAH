@@ -24,7 +24,7 @@
 }
 
 <div class="form-card form-card-narrow">
-    <form method="post">
+    <form method="post" asp-antiforgery="true">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" style="@(ViewData.ModelState.IsValid ? "display:none" : "")"></div>
 
         <div class="form-section">
@@ -33,25 +33,26 @@
             <div class="form-row">
                 <div class="form-group">
                     <label asp-for="FirstName" class="form-label">First Name <span class="required">*</span></label>
-                    <input asp-for="FirstName" class="form-control" placeholder="Anna" />
+                    <input asp-for="FirstName" class="form-control" placeholder="e.g. Olena" autocomplete="given-name" />
                     <div asp-validation-for="FirstName" class="form-error"></div>
                 </div>
                 <div class="form-group">
                     <label asp-for="LastName" class="form-label">Last Name <span class="required">*</span></label>
-                    <input asp-for="LastName" class="form-control" placeholder="Schmidt" />
+                    <input asp-for="LastName" class="form-control" placeholder="e.g. Kovalenko" autocomplete="family-name" />
                     <div asp-validation-for="LastName" class="form-error"></div>
                 </div>
             </div>
 
             <div class="form-group">
                 <label asp-for="Email" class="form-label">Email <span class="required">*</span></label>
-                <input asp-for="Email" type="email" class="form-control" placeholder="anna@example.com" />
+                <input asp-for="Email" type="email" class="form-control" placeholder="e.g. athlete@sportmatrix.ua" autocomplete="email" />
                 <div asp-validation-for="Email" class="form-error"></div>
             </div>
 
             <div class="form-group">
                 <label asp-for="DateOfBirth" class="form-label">Date of Birth <span class="required">*</span></label>
-                <input asp-for="DateOfBirth" type="date" class="form-control" />
+                <input asp-for="DateOfBirth" type="date" class="form-control"
+                       min="1920-01-01" max="@DateTime.Today.ToString("yyyy-MM-dd")" />
                 <div asp-validation-for="DateOfBirth" class="form-error"></div>
             </div>
         </div>
@@ -62,12 +63,12 @@
             <div class="form-row">
                 <div class="form-group">
                     <label asp-for="Weight" class="form-label">Weight (kg) <span class="required">*</span></label>
-                    <input asp-for="Weight" type="number" step="0.1" min="20" max="300" class="form-control" placeholder="72.5" />
+                    <input asp-for="Weight" type="number" step="0.1" min="20" max="300" class="form-control" placeholder="e.g. 72.5" />
                     <div asp-validation-for="Weight" class="form-error"></div>
                 </div>
                 <div class="form-group">
                     <label asp-for="Height" class="form-label">Height (cm) <span class="required">*</span></label>
-                    <input asp-for="Height" type="number" step="0.1" min="100" max="250" class="form-control" placeholder="175" />
+                    <input asp-for="Height" type="number" step="0.1" min="100" max="250" class="form-control" placeholder="e.g. 178" />
                     <div asp-validation-for="Height" class="form-error"></div>
                 </div>
             </div>
@@ -75,15 +76,8 @@
 
         <div class="form-actions">
             <a asp-action="Index" class="btn btn-ghost">Cancel</a>
-            <button type="submit" class="btn btn-orange" disabled="@(Model.Submitting ? "disabled" : null)">
-                @if (Model.Submitting)
-                {
-                    <span class="spinner"></span>
-                }
-                else
-                {
-                    <i class="bi bi-person-plus-fill"></i>
-                }
+            <button type="submit" class="btn btn-orange">
+                <i class="bi bi-person-plus-fill"></i>
                 Save Athlete
             </button>
         </div>

@@ -59,19 +59,18 @@
                                 <div class="activity-meta">
                                     <span><i class="bi bi-map icon-orange"></i> @activity.Distance</span>
                                     <span><i class="bi bi-clock"></i> @activity.MovingTime</span>
+                                    @if (activity.AverageHeartRate.HasValue)
+                                    {
+                                        <span><i class="bi bi-heart-pulse text-danger"></i> @activity.AverageHeartRate.Value bpm</span>
+                                    }
+                                    @if (activity.Calories.HasValue)
+                                    {
+                                        <span><i class="bi bi-fire text-warning"></i> @activity.Calories.Value kcal</span>
+                                    }
                                     <span><i class="bi bi-calendar3"></i> @activity.StartDate</span>
                                 </div>
                             </div>
-                            @if (Model.Athlete != null)
-                            {
-                                <div class="activity-actions">
-                                    <form method="post" asp-action="AnalyzeWorkout" asp-route-id="@Model.Athlete.Id" asp-route-activityId="@activity.Id">
-                                        <button type="submit" class="btn btn-orange btn-sm">
-                                            <i class="bi bi-cpu"></i> Analyze
-                                        </button>
-                                    </form>
-                                </div>
-                            }
+
                         </div>
                     }
                 </div>
@@ -123,12 +122,18 @@
         </div>
     </div>
 
-    <div class="ai-panel">
+    <div class="ai-panel" id="aiPanel" data-athlete-id="@Model.Athlete?.Id">
         <div class="ai-panel-header">
             <i class="bi bi-stars"></i>
             AI Insights
         </div>
-        <div class="ai-panel-body">
+        <div class="ai-panel-body" style="position: relative;">
+            <!-- AI Spinner Loader -->
+            <div class="ai-panel-loader" id="aiLoader">
+                <div class="spinner"></div>
+                <div class="spinner-text">Analyzing...</div>
+            </div>
+            <div id="aiResults">
             @if (Model.AIAnalysis != null)
             {
                 @if (!string.IsNullOrEmpty(Model.AIAnalysis.Analysis))
@@ -173,72 +178,65 @@
 
                     <div class="ai-action-grid">
                         <div class="ai-action-card">
-                            <form method="post" asp-action="GetPerformanceTrends" asp-route-id="@Model.Athlete.Id">
-                                <button type="submit">
-                                    <div class="ai-action-icon"><i class="bi bi-graph-up"></i></div>
-                                    <div class="ai-action-title">Performance Trends</div>
-                                    <div class="ai-action-copy">Analyze your training patterns</div>
-                                </button>
-                            </form>
+                            <button type="button" class="ai-action-btn"
+                                    data-action="GetPerformanceTrends">
+                                <div class="ai-action-icon"><i class="bi bi-graph-up"></i></div>
+                                <div class="ai-action-title">Performance Trends</div>
+                                <div class="ai-action-copy">Analyze your training patterns</div>
+                            </button>
                         </div>
 
                         <div class="ai-action-card">
-                            <form method="post" asp-action="GetTrainingRecommendations" asp-route-id="@Model.Athlete.Id">
-                                <button type="submit">
-                                    <div class="ai-action-icon"><i class="bi bi-lightbulb"></i></div>
-                                    <div class="ai-action-title">Training Tips</div>
-                                    <div class="ai-action-copy">Get personalized recommendations</div>
-                                </button>
-                            </form>
+                            <button type="button" class="ai-action-btn"
+                                    data-action="GetTrainingRecommendations">
+                                <div class="ai-action-icon"><i class="bi bi-lightbulb"></i></div>
+                                <div class="ai-action-title">Training Tips</div>
+                                <div class="ai-action-copy">Get personalized recommendations</div>
+                            </button>
                         </div>
 
                         <div class="ai-action-card">
-                            <form method="post" asp-action="AnalyzeHealthMetrics" asp-route-id="@Model.Athlete.Id">
-                                <button type="submit">
-                                    <div class="ai-action-icon"><i class="bi bi-heart-pulse"></i></div>
-                                    <div class="ai-action-title">Health Analysis</div>
-                                    <div class="ai-action-copy">Review your health metrics</div>
-                                </button>
-                            </form>
+                            <button type="button" class="ai-action-btn"
+                                    data-action="GetHealthMetrics">
+                                <div class="ai-action-icon"><i class="bi bi-heart-pulse"></i></div>
+                                <div class="ai-action-title">Health Analysis</div>
+                                <div class="ai-action-copy">Review your health metrics</div>
+                            </button>
                         </div>
 
                         <div class="ai-action-card">
-                            <form method="post" asp-action="GetNextDayRecommendation" asp-route-id="@Model.Athlete.Id">
-                                <button type="submit">
-                                    <div class="ai-action-icon"><i class="bi bi-calendar-check"></i></div>
-                                    <div class="ai-action-title">Get Recommendation</div>
-                                    <div class="ai-action-copy">Plan your next workout</div>
-                                </button>
-                            </form>
+                            <button type="button" class="ai-action-btn"
+                                    data-action="GetNextDayRecommendation">
+                                <div class="ai-action-icon"><i class="bi bi-calendar-check"></i></div>
+                                <div class="ai-action-title">Plan Next Workout</div>
+                                <div class="ai-action-copy">Create a personalized next workout</div>
+                            </button>
                         </div>
                     </div>
                 </div>
             }
+            </div>
         </div>
 
         @if (Model.AIAnalysis != null && Model.Athlete != null)
         {
             <div class="quick-actions">
-                <form method="post" asp-action="GetPerformanceTrends" asp-route-id="@Model.Athlete.Id">
-                    <button type="submit" class="quick-action-btn">
-                        <i class="bi bi-graph-up"></i> Performance Trends
-                    </button>
-                </form>
-                <form method="post" asp-action="GetTrainingRecommendations" asp-route-id="@Model.Athlete.Id">
-                    <button type="submit" class="quick-action-btn">
-                        <i class="bi bi-lightbulb"></i> Training Tips
-                    </button>
-                </form>
-                <form method="post" asp-action="AnalyzeHealthMetrics" asp-route-id="@Model.Athlete.Id">
-                    <button type="submit" class="quick-action-btn">
-                        <i class="bi bi-heart-pulse"></i> Health Analysis
-                    </button>
-                </form>
-                <form method="post" asp-action="GetNextDayRecommendation" asp-route-id="@Model.Athlete.Id">
-                    <button type="submit" class="quick-action-btn">
-                        <i class="bi bi-calendar-check"></i> Get Recommendation
-                    </button>
-                </form>
+                <button type="button" class="quick-action-btn ai-action-btn"
+                        data-action="GetPerformanceTrends">
+                    <i class="bi bi-graph-up"></i> Performance Trends
+                </button>
+                <button type="button" class="quick-action-btn ai-action-btn"
+                        data-action="GetTrainingRecommendations">
+                    <i class="bi bi-lightbulb"></i> Training Tips
+                </button>
+                <button type="button" class="quick-action-btn ai-action-btn"
+                        data-action="GetHealthMetrics">
+                    <i class="bi bi-heart-pulse"></i> Health Analysis
+                </button>
+                <button type="button" class="quick-action-btn ai-action-btn"
+                        data-action="GetNextDayRecommendation">
+                        <i class="bi bi-calendar-check"></i> Plan Next Workout
+                </button>
             </div>
         }
     </div>
@@ -297,4 +295,5 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script type="application/json" id="dashboardChartData">@Html.Raw(chartData)</script>
     <script src="~/js/charts.js" asp-append-version="true"></script>
+    <script src="~/js/ai-dashboard.js" asp-append-version="true"></script>
 }

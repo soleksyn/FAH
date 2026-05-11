@@ -25,15 +25,15 @@ public class AIController : ControllerBase
         AIWorkoutAnalysisRequestDto request,
         CancellationToken cancellationToken)
     {
-        this.logger.LogInformation(
+        logger.LogInformation(
             "AI workout analysis request for {WorkoutCount} workouts, type: {AnalysisType}",
             request.RecentWorkouts?.Count ?? 0, request.AnalysisType ?? "General");
 
-        AIWorkoutAnalysisResponseDto result = await this.aiAssistant.GetWorkoutAnalysisAsync(request, cancellationToken);
+        AIWorkoutAnalysisResponseDto result = await aiAssistant.GetWorkoutAnalysisAsync(request, cancellationToken);
 
-        this.logger.LogInformation("AI analysis response generated from source: {Source}", result.Source);
+        logger.LogInformation("AI analysis response generated from source: {Source}", result.Source);
 
-        return this.Ok(result);
+        return Ok(result);
     }
 
     [HttpGet("health")]

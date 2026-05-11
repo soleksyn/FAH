@@ -85,10 +85,10 @@ public class WorkoutAnalysisService : IWorkoutAnalysisService
     {
         return analysisType switch
         {
-            AnalysisType.Health => "You are a sports medicine and recovery specialist. Analyze the athlete's training load for health risks, recovery status, and injury prevention. Be evidence-based and concise.",
-            AnalysisType.Performance => "You are an elite performance coach. Analyze the athlete's training data for performance trends, strengths, weaknesses, and opportunities to improve speed, power, or endurance.",
-            AnalysisType.Trends => "You are a fitness data analyst. Identify macro-level training patterns, consistency trends, and long-term trajectory from the provided workout history.",
-            AnalysisType.NextDay => "You are a recovery planning expert. Based on the athlete's recent workload, prescribe the optimal next-day activity and a specific recovery protocol.",
+            AnalysisType.HealthMetrics => "You are a sports medicine and recovery specialist. Analyze the athlete's training load for health risks, recovery status, and injury prevention. Be evidence-based and concise.",
+            AnalysisType.PerformanceTrends => "You are an elite performance coach. Analyze the athlete's training data for performance trends, strengths, weaknesses, and opportunities to improve speed, power, or endurance. Identify macro-level training patterns, consistency trends, and long-term trajectory from the provided workout history.",
+            AnalysisType.TrainingRecommendations => "You are an elite performance coach. Analyze the athlete's training data to provide actionable, data-driven insights and specific training recommendations.",
+            AnalysisType.NextDayRecommendation => "You are an elite performance coach specializing in workout programming. Analyze the athlete's complete training history from the last 14 days (workout types, intensity, volume, recovery patterns, and progression). Based on this two-week context, design a specific next workout recommendation including: exact activity type, target duration/distance, intended intensity (with heart rate zones if applicable), and the training purpose (e.g., recovery, endurance, speed, strength). Ensure the recommendation balances workload progression with adequate recovery.",
             _ => "You are a comprehensive fitness coach. Analyze the training data and provide actionable, data-driven insights."
         };
     }
@@ -101,20 +101,40 @@ public class WorkoutAnalysisService : IWorkoutAnalysisService
         }
 
         string workoutLines = string.Join("\n", request.RecentWorkouts.Select(w =>
-            $"- {w.Date:yyyy-MM-dd} | {w.ActivityType} | {w.Distance / 1000.0:F1} km | {TimeSpan.FromSeconds(w.Duration):hh\\:mm\\:ss} | {w.Calories} kcal"));
+            $"- {w.Date:yyyy-MM-dd} | {w.ActivityType} | {w.Distance / 1000.0:F1} km | {TimeSpan.FromSeconds(w.Duration):hh\\:mm\\:ss} | {FormatCalories(w.Calories)}{FormatAverageHeartRate(w)}"));
 
         string athleteContext = request.AthleteProfile is not null
             ? $"\nAthlete profile: Fitness level = {request.AthleteProfile.FitnessLevel}, Goal = {request.AthleteProfile.PrimaryGoal}."
             : string.Empty;
 
-        return $"Analyze the following recent workouts and return a structured JSON response.{athleteContext}\n\nWorkouts:\n{workoutLines}";
+        string taskContext = request.AnalysisType switch
+        {
+            AnalysisType.NextDayRecommendation =>
+                "The following workouts represent the athlete's complete training history over the last 14 days. Use this two-week context to design a specific next workout recommendation. Consider workout variety, intensity distribution, recovery needs, and progression.",
+            _ => "Analyze the following recent workouts and return a structured JSON response."
+        };
+
+        return $"{taskContext}{athleteContext}\n\nWorkouts:\n{workoutLines}";
+    }
+
+    private static string FormatCalories(int? calories)
+    {
+        return calories.HasValue ? $"{calories.Value} kcal" : "calories unavailable";
+    }
+
+    private static string FormatAverageHeartRate(WorkoutDataDto workout)
+    {
+        int? averageHeartRate = workout.AverageHeartRate
+            ?? (workout.MetricsData?.TryGetValue("averageHeartRate", out double value) == true ? (int)Math.Round(value) : null);
+
+        return averageHeartRate.HasValue ? $" | avg HR {averageHeartRate.Value} bpm" : string.Empty;
     }
 
     private WorkoutAnalysisResponseDto DeserializeResponse(string json)
     {
         if (string.IsNullOrWhiteSpace(json))
         {
-            return this.GetFallbackAnalysis(AnalysisType.Performance);
+            return this.GetFallbackAnalysis(AnalysisType.PerformanceTrends);
         }
 
         try
@@ -127,12 +147,12 @@ public class WorkoutAnalysisService : IWorkoutAnalysisService
             }
 
             this.logger.LogWarning("Gemini returned valid JSON but an empty analysis field");
-            return this.GetFallbackAnalysis(AnalysisType.Performance);
+            return this.GetFallbackAnalysis(AnalysisType.PerformanceTrends);
         }
         catch (JsonException ex)
         {
             this.logger.LogError(ex, "Failed to deserialize Gemini JSON response: {Json}", json);
-            return this.GetFallbackAnalysis(AnalysisType.Performance);
+            return this.GetFallbackAnalysis(AnalysisType.PerformanceTrends);
         }
     }
 

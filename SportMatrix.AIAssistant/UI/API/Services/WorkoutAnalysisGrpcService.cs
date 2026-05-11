@@ -1,4 +1,4 @@
-﻿namespace SportMatrix.AIAssistant.UI.API.Services;
+namespace SportMatrix.AIAssistant.UI.API.Services;
 
 using Grpc.Core;
 using SportMatrix.AIAssistant.Application.DTOs;
@@ -68,7 +68,7 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
 
             WorkoutAnalysisRequestDto analysisRequest = new WorkoutAnalysisRequestDto
             {
-                AnalysisType = AnalysisType.Trends,
+                AnalysisType = AnalysisType.PerformanceTrends,
                 RecentWorkouts = recentWorkouts,
                 AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(request.AthleteId, recentWorkouts),
                 AdditionalContext = new Dictionary<string, object>
@@ -110,7 +110,7 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
 
             WorkoutAnalysisRequestDto analysisRequest = new WorkoutAnalysisRequestDto
             {
-                AnalysisType = AnalysisType.Recommendations,
+                AnalysisType = AnalysisType.TrainingRecommendations,
                 RecentWorkouts = recentWorkouts,
                 AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(request.AthleteId, recentWorkouts),
                 AdditionalContext = new Dictionary<string, object>
@@ -152,6 +152,7 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
                 Distance = w.Distance,
                 Duration = w.Duration,
                 Calories = w.Calories,
+                AverageHeartRate = w.AverageHeartRate > 0 ? w.AverageHeartRate : null,
             }).ToList();
 
             if (recentWorkouts.Count == 0)
@@ -164,7 +165,7 @@ public class WorkoutAnalysisGrpcService : Sportmatrix.WorkoutService.WorkoutServ
 
             WorkoutAnalysisRequestDto analysisRequest = new WorkoutAnalysisRequestDto
             {
-                AnalysisType = AnalysisType.Health,
+                AnalysisType = AnalysisType.HealthMetrics,
                 RecentWorkouts = recentWorkouts,
                 AthleteProfile = this.workoutDataProvider.BuildAthleteProfile(request.AthleteId, recentWorkouts),
                 AdditionalContext = new Dictionary<string, object>

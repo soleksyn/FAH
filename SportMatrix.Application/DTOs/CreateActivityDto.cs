@@ -1,6 +1,7 @@
-namespace SportMatrix.Application.DTOs;
+﻿namespace SportMatrix.Application.DTOs;
 
 using System.ComponentModel.DataAnnotations;
+using SportMatrix.Domain.Enums;
 using System.Text.Json.Serialization;
 
 public class CreateActivityDto
@@ -20,7 +21,7 @@ public class CreateActivityDto
 
     public double TotalElevationGain { get; set; }
 
-    public string SportType { get; set; } = string.Empty;
+    public ActivityType ActivityType { get; set; }
 
     public DateTime StartDate { get; set; }
 
@@ -42,8 +43,12 @@ public class CreateActivityDto
 
     public double? AverageCadence { get; set; }
 
-    [JsonIgnore] // Wird nur f�r die Antwort berechnet, nicht im Request erwartet
+    [JsonIgnore] // Wird nur für die Antwort berechnet, nicht im Request erwartet
     public string? CalculatedPace => this.Distance > 0 && this.MovingTimeSeconds > 0
         ? $"{TimeSpan.FromSeconds(this.MovingTimeSeconds / this.Distance * 1000).Minutes}:{TimeSpan.FromSeconds(this.MovingTimeSeconds / this.Distance * 1000).Seconds:D2} min/km"
         : null;
 }
+
+
+
+

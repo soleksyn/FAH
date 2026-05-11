@@ -15,6 +15,7 @@ public static class WorkoutDataExtensions
             Distance = dto.Distance,
             Duration = dto.Duration,
             Calories = dto.Calories,
+            AverageHeartRate = dto.AverageHeartRate,
             MetricsData = dto.MetricsData,
         };
     }
@@ -28,6 +29,7 @@ public static class WorkoutDataExtensions
             Distance = domain.Distance,
             Duration = domain.Duration,
             Calories = domain.Calories,
+            AverageHeartRate = domain.AverageHeartRate,
             MetricsData = domain.MetricsData,
         };
     }
@@ -41,6 +43,7 @@ public static class WorkoutDataExtensions
             Distance = grpcWorkout.Distance,
             Duration = grpcWorkout.Duration,
             Calories = grpcWorkout.Calories,
+            AverageHeartRate = grpcWorkout.AverageHeartRate > 0 ? grpcWorkout.AverageHeartRate : null,
             MetricsData = null,
         };
     }
@@ -54,6 +57,7 @@ public static class WorkoutDataExtensions
             Distance = grpcWorkout.Distance,
             Duration = grpcWorkout.Duration,
             Calories = grpcWorkout.Calories,
+            AverageHeartRate = grpcWorkout.AverageHeartRate,
         };
     }
 
@@ -65,7 +69,7 @@ public static class WorkoutDataExtensions
             AthleteProfile = grpcJsonRequest.AthleteProfile?.ToAthleteProfileDto(),
             RecentWorkouts = grpcJsonRequest.RecentWorkouts?.Select(w => w.ToWorkoutDataDto()).ToList()
                             ?? new List<WorkoutDataDto>(),
-            AnalysisType = Enum.TryParse<AnalysisType>(grpcJsonRequest.AnalysisType, ignoreCase: true, out var type) ? type : AnalysisType.Performance,
+            AnalysisType = Enum.TryParse<AnalysisType>(grpcJsonRequest.AnalysisType, ignoreCase: true, out var type) ? type : AnalysisType.PerformanceTrends,
         };
     }
 }

@@ -18,7 +18,7 @@ public class AthleteCreateViewModel
 
     [Required(ErrorMessage = "Date of birth is required.")]
     [DataType(DataType.Date)]
-    public DateTime DateOfBirth { get; set; }
+    public DateTime? DateOfBirth { get; set; }
 
     [Required(ErrorMessage = "Weight is required.")]
     [Range(20, 300, ErrorMessage = "Weight must be between 20 and 300 kg.")]
@@ -29,5 +29,4 @@ public class AthleteCreateViewModel
     public double Height { get; set; }
 
     public string? Error { get; set; }
-    public bool Submitting { get; set; } = false;
 }

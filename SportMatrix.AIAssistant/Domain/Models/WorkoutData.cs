@@ -12,5 +12,7 @@ public class WorkoutData
 
     public int? Calories { get; set; }
 
+    public int? AverageHeartRate { get; set; }
+
     public Dictionary<string, double>? MetricsData { get; set; } // Heart rate, pace, etc.
 }

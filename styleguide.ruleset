@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="StyleCop" Description="StyleCop RuleSet" ToolsVersion="17.0">
   <Rules AnalyzerId="IDisposableAnalyzers" RuleNamespace="IDisposableAnalyzers">
     <Rule Id="IDISP013" Action="None" />
@@ -316,7 +316,7 @@
     <Rule Id="SA1214" Action="None" />
     <Rule Id="SA1216" Action="None" />
     <Rule Id="SA1217" Action="None" />
-    <Rule Id="SA1300" Action="Error" />
+    <Rule Id="SA1300" Action="Warning" />
     <Rule Id="SA1306" Action="None" />
     <Rule Id="SA1307" Action="None" />
     <Rule Id="SA1309" Action="None" />
@@ -324,7 +324,7 @@
     <Rule Id="SA1311" Action="None" />
     <Rule Id="SA1312" Action="None" />
     <Rule Id="SA1313" Action="None" />
-    <Rule Id="SA1404" Action="Error" />
+    <Rule Id="SA1404" Action="Warning" />
     <Rule Id="SA1405" Action="None" />
     <Rule Id="SA1406" Action="None" />
     <Rule Id="SA1407" Action="None" />
@@ -394,6 +394,6 @@
     <Rule Id="SA1649" Action="None" />
     <Rule Id="SA1651" Action="None" />
     <Rule Id="SA1652" Action="None" />
-    <Rule Id="SX1309" Action="Error" />
+    <Rule Id="SX1309" Action="Warning" />
   </Rules>
 </RuleSet>

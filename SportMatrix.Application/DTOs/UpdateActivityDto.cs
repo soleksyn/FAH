@@ -1,3 +1,5 @@
+using SportMatrix.Domain.Enums;
+
 namespace SportMatrix.Application.DTOs;
 
 public class UpdateActivityDto
@@ -16,7 +18,7 @@ public class UpdateActivityDto
 
     public double TotalElevationGain { get; set; }
 
-    public string SportType { get; set; } = string.Empty;
+    public ActivityType ActivityType { get; set; }
 
     public DateTime StartDate { get; set; }
 
